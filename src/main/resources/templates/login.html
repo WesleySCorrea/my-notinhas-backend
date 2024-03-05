@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login com Google</title>
+</head>
+<body>
+<h1>Login com Google</h1>
+<p>Clique no botão abaixo para fazer login com o Google:</p>
+<button onclick="redirectToGoogleLogin()">Login com Google</button>
+
+<script>
+        function redirectToGoogleLogin() {
+            window.location.href = "/api/oauth2/authorization/google"; // Endpoint para o login com o Google
+        }
+    </script>
+</body>
+</html>

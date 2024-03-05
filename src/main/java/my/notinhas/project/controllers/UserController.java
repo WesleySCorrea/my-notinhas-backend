@@ -1,0 +1,57 @@
+package my.notinhas.project.controllers;
+
+import lombok.AllArgsConstructor;
+import my.notinhas.project.dtos.UserDTO;
+import my.notinhas.project.services.IUserService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@AllArgsConstructor
+@RequestMapping("/user")
+public class UserController {
+
+    private final IUserService service;
+
+    @GetMapping
+    public ResponseEntity<List<UserDTO>> findAll() {
+
+        List<UserDTO> users = this.service.findAll();
+
+        return ResponseEntity.ok().body(users);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<UserDTO> findById(@PathVariable Long id) {
+
+        UserDTO user = this.service.findByID(id);
+
+        return ResponseEntity.ok().body(user);
+    }
+
+    @PostMapping
+    public ResponseEntity<UserDTO> save(@RequestBody UserDTO userDTO) {
+
+        UserDTO user = this.service.saveUsers(userDTO);
+
+        return ResponseEntity.ok(user);
+    }
+
+//    @PatchMapping("/{id}")
+//    public ResponseEntity<UserDTO> update(@RequestBody UserDTO userDTO, @PathVariable Long id) {
+//
+//        UserDTO userUpdated = this.service.updateUser(userDTO, id);
+//
+//        return ResponseEntity.ok(userUpdated);
+//    }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<Void> delete (@PathVariable Long id) {
+
+        this.service.deleteByID(id);
+
+        return ResponseEntity.noContent().build();
+    }
+}
