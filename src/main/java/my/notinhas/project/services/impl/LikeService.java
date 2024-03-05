@@ -1,7 +1,7 @@
 package my.notinhas.project.services.impl;
 
-import my.notinhas.project.dtos.LikesDTO;
 import my.notinhas.project.entities.Likes;
+import my.notinhas.project.dtos.LikesDTO;
 import my.notinhas.project.services.ILikeService;
 import org.springframework.stereotype.Service;
 
