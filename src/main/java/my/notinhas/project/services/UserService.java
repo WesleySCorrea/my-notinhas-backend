@@ -5,11 +5,13 @@ import my.notinhas.project.dtos.auth.IdTokenDTO;
 
 import java.util.List;
 
-public interface IUserService {
+public interface UserService {
 
     List<UserDTO> findAll();
 
     UserDTO findByID(Long id);
+
+    UserDTO findByEmail(String email);
 
     UserDTO saveUsers(UserDTO userDTO);
 
@@ -17,5 +19,4 @@ public interface IUserService {
 
     void deleteByID(Long id);
 
-    IdTokenDTO validateIdToken(String idToken);
 }

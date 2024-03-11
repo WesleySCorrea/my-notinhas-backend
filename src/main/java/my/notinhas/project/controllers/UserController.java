@@ -2,8 +2,7 @@ package my.notinhas.project.controllers;
 
 import lombok.AllArgsConstructor;
 import my.notinhas.project.dtos.UserDTO;
-import my.notinhas.project.dtos.auth.IdTokenDTO;
-import my.notinhas.project.services.IUserService;
+import my.notinhas.project.services.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +14,7 @@ import java.util.List;
 @RequestMapping("/user")
 public class UserController {
 
-    private final IUserService service;
+    private final UserService service;
 
     @GetMapping
     public ResponseEntity<List<UserDTO>> findAll() {
@@ -55,17 +54,5 @@ public class UserController {
         this.service.deleteByID(id);
 
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/getinfo/{accessToken}")
-    public ResponseEntity<IdTokenDTO> getInfo(@PathVariable String accessToken) {
-
-        IdTokenDTO idTokenDTO = service.validateIdToken(accessToken);
-
-        if (idTokenDTO != null) {
-            return ResponseEntity.status(HttpStatus.CREATED).body(idTokenDTO); // Token válido, retorna 200
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build(); // Token inválido, retorna 400
-        }
     }
 }

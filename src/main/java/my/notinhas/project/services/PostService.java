@@ -2,12 +2,10 @@ package my.notinhas.project.services;
 
 import my.notinhas.project.dtos.PostDTO;
 import my.notinhas.project.dtos.PostResponseDTO;
-import my.notinhas.project.dtos.UserDTO;
-import my.notinhas.project.entities.Posts;
 
 import java.util.List;
 
-public interface IPostService {
+public interface PostService {
 
     List<PostResponseDTO> findAll();
 

@@ -7,10 +7,9 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class NotPermissionException extends RuntimeException {
+public class UnauthorizedAccessTokenException extends RuntimeException {
 
-//    EXCEPTION PERSONALIZADA
-    public NotPermissionException(String msg){
+    public UnauthorizedAccessTokenException(String msg) {
         super(msg);
     }
 }

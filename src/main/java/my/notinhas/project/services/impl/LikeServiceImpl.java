@@ -1,14 +1,11 @@
 package my.notinhas.project.services.impl;
 
-import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import my.notinhas.project.dtos.LikeDTO;
 import my.notinhas.project.dtos.LikeResponseDTO;
-import my.notinhas.project.dtos.PostDTO;
 import my.notinhas.project.entities.Likes;
-import my.notinhas.project.entities.Posts;
 import my.notinhas.project.repositories.LikeRepository;
-import my.notinhas.project.services.ILikeService;
+import my.notinhas.project.services.LikeService;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -19,7 +16,7 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
-public class LikeService implements ILikeService {
+public class LikeServiceImpl implements LikeService {
 
     private final LikeRepository repository;
     private final ModelMapper mapper;

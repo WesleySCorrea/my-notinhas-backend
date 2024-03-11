@@ -3,7 +3,7 @@ package my.notinhas.project.controllers;
 import lombok.AllArgsConstructor;
 import my.notinhas.project.dtos.LikeDTO;
 import my.notinhas.project.dtos.LikeResponseDTO;
-import my.notinhas.project.services.ILikeService;
+import my.notinhas.project.services.LikeService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +15,7 @@ import java.util.List;
 @RequestMapping("/like")
 public class LikeController {
 
-    private final ILikeService service;
+    private final LikeService service;
 
     @GetMapping
     public ResponseEntity<List<LikeResponseDTO>> findAll() {

@@ -1,14 +1,11 @@
 package my.notinhas.project.services.impl;
 
 import lombok.AllArgsConstructor;
-import my.notinhas.project.dtos.LikeDTO;
 import my.notinhas.project.dtos.PostDTO;
 import my.notinhas.project.dtos.PostResponseDTO;
-import my.notinhas.project.dtos.UserDTO;
-import my.notinhas.project.entities.Likes;
 import my.notinhas.project.entities.Posts;
 import my.notinhas.project.repositories.PostRepository;
-import my.notinhas.project.services.IPostService;
+import my.notinhas.project.services.PostService;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -19,7 +16,7 @@ import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
-public class PostService implements IPostService {
+public class PostServiceImpl implements PostService {
 
     private final PostRepository repository;
     private final ModelMapper mapper;

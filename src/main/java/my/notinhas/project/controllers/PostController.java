@@ -3,7 +3,7 @@ package my.notinhas.project.controllers;
 import lombok.AllArgsConstructor;
 import my.notinhas.project.dtos.PostDTO;
 import my.notinhas.project.dtos.PostResponseDTO;
-import my.notinhas.project.services.IPostService;
+import my.notinhas.project.services.PostService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +15,7 @@ import java.util.List;
 @RequestMapping("/post")
 public class PostController {
 
-    private final IPostService service;
+    private final PostService service;
 
     @GetMapping
     public ResponseEntity<List<PostResponseDTO>> findAll() {
