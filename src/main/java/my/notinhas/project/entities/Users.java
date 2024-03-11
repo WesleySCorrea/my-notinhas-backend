@@ -4,11 +4,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
 @Entity
 @Getter
+@Setter
 @Table(name = "users")
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class Users {
