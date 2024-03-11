@@ -33,7 +33,6 @@ public class Users {
     private String locale;
     @Column(name = "picture")
     private String picture;
-    @JsonIgnore
     @OneToMany(mappedBy = "user")
     private List<Posts> posts;
 

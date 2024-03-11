@@ -20,11 +20,10 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class PostDTO {
     private Long id;
-    private String userName;
     private LocalDate date;
     private String content;
     private Boolean active;
-    private Users user;
+    private UserDTO user;
     private Long totalLikes;
     private List<LikeDTO> likes = new ArrayList<>();
 

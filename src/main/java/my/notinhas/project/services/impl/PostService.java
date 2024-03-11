@@ -37,9 +37,11 @@ public class PostService implements IPostService {
             post.calculateTotalLikesAndDeslikes(post.getLikes());
         }
 
-        return postsDTO.stream()
-                .map(post -> mapper.map(postsDTO, PostResponseDTO.class))
+        List<PostResponseDTO> essa = postsDTO.stream()
+                .map(post -> mapper.map(post, PostResponseDTO.class))
                 .collect(Collectors.toList());
+
+        return essa;
     }
 
     @Override

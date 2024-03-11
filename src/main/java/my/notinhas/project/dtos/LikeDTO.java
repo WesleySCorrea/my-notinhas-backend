@@ -17,6 +17,5 @@ import my.notinhas.project.enums.Value;
 public class LikeDTO {
     private Long id;
     private Value value;
-    @NotNull
     private Posts post;
 }

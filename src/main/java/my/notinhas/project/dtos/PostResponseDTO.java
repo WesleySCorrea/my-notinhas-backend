@@ -16,11 +16,10 @@ import java.time.LocalDate;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class PostResponseDTO {
     private Long id;
-    private String userName;
     private LocalDate date;
     private String content;
     private Boolean active;
-    private Users user;
+    private UserDTO user;
     private Long totalLikes;
 
 }

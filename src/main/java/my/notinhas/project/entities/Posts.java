@@ -19,8 +19,6 @@ public class Posts {
     @Column(name = "id", unique = true)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "user_name")
-    private String userName;
     @Column(name = "date")
     private LocalDate date;
     @Column(name = "content")
