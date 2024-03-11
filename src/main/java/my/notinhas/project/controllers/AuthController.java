@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import my.notinhas.project.dtos.UserDTO;
 import my.notinhas.project.dtos.auth.IdTokenDTO;
 import my.notinhas.project.dtos.auth.LoginDTO;
+import my.notinhas.project.dtos.auth.LoginRequestDTO;
 import my.notinhas.project.services.AuthService;
 import my.notinhas.project.services.UserService;
 import org.springframework.http.HttpStatus;
@@ -17,18 +18,18 @@ public class AuthController {
 
     private final AuthService service;
 
-    @PostMapping("/login/{accessToken}")
-    public ResponseEntity<LoginDTO> login(@PathVariable String accessToken) {
+    @PostMapping("/login")
+    public ResponseEntity<LoginDTO> login(@RequestBody LoginRequestDTO loginRequestDTO) {
 
-        LoginDTO loginDTO = service.login(accessToken);
+        LoginDTO loginDTO = service.login(loginRequestDTO.getAccessToken());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(loginDTO);
     }
 
-    @PostMapping("/idtoken/{accessToken}")
-    public ResponseEntity<IdTokenDTO> createIdToken(@PathVariable String accessToken) {
+    @PostMapping("/idtoken")
+    public ResponseEntity<IdTokenDTO> createIdToken(@RequestBody LoginRequestDTO loginRequestDTO) {
 
-        IdTokenDTO idTokenDTO = service.createIdToken(accessToken);
+        IdTokenDTO idTokenDTO = service.createIdToken(loginRequestDTO.getAccessToken());
 
         if (idTokenDTO != null) {
             return ResponseEntity.status(HttpStatus.CREATED).body(idTokenDTO);

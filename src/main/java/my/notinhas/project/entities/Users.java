@@ -1,6 +1,5 @@
 package my.notinhas.project.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -33,7 +32,7 @@ public class Users {
     private String locale;
     @Column(name = "picture")
     private String picture;
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Posts> posts;
 
 }

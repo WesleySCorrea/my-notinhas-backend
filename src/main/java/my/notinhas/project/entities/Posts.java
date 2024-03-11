@@ -25,7 +25,7 @@ public class Posts {
     private String content;
     @Column(name = "active")
     private Boolean active;
-    @OneToMany(mappedBy = "post")
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<Likes> likes;
     @ManyToOne
     @JoinColumn(name = "user_id")

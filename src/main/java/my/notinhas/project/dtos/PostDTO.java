@@ -5,8 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import my.notinhas.project.entities.Likes;
-import my.notinhas.project.entities.Users;
 import my.notinhas.project.enums.Value;
 
 import java.time.LocalDate;
