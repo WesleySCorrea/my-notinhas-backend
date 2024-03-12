@@ -31,18 +31,6 @@ public class AuthController {
 
         IdTokenDTO idTokenDTO = service.createIdToken(loginRequestDTO.getAccessToken());
 
-        if (idTokenDTO != null) {
-            return ResponseEntity.status(HttpStatus.CREATED).body(idTokenDTO);
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
-    }
-
-    @PostMapping("/register/{accessToken}")
-    public ResponseEntity<UserDTO> registerUser(@PathVariable String accessToken) {
-
-        UserDTO userDTO = service.register(accessToken);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(userDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(idTokenDTO);
     }
 }

@@ -13,6 +13,8 @@ public interface UserService {
 
     UserDTO findByEmail(String email);
 
+    Boolean existsByEmail(String email);
+
     UserDTO saveUsers(UserDTO userDTO);
 
     UserDTO updateUser(UserDTO userDTO, Long id);

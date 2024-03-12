@@ -42,11 +42,14 @@ public class AuthServiceImpl implements AuthService {
 
         GetInfo getInfo = requests.getInfo(idTokenDTO.access_token);
 
-        UserDTO userDTO = service.findByEmail(getInfo.getEmail());
+        UserDTO userDTO;
+        if (service.existsByEmail(getInfo.getEmail())) {
+            userDTO = service.findByEmail(getInfo.getEmail());
+        } else {
+            userDTO = this.register(getInfo);
+        }
 
-        LoginDTO loginDTO = new LoginDTO(idTokenDTO, userDTO);
-
-        return loginDTO;
+        return new LoginDTO(idTokenDTO, userDTO);
     }
 
     @Override
@@ -64,9 +67,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public UserDTO register(String accessToken) {
-
-        GetInfo getInfo = requests.getInfo(accessToken);
+    public UserDTO register(GetInfo getInfo) {
 
         UserDTO userDTO = createUserDTOWithUserName(getInfo);
 

@@ -56,6 +56,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Boolean existsByEmail(String email) {
+
+        return repository.existsByEmail(email);
+    }
+
+    @Override
     public UserDTO saveUsers(UserDTO userDTO) {
 
         Users request = mapper.map(userDTO, Users.class);
