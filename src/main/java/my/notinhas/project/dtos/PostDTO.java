@@ -23,17 +23,5 @@ public class PostDTO {
     private Boolean active;
     private UserDTO user;
     private Long totalLikes;
-    private List<LikeDTO> likes = new ArrayList<>();
-
-    public void calculateTotalLikesAndDeslikes(List<LikeDTO> likes) {
-        this.totalLikes = 0L;
-
-        for (LikeDTO like : likes) {
-            if (like.getValue() == Value.LIKE) {
-                this.totalLikes++;
-            } else if (like.getValue() == Value.DESLIKE) {
-                this.totalLikes--;
-            }
-        }
-    }
+    private List<LikeDTO> likes;
 }

@@ -2,12 +2,14 @@ package my.notinhas.project.services;
 
 import my.notinhas.project.dtos.PostDTO;
 import my.notinhas.project.dtos.PostResponseDTO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
 public interface PostService {
 
-    List<PostResponseDTO> findAll();
+    Page<PostResponseDTO> findAll(Pageable pageable);
 
     PostResponseDTO findByID(Long id);
 

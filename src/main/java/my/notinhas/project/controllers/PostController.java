@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import my.notinhas.project.dtos.PostDTO;
 import my.notinhas.project.dtos.PostResponseDTO;
 import my.notinhas.project.services.PostService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,9 +20,9 @@ public class PostController {
     private final PostService service;
 
     @GetMapping
-    public ResponseEntity<List<PostResponseDTO>> findAll() {
+    public ResponseEntity<Page<PostResponseDTO>> findAll(Pageable pageable) {
 
-        List<PostResponseDTO> posts = this.service.findAll();
+        Page<PostResponseDTO> posts = this.service.findAll(pageable);
 
         return ResponseEntity.ok().body(posts);
     }

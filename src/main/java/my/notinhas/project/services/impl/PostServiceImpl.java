@@ -8,6 +8,9 @@ import my.notinhas.project.repositories.PostRepository;
 import my.notinhas.project.services.PostService;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,23 +25,19 @@ public class PostServiceImpl implements PostService {
     private final ModelMapper mapper;
 
     @Override
-    public List<PostResponseDTO> findAll() {
+    public Page<PostResponseDTO> findAll(Pageable pageable) {
 
-        List<Posts> posts = this.repository.findAll();
+        Page<Posts> posts = this.repository.findAll(pageable);
 
-        List<PostDTO> postsDTO = posts.stream()
-                .map(post -> mapper.map(post, PostDTO.class))
-                .collect(Collectors.toList());
-
-        for (PostDTO post: postsDTO) {
+        for (Posts post: posts) {
             post.calculateTotalLikesAndDeslikes(post.getLikes());
         }
 
-        List<PostResponseDTO> essa = postsDTO.stream()
+        List<PostResponseDTO> postResponseDTO = posts.stream()
                 .map(post -> mapper.map(post, PostResponseDTO.class))
                 .collect(Collectors.toList());
 
-        return essa;
+        return new PageImpl<>(postResponseDTO, pageable, posts.getTotalElements());
     }
 
     @Override
@@ -47,12 +46,10 @@ public class PostServiceImpl implements PostService {
         Posts post = this.repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Post with ID " + id + " not found."));
 
-        PostDTO postDTO =  mapper.map(post, PostDTO.class);
-
-        postDTO.calculateTotalLikesAndDeslikes(postDTO.getLikes());
+        post.calculateTotalLikesAndDeslikes(post.getLikes());
 
 
-        return mapper.map(postDTO, PostResponseDTO.class);
+        return mapper.map(post, PostResponseDTO.class);
     }
 
     @Override
