@@ -2,15 +2,19 @@ package my.notinhas.project.controllers;
 
 import lombok.AllArgsConstructor;
 import my.notinhas.project.dtos.PostDTO;
-import my.notinhas.project.dtos.PostResponseDTO;
+import my.notinhas.project.dtos.UserDTO;
+import my.notinhas.project.dtos.request.PostRequestDTO;
+import my.notinhas.project.dtos.response.PostPublicResponseDTO;
+import my.notinhas.project.dtos.response.PostResponseDTO;
+import my.notinhas.project.entities.Users;
 import my.notinhas.project.services.PostService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @AllArgsConstructor
@@ -19,7 +23,15 @@ public class PostController {
 
     private final PostService service;
 
-    @GetMapping
+    @GetMapping("/public")
+    public ResponseEntity<Page<PostPublicResponseDTO>> findAllPublic(Pageable pageable) {
+
+        Page<PostPublicResponseDTO> posts = this.service.findAllPublic(pageable);
+
+        return ResponseEntity.ok().body(posts);
+    }
+
+    @GetMapping()
     public ResponseEntity<Page<PostResponseDTO>> findAll(Pageable pageable) {
 
         Page<PostResponseDTO> posts = this.service.findAll(pageable);
@@ -29,6 +41,7 @@ public class PostController {
 
     @GetMapping("/{id}")
     public ResponseEntity<PostResponseDTO> findById(@PathVariable Long id) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         PostResponseDTO post = this.service.findByID(id);
 
@@ -36,17 +49,26 @@ public class PostController {
     }
 
     @PostMapping
-    public ResponseEntity<PostDTO> save(@RequestBody PostDTO postDTO) {
+    public ResponseEntity<PostDTO> save(@RequestBody PostRequestDTO postRequestDTO) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        PostDTO post = this.service.savePost(postDTO);
+        UserDTO user = (UserDTO) authentication.getPrincipal();
+        postRequestDTO.setUser(user);
+
+        PostDTO post = this.service.savePost(postRequestDTO);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(post);
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<PostDTO> update(@RequestBody PostDTO postDTO, @PathVariable Long id) {
+    public ResponseEntity<PostDTO> update(@RequestBody PostRequestDTO postRequestDTO, @PathVariable Long id) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        PostDTO postUpdated = this.service.updatePost(postDTO, id);
+        UserDTO user = (UserDTO) authentication.getPrincipal();
+        postRequestDTO.setUser(user);
+
+
+        PostDTO postUpdated = this.service.updatePost(postRequestDTO, id);
 
         return ResponseEntity.ok(postUpdated);
     }

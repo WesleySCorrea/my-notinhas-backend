@@ -6,32 +6,27 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
-import my.notinhas.project.dtos.UserDTO;
-import my.notinhas.project.dtos.auth.GetInfo;
 import my.notinhas.project.dtos.auth.IdTokenDTO;
-import my.notinhas.project.exception.runtime.CallHttpErrorException;
-import my.notinhas.project.exception.runtime.UnauthorizedAccessTokenException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
 
 @Component
-public class Requests {
+public class HttpRequests {
     @Autowired
     private ObjectMapper objectMapper;
     @Value("${google.client-id}")
     private String clientId;
     @Value("${google.client-secret}")
     private String clientSecret;
+
 
     public IdTokenDTO idTokenRequest(String access_token) {
 
@@ -50,7 +45,8 @@ public class Requests {
                     .bodyToMono(String.class)
                     .block();
         } catch (Exception e) {
-            throw new CallHttpErrorException("Error making the HTTP call: " + e.getMessage());
+//            throw new CallHttpErrorException("Error making the HTTP call: " + e.getMessage());
+            throw new RuntimeException("Error making the HTTP call: " + e.getMessage());
         }
 
         if (idTokenString != null) {
@@ -62,42 +58,13 @@ public class Requests {
         }
         return null;
     }
-
-    public GetInfo getInfo(String accessToken) {
-        WebClient webClient = WebClient.create("https://www.googleapis.com");
-
-        String getInfoString;
-        try {
-            getInfoString = webClient.get()
-                    .uri("/oauth2/v2/userinfo")
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                    .retrieve()
-                    .bodyToMono(String.class)
-                    .block();
-        } catch (WebClientResponseException.Unauthorized e) {
-            throw new UnauthorizedAccessTokenException("Access token is unauthorized or invalid");
-        } catch (Exception e) {
-            throw new CallHttpErrorException("Error making the HTTP call: " + e.getMessage());
-        }
-
-        if (getInfoString != null) {
-            try {
-                return objectMapper.readValue(getInfoString, GetInfo.class);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        return null;
-    }
-
     public Boolean validedTokenId (IdTokenDTO idTokenDTO) {
-        String CLIENT_ID = clientId;
 
         NetHttpTransport transport = new NetHttpTransport();
         JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
 
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(transport, jsonFactory)
-                .setAudience(Collections.singletonList(CLIENT_ID))
+                .setAudience(Collections.singletonList(clientId))
                 .build();
 
         try {
@@ -108,4 +75,50 @@ public class Requests {
         }
         return true;
     }
+
+//    public GetInfo getInfo(String accessToken) {
+//        WebClient webClient = WebClient.create("https://www.googleapis.com");
+//
+//        String getInfoString;
+//        try {
+//            getInfoString = webClient.get()
+//                    .uri("/oauth2/v2/userinfo")
+//                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+//                    .retrieve()
+//                    .bodyToMono(String.class)
+//                    .block();
+//        } catch (WebClientResponseException.Unauthorized e) {
+//            throw new UnauthorizedAccessTokenException("Access token is unauthorized or invalid");
+//        } catch (Exception e) {
+//            throw new CallHttpErrorException("Error making the HTTP call: " + e.getMessage());
+//        }
+//
+//        if (getInfoString != null) {
+//            try {
+//                return objectMapper.readValue(getInfoString, GetInfo.class);
+//            } catch (JsonProcessingException e) {
+//                throw new RuntimeException(e);
+//            }
+//        }
+//        return null;
+//    }
+
+//    public IdTokenInfoDTO getIdToken(String idToken) {
+//
+//        WebClient webClient = WebClient.create("https://www.googleapis.com");
+//
+//        try {
+//            IdTokenInfoDTO idTokenInfo = webClient.get()
+//                    .uri("/oauth2/v1/tokeninfo?id_token=" + idToken)
+//                    .retrieve()
+//                    .bodyToMono(IdTokenInfoDTO.class)
+//                    .block();
+//
+//            return idTokenInfo;
+//        } catch (WebClientResponseException e) {
+//            throw new UnauthorizedAccessTokenException("Access token is unauthorized or invalid");
+//        } catch (Exception e) {
+//            throw new CallHttpErrorException("Error making the HTTP call: " + e.getMessage());
+//        }
+//    }
 }

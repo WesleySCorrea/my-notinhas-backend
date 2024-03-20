@@ -1,10 +1,11 @@
-package my.notinhas.project.dtos;
+package my.notinhas.project.dtos.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import my.notinhas.project.dtos.UserDTO;
 
 import java.time.LocalDate;
 
@@ -13,12 +14,10 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class PostResponseDTO {
+public class PostPublicResponseDTO {
     private Long id;
     private LocalDate date;
     private String content;
     private Boolean active;
     private UserDTO user;
-    private Long totalLikes;
-
 }

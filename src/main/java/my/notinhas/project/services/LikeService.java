@@ -1,7 +1,7 @@
 package my.notinhas.project.services;
 
 import my.notinhas.project.dtos.LikeDTO;
-import my.notinhas.project.dtos.LikeResponseDTO;
+import my.notinhas.project.dtos.response.LikeResponseDTO;
 
 import java.util.List;
 

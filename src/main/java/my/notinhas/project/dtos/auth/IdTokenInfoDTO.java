@@ -12,18 +12,18 @@
 //@NoArgsConstructor
 //@AllArgsConstructor
 //@JsonInclude(JsonInclude.Include.NON_EMPTY)
-//public class GetInfo {
-//
-//    @JsonProperty("id")
-//    private String googleId;
+//public class IdTokenInfoDTO {
+//    @JsonProperty("issued_to")
+//    private String issuedTo;
+//    private String audience;
+//    @JsonProperty("user_id")
+//    private String userId;
+//    @JsonProperty("expires_in")
+//    private int expiresIn;
 //    private String email;
-//    @JsonProperty("verified_email")
-//    private boolean verifiedEmail;
-//    private String name;
-//    @JsonProperty("given_name")
-//    private String firstName;
-//    @JsonProperty("family_name")
-//    private String lastName;
-//    private String locale;
-//    private String picture;
+//    @JsonProperty("email_verified")
+//    private boolean emailVerified;
+//    private String issuer;
+//    @JsonProperty("issued_at")
+//    private long issuedAt;
 //}

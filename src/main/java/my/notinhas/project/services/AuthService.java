@@ -1,12 +1,12 @@
 package my.notinhas.project.services;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import my.notinhas.project.dtos.UserDTO;
-import my.notinhas.project.dtos.auth.GetInfo;
 import my.notinhas.project.dtos.auth.IdTokenDTO;
-import my.notinhas.project.dtos.auth.LoginDTO;
+import my.notinhas.project.dtos.auth.login.LoginResponseDTO;
 
 public interface AuthService {
-    LoginDTO login(String accessToken);
+    LoginResponseDTO login(String accessToken);
     IdTokenDTO createIdToken(String accessToken);
-    UserDTO register(GetInfo getInfo);
+    UserDTO register(GoogleIdToken googleIdToken);
 }

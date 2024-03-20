@@ -2,8 +2,13 @@ package my.notinhas.project.services.impl;
 
 import lombok.AllArgsConstructor;
 import my.notinhas.project.dtos.PostDTO;
-import my.notinhas.project.dtos.PostResponseDTO;
+import my.notinhas.project.dtos.UserDTO;
+import my.notinhas.project.dtos.request.PostRequestDTO;
+import my.notinhas.project.dtos.response.PostPublicResponseDTO;
+import my.notinhas.project.dtos.response.PostResponseDTO;
 import my.notinhas.project.entities.Posts;
+import my.notinhas.project.entities.Users;
+import my.notinhas.project.exception.runtime.ObjectNotFoundException;
 import my.notinhas.project.repositories.PostRepository;
 import my.notinhas.project.services.PostService;
 import org.modelmapper.Conditions;
@@ -13,6 +18,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -25,13 +31,20 @@ public class PostServiceImpl implements PostService {
     private final ModelMapper mapper;
 
     @Override
+    public Page<PostPublicResponseDTO> findAllPublic(Pageable pageable) {
+        Page<Posts> posts = this.repository.findAll(pageable);
+
+        List<PostPublicResponseDTO> postPublicResponseDTO = posts.stream()
+                .map(post -> mapper.map(post, PostPublicResponseDTO.class))
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(postPublicResponseDTO, pageable, posts.getTotalElements());
+    }
+
+    @Override
     public Page<PostResponseDTO> findAll(Pageable pageable) {
 
         Page<Posts> posts = this.repository.findAll(pageable);
-
-        for (Posts post: posts) {
-            post.calculateTotalLikesAndDeslikes(post.getLikes());
-        }
 
         List<PostResponseDTO> postResponseDTO = posts.stream()
                 .map(post -> mapper.map(post, PostResponseDTO.class))
@@ -44,18 +57,19 @@ public class PostServiceImpl implements PostService {
     public PostResponseDTO findByID(Long id) {
 
         Posts post = this.repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Post with ID " + id + " not found."));
-
-        post.calculateTotalLikesAndDeslikes(post.getLikes());
-
+                .orElseThrow(() -> new ObjectNotFoundException("Post with ID " + id + " not found."));
 
         return mapper.map(post, PostResponseDTO.class);
     }
 
     @Override
-    public PostDTO savePost(PostDTO postDTO) {
+    public PostDTO savePost(PostRequestDTO postRequestDTO) {
 
-        Posts request = mapper.map(postDTO, Posts.class);
+        Posts request = new Posts();
+        request.setDate(LocalDateTime.now());
+        request.setContent(postRequestDTO.getContent());
+        request.setActive(Boolean.TRUE);
+        request.setUser(mapper.map(postRequestDTO.getUser(), Users.class));
 
         Posts newPost = this.repository.save(request);
 
@@ -63,15 +77,21 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostDTO updatePost(PostDTO postDTO, Long id) {
+    public PostDTO updatePost(PostRequestDTO postRequestDTO, Long id) {
 
         mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
 
         var postPersisted = this.findByID(id);
-        mapper.map(postDTO, postPersisted);
-        PostDTO postToPersist = mapper.map(postPersisted, PostDTO.class);
+        postPersisted.setContent(postRequestDTO.getContent());
 
-        return this.savePost(mapper.map(postToPersist, PostDTO.class));
+        Posts postToPersist;
+        if (postPersisted.getUser().getId().equals(postRequestDTO.getUser().getId())) {
+            postToPersist = repository.save(mapper.map(postPersisted, Posts.class));
+        } else {
+            throw new RuntimeException("Post não pertence ao usuário");
+        }
+
+        return this.savePost(mapper.map(postToPersist, PostRequestDTO.class));
     }
 
     @Override

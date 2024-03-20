@@ -18,7 +18,6 @@ public class Likes {
     @Column(name = "value")
     @Enumerated(value = EnumType.STRING)
     private Value value;
-
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "post_id")

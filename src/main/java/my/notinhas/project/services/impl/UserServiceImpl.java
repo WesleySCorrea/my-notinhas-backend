@@ -1,10 +1,8 @@
 package my.notinhas.project.services.impl;
 
 import lombok.AllArgsConstructor;
-import my.notinhas.project.component.Requests;
 import my.notinhas.project.dtos.UserDTO;
 import my.notinhas.project.entities.Users;
-import my.notinhas.project.exception.runtime.PersistFailedException;
 import my.notinhas.project.repositories.UserRepository;
 import my.notinhas.project.services.UserService;
 import org.modelmapper.Conditions;
@@ -21,7 +19,6 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository repository;
     private final ModelMapper mapper;
-    private final Requests requests;
 
     @Override
     public List<UserDTO> findAll() {
@@ -70,7 +67,8 @@ public class UserServiceImpl implements UserService {
         try {
             newUser = this.repository.save(request);
         } catch (Exception e) {
-            throw new PersistFailedException("Failed when trying to persist the object");
+//            throw new PersistFailedException("Failed when trying to persist the object");
+            throw new RuntimeException("Failed when trying to persist the object");
         }
 
         return mapper.map(newUser, UserDTO.class);

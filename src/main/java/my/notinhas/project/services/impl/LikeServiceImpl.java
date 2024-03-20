@@ -2,7 +2,7 @@ package my.notinhas.project.services.impl;
 
 import lombok.AllArgsConstructor;
 import my.notinhas.project.dtos.LikeDTO;
-import my.notinhas.project.dtos.LikeResponseDTO;
+import my.notinhas.project.dtos.response.LikeResponseDTO;
 import my.notinhas.project.entities.Likes;
 import my.notinhas.project.repositories.LikeRepository;
 import my.notinhas.project.services.LikeService;

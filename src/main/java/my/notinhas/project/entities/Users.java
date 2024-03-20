@@ -28,8 +28,6 @@ public class Users {
     private String firstName;
     @Column(name = "last_name")
     private String lastName;
-    @Column(name = "locale")
-    private String locale;
     @Column(name = "picture")
     private String picture;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)

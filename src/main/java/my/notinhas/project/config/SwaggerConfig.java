@@ -12,11 +12,11 @@ public class SwaggerConfig {
 
     @Bean
     public OpenAPI openAPI() {
-            return new OpenAPI()
-                    .info(new Info()
-                            .title("My Notinhas")
-                            .version("1.0.0")
-                            .description("Api to save postists in web page")
-                    );
+        return new OpenAPI()
+                .info(new Info()
+                        .title("My Notinhas")
+                        .version("1.0.0")
+                        .description("Api to save postists in web page")
+                );
     }
 }

@@ -1,37 +1,35 @@
 package my.notinhas.project.config;
 
-import jakarta.servlet.DispatcherType;
-import jakarta.websocket.Endpoint;
-import lombok.RequiredArgsConstructor;
+import my.notinhas.project.config.auth.OAuth2AuthorizationRequestFilter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-
-import java.nio.file.PathMatcher;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
+    private final OAuth2AuthorizationRequestFilter oAuth2AuthorizationRequestFilter;
+
+    @Autowired
+    public SecurityConfig(OAuth2AuthorizationRequestFilter oAuth2AuthorizationRequestFilter) {
+        this.oAuth2AuthorizationRequestFilter = oAuth2AuthorizationRequestFilter;
+    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
-//                .csrf(csrf -> csrf
-//                        .ignoringRequestMatchers("/user", "/post", "/like"))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(HttpMethod.POST, "/**").permitAll()
-//                        .requestMatchers(HttpMethod.PATCH, "/**").permitAll()
-//                        .requestMatchers(HttpMethod.DELETE, "/**").permitAll()
-                        .requestMatchers("/**").permitAll()
+                        .requestMatchers("/post/public").permitAll()
+                        .requestMatchers("/auth/**").permitAll()
                         .anyRequest().authenticated())
-                .httpBasic(Customizer.withDefaults());
+                .addFilterBefore(oAuth2AuthorizationRequestFilter, BasicAuthenticationFilter.class);
 
         return httpSecurity.build();
     }
