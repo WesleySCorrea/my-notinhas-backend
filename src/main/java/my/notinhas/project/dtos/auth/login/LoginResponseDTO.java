@@ -1,7 +1,6 @@
 package my.notinhas.project.dtos.auth.login;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
