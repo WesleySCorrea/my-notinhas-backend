@@ -1,7 +1,7 @@
 package my.notinhas.project.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.hibernate.ObjectNotFoundException;
+import my.notinhas.project.exception.runtime.ObjectNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
