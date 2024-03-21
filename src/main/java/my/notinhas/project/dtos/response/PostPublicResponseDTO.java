@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import my.notinhas.project.dtos.UserDTO;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -16,7 +16,7 @@ import java.time.LocalDate;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class PostPublicResponseDTO {
     private Long id;
-    private LocalDate date;
+    private LocalDateTime date;
     private String content;
     private Boolean active;
     private UserDTO user;

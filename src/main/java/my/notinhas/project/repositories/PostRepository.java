@@ -6,6 +6,5 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PostRepository extends JpaRepository<Posts, Long> {
-
-    Page<Posts> findAll(Pageable pageable);
+    Page<Posts> findAllByActiveTrue(Pageable pageable);
 }
