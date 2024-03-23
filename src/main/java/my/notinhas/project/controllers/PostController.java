@@ -48,19 +48,19 @@ public class PostController {
     }
 
     @PostMapping
-    public ResponseEntity<PostDTO> save(@RequestBody PostRequestDTO postRequestDTO) {
+    public ResponseEntity<Void> save(@RequestBody PostRequestDTO postRequestDTO) {
 
-        PostDTO post = this.service.savePost(postRequestDTO);
+        this.service.savePost(postRequestDTO);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(post);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<PostDTO> update(@RequestBody PostRequestDTO postRequestDTO, @PathVariable Long id) {
+    public ResponseEntity<Void> update(@RequestBody PostRequestDTO postRequestDTO, @PathVariable Long id) {
 
-        PostDTO postUpdated = this.service.updatePost(postRequestDTO, id);
+        this.service.updatePost(postRequestDTO, id);
 
-        return ResponseEntity.ok(postUpdated);
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("{id}")

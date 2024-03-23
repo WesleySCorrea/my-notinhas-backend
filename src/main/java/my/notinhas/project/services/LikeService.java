@@ -5,6 +5,6 @@ import my.notinhas.project.dtos.request.LikeRequestDTO;
 
 public interface LikeService {
 
-    LikeDTO saveLike(LikeRequestDTO likeRequestDTO);
+    void saveLike(LikeRequestDTO likeRequestDTO);
 
 }

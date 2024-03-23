@@ -83,7 +83,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostDTO savePost(PostRequestDTO postRequestDTO) {
+    public void savePost(PostRequestDTO postRequestDTO) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         UserDTO user = (UserDTO) authentication.getPrincipal();
@@ -95,18 +95,15 @@ public class PostServiceImpl implements PostService {
         request.setActive(Boolean.TRUE);
         request.setUser(mapper.map(postRequestDTO.getUser(), Users.class));
 
-        Posts newPost;
         try {
-            newPost = this.postRepository.save(request);
+            this.postRepository.save(request);
         } catch (Exception e) {
             throw new PersistFailedException("Fail when the object was persisted");
         }
-
-        return mapper.map(newPost, PostDTO.class);
     }
 
     @Override
-    public PostDTO updatePost(PostRequestDTO postRequestDTO, Long id) {
+    public void updatePost(PostRequestDTO postRequestDTO, Long id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         UserDTO user = (UserDTO) authentication.getPrincipal();
@@ -117,14 +114,11 @@ public class PostServiceImpl implements PostService {
         var postPersisted = this.findByID(id);
         postPersisted.setContent(postRequestDTO.getContent());
 
-        Posts postToPersist;
         if (postPersisted.getUser().getUserName().equals(postRequestDTO.getUser().getUserName())) {
-            postToPersist = postRepository.save(mapper.map(postPersisted, Posts.class));
+            this.postRepository.save(mapper.map(postPersisted, Posts.class));
         } else {
             throw new UnauthorizedIdTokenException("Post does not belong to the user");
         }
-
-        return mapper.map(postToPersist, PostDTO.class);
     }
 
     @Override

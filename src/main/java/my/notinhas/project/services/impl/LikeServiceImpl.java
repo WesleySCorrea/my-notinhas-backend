@@ -19,7 +19,7 @@ public class LikeServiceImpl implements LikeService {
     private final LikeRepository repository;
 
     @Override
-    public LikeDTO saveLike(LikeRequestDTO likeRequestDTO) {
+    public void saveLike(LikeRequestDTO likeRequestDTO) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         UserDTO userDTO = (UserDTO) authentication.getPrincipal();
@@ -32,11 +32,11 @@ public class LikeServiceImpl implements LikeService {
 
             if (existingLike.getLikeEnum() == likeRequestDTO.getLikeEnum()) {
 
-                repository.deleteById(existingLike.getId());
-                return null;
+                this.repository.deleteById(existingLike.getId());
+
             } else {
                 existingLike.setLikeEnum(likeRequestDTO.getLikeEnum());
-                newLike = repository.save(existingLike);
+                this.repository.save(existingLike);
             }
 
         } else {
@@ -44,12 +44,10 @@ public class LikeServiceImpl implements LikeService {
             Likes request = likeRequestDTO.converterLikeRequestToLike();
 
             try {
-                newLike = this.repository.save(request);
+                this.repository.save(request);
             } catch (Exception e) {
                 throw new PersistFailedException("Fail when the like was persisted");
             }
         }
-
-        return new LikeDTO().converterLikeToLikeDTO(newLike);
     }
 }
