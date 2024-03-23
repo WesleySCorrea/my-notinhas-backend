@@ -2,6 +2,7 @@ package my.notinhas.project.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
 import my.notinhas.project.exception.runtime.ObjectNotFoundException;
+import my.notinhas.project.exception.runtime.UnauthorizedIdTokenException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -25,6 +26,19 @@ public class ResourceExceptionHandler extends ResponseEntityExceptionHandler {
         err.setErrors(Collections.singletonList(new FieldMessage("ObjectNotFoundException",e.getMessage())));
         return ResponseEntity.status(status).body(err);
     }
+
+    @ExceptionHandler(UnauthorizedIdTokenException.class)
+    public ResponseEntity<Object> unauthorizedIdTokenException(UnauthorizedIdTokenException e, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.UNAUTHORIZED;
+        ValidationError err = new ValidationError();
+        err.setTimestamp(Instant.now());
+        err.setStatus(status.value());
+        err.setError(e.getMessage());
+        err.setPath(request.getRequestURI());
+        err.setErrors(Collections.singletonList(new FieldMessage("UnauthorizedIdTokenException",e.getMessage())));
+        return ResponseEntity.status(status).body(err);
+    }
+
 //    @ExceptionHandler(PersistFailedException.class)
 //    public ResponseEntity<Object> persistFailedException(PersistFailedException e,HttpServletRequest request) {
 //        HttpStatus status = HttpStatus.NOT_FOUND;
@@ -49,19 +63,8 @@ public class ResourceExceptionHandler extends ResponseEntityExceptionHandler {
 //        return ResponseEntity.status(status).body(err);
 //    }
 //
-//    @ExceptionHandler(UnauthorizedAccessTokenException.class)
-//    public ResponseEntity<Object> unauthorizedAccessTokenException(UnauthorizedAccessTokenException e,HttpServletRequest request) {
-//        HttpStatus status = HttpStatus.UNAUTHORIZED;
-//        ValidationError err = new ValidationError();
-//        err.setTimestamp(Instant.now());
-//        err.setStatus(status.value());
-//        err.setError(e.getMessage());
-//        err.setPath(request.getRequestURI());
-//        err.setErrors(Collections.singletonList(new FieldMessage("UnauthorizedAccessTokenException",e.getMessage())));
-//        return ResponseEntity.status(status).body(err);
-//    }
 //MONTAR AS EXCEPTIONS
-
+//
 //    @ExceptionHandler(MethodArgumentNotValidException.class)
 //    public ResponseEntity<Object> validation(MethodArgumentNotValidException e, HttpServletRequest request) {
 //        HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;

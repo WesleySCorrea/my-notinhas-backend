@@ -1,5 +1,5 @@
 package my.notinhas.project.enums;
 
-public enum Value {
+public enum LikeEnum {
     LIKE, DISLIKE
 }

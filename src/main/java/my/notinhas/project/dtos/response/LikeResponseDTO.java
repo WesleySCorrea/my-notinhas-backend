@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import my.notinhas.project.enums.Value;
+import my.notinhas.project.enums.LikeEnum;
 
 @Getter
 @Setter
@@ -14,5 +14,5 @@ import my.notinhas.project.enums.Value;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class LikeResponseDTO {
     private Long id;
-    private Value value;
+    private LikeEnum likeEnum;
 }

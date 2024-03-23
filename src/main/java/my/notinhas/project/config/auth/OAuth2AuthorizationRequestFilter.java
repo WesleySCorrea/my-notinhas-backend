@@ -8,8 +8,9 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import my.notinhas.project.component.Auth;
 import my.notinhas.project.dtos.UserDTO;
-import my.notinhas.project.exception.runtime.ObjectNotFoundException;
+import my.notinhas.project.exception.runtime.UnauthorizedIdTokenException;
 import my.notinhas.project.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,6 +31,9 @@ public class OAuth2AuthorizationRequestFilter extends OncePerRequestFilter {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private Auth auth;
+
     @Value("${google.client-id}")
     private String clientId;
 
@@ -37,7 +41,7 @@ public class OAuth2AuthorizationRequestFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
 
         if (isAuthenticationNotRequired(request)) {
-            chain.doFilter(request, response); // Não executa o filtro de autenticação e passa para o próximo filtro
+            chain.doFilter(request, response);
             return;
         }
 
@@ -51,6 +55,8 @@ public class OAuth2AuthorizationRequestFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext()
                     .setAuthentication(
                             new UsernamePasswordAuthenticationToken(userDTO, null, null));
+        } else {
+            throw new UnauthorizedIdTokenException("Token invalid or expired");
         }
 
         chain.doFilter(request, response);
@@ -82,7 +88,7 @@ public class OAuth2AuthorizationRequestFilter extends OncePerRequestFilter {
             googleIdToken = verifier.verify(idToken);
             return googleIdToken;
         } catch (GeneralSecurityException | IOException e) {
-            throw new RuntimeException(e);
+            throw new UnauthorizedIdTokenException("Token invalid or expired");
         }
     }
 

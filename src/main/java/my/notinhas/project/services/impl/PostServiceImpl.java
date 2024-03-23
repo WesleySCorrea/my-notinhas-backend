@@ -2,12 +2,13 @@ package my.notinhas.project.services.impl;
 
 import lombok.AllArgsConstructor;
 import my.notinhas.project.dtos.PostDTO;
+import my.notinhas.project.dtos.UserDTO;
 import my.notinhas.project.dtos.request.PostRequestDTO;
 import my.notinhas.project.dtos.response.PostPublicResponseDTO;
 import my.notinhas.project.dtos.response.PostResponseDTO;
 import my.notinhas.project.entities.Posts;
 import my.notinhas.project.entities.Users;
-import my.notinhas.project.enums.Value;
+import my.notinhas.project.enums.LikeEnum;
 import my.notinhas.project.exception.runtime.ObjectNotFoundException;
 import my.notinhas.project.repositories.LikeRepository;
 import my.notinhas.project.repositories.PostRepository;
@@ -17,6 +18,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -79,6 +82,10 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PostDTO savePost(PostRequestDTO postRequestDTO) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        UserDTO user = (UserDTO) authentication.getPrincipal();
+        postRequestDTO.setUser(user);
 
         Posts request = new Posts();
         request.setDate(LocalDateTime.now());
@@ -93,6 +100,10 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PostDTO updatePost(PostRequestDTO postRequestDTO, Long id) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        UserDTO user = (UserDTO) authentication.getPrincipal();
+        postRequestDTO.setUser(user);
 
         mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
 
@@ -100,7 +111,7 @@ public class PostServiceImpl implements PostService {
         postPersisted.setContent(postRequestDTO.getContent());
 
         Posts postToPersist;
-        if (postPersisted.getUser().getId().equals(postRequestDTO.getUser().getId())) {
+        if (postPersisted.getUser().getUserName().equals(postRequestDTO.getUser().getUserName())) {
             postToPersist = postRepository.save(mapper.map(postPersisted, Posts.class));
         } else {
             throw new RuntimeException("Post não pertence ao usuário");
@@ -122,17 +133,9 @@ public class PostServiceImpl implements PostService {
     }
 
     private Long calculeTotalLike(Long postId) {
-//
-//        for (Likes like : likes) {
-//
-//            if (like.getValue() == Value.LIKE) {
-//                numberOfLikes++;
-//            } else if (like.getValue() == Value.DISLIKE) {
-//                numberOfLikes--;
-//            }
-//        }
-        Long totalLike = likeRepository.countByPostIdAndValue(postId, Value.LIKE);
-        Long totalDislike = likeRepository.countByPostIdAndValue(postId, Value.DISLIKE);
+
+        Long totalLike = likeRepository.countByPostIdAndLikeEnum(postId, LikeEnum.LIKE);
+        Long totalDislike = likeRepository.countByPostIdAndLikeEnum(postId, LikeEnum.DISLIKE);
 
         return totalLike - totalDislike;
     }

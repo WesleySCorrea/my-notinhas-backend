@@ -4,6 +4,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
+import my.notinhas.project.exception.runtime.UnauthorizedIdTokenException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -26,7 +27,7 @@ public class Auth {
                     .setAudience(Collections.singletonList(clientId))
                     .build();
         } catch (GeneralSecurityException | IOException e) {
-            throw new RuntimeException(e);
+            throw new UnauthorizedIdTokenException("Invalid or expired token id");
         }
 
         GoogleIdToken googleIdToken;
@@ -34,7 +35,7 @@ public class Auth {
             googleIdToken = verifier.verify(idToken);
             return googleIdToken;
         } catch (GeneralSecurityException | IOException e) {
-            throw new RuntimeException(e);
+            throw new UnauthorizedIdTokenException("Token invalid or expired");
         }
     }
 }

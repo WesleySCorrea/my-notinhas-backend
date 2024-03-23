@@ -49,10 +49,6 @@ public class PostController {
 
     @PostMapping
     public ResponseEntity<PostDTO> save(@RequestBody PostRequestDTO postRequestDTO) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        UserDTO user = (UserDTO) authentication.getPrincipal();
-        postRequestDTO.setUser(user);
 
         PostDTO post = this.service.savePost(postRequestDTO);
 
@@ -61,11 +57,6 @@ public class PostController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<PostDTO> update(@RequestBody PostRequestDTO postRequestDTO, @PathVariable Long id) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        UserDTO user = (UserDTO) authentication.getPrincipal();
-        postRequestDTO.setUser(user);
-
 
         PostDTO postUpdated = this.service.updatePost(postRequestDTO, id);
 
