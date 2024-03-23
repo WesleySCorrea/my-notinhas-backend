@@ -22,10 +22,10 @@ public class Likes {
     @Enumerated(value = EnumType.STRING)
     private LikeEnum likeEnum;
     @JsonIgnore
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne
     @JoinColumn(name = "post_id")
     private Posts post;
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private Users user;
 }
