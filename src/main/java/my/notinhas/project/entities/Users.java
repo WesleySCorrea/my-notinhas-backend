@@ -2,14 +2,15 @@ package my.notinhas.project.entities;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
 @Entity
 @Getter
 @Setter
+@AllArgsConstructor
+@RequiredArgsConstructor
 @Table(name = "users")
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class Users {

@@ -26,7 +26,8 @@ public class Posts {
     private Boolean active;
 //    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
 //    private List<Likes> likes;
-    @ManyToOne
+
+    @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "user_id")
     private Users user;
 }

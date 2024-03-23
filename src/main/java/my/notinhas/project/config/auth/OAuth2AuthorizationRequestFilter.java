@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import my.notinhas.project.component.Auth;
 import my.notinhas.project.dtos.UserDTO;
+import my.notinhas.project.exception.runtime.CallHttpErrorException;
 import my.notinhas.project.exception.runtime.UnauthorizedIdTokenException;
 import my.notinhas.project.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,7 +81,7 @@ public class OAuth2AuthorizationRequestFilter extends OncePerRequestFilter {
                     .setAudience(Collections.singletonList(clientId))
                     .build();
         } catch (GeneralSecurityException | IOException e) {
-            throw new RuntimeException(e);
+            throw new CallHttpErrorException("Error making the HTTP call: " + e.getMessage());
         }
 
         GoogleIdToken googleIdToken;
@@ -94,7 +95,7 @@ public class OAuth2AuthorizationRequestFilter extends OncePerRequestFilter {
 
     private boolean isAuthenticationNotRequired(HttpServletRequest request) {
         AntPathMatcher matcher = new AntPathMatcher();
-        List<String> permitAllPatterns = Arrays.asList("/post/public", "/auth/**"); // Adicione mais endpoints permitAll, se necessário
+        List<String> permitAllPatterns = Arrays.asList("/post/public", "/auth/**");
 
         return permitAllPatterns.stream().anyMatch(pattern -> matcher.match(pattern, request.getServletPath()));
     }

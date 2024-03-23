@@ -1,8 +1,7 @@
 package my.notinhas.project.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
-import my.notinhas.project.exception.runtime.ObjectNotFoundException;
-import my.notinhas.project.exception.runtime.UnauthorizedIdTokenException;
+import my.notinhas.project.exception.runtime.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -39,57 +38,51 @@ public class ResourceExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(status).body(err);
     }
 
-//    @ExceptionHandler(PersistFailedException.class)
-//    public ResponseEntity<Object> persistFailedException(PersistFailedException e,HttpServletRequest request) {
-//        HttpStatus status = HttpStatus.NOT_FOUND;
-//        ValidationError err = new ValidationError();
-//        err.setTimestamp(Instant.now());
-//        err.setStatus(status.value());
-//        err.setError(e.getMessage());
-//        err.setPath(request.getRequestURI());
-//        err.setErrors(Collections.singletonList(new FieldMessage("PersistFailedException",e.getMessage())));
-//        return ResponseEntity.status(status).body(err);
-//    }
-//
-//    @ExceptionHandler(CallHttpErrorException.class)
-//    public ResponseEntity<Object> callHttpErrorException(CallHttpErrorException e,HttpServletRequest request) {
-//        HttpStatus status = HttpStatus.BAD_REQUEST;
-//        ValidationError err = new ValidationError();
-//        err.setTimestamp(Instant.now());
-//        err.setStatus(status.value());
-//        err.setError(e.getMessage());
-//        err.setPath(request.getRequestURI());
-//        err.setErrors(Collections.singletonList(new FieldMessage("CallHttpErrorException",e.getMessage())));
-//        return ResponseEntity.status(status).body(err);
-//    }
-//
-//MONTAR AS EXCEPTIONS
-//
-//    @ExceptionHandler(MethodArgumentNotValidException.class)
-//    public ResponseEntity<Object> validation(MethodArgumentNotValidException e, HttpServletRequest request) {
-//        HttpStatus status = HttpStatus.UNPROCESSABLE_ENTITY;
-//        ValidationError err = new ValidationError();
-//        err.setTimestamp(Instant.now());
-//        err.setStatus(status.value());
-//        err.setError("Validation exception");
-//        err.setPath(request.getRequestURI());
-//        for (FieldError f : e.getBindingResult().getFieldErrors()){
-//            err.addError(f.getField(),f.getDefaultMessage());
-//        }
-//        return ResponseEntity.status(status).body(err);
-//    }
+    @ExceptionHandler(CallHttpErrorException.class)
+    public ResponseEntity<Object> callHttpErrorException(CallHttpErrorException e,HttpServletRequest request) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        ValidationError err = new ValidationError();
+        err.setTimestamp(Instant.now());
+        err.setStatus(status.value());
+        err.setError(e.getMessage());
+        err.setPath(request.getRequestURI());
+        err.setErrors(Collections.singletonList(new FieldMessage("CallHttpErrorException",e.getMessage())));
+        return ResponseEntity.status(status).body(err);
+    }
 
-//    MONTAR EXCEPTIONS PERSONALZADAS
-//@ExceptionHandler(ObjectNotFoundException.class)
-//public ResponseEntity<Object> objectNotFoundException(ObjectNotFoundException e,HttpServletRequest request) {
-//    HttpStatus status = HttpStatus.NOT_FOUND;
-//    ValidationError err = new ValidationError();
-//    err.setTimestamp(Instant.now());
-//    err.setStatus(status.value());
-//    err.setError(e.getMessage());
-//    err.setPath(request.getRequestURI());
-//    err.setErrors(Collections.singletonList(new FieldMessage("ObjectNotFoundException",e.getMessage())));
-//    log.error(e.getMessage());
-//    return ResponseEntity.status(status).body(err);
-//}
+    @ExceptionHandler(ObjectConversionException.class)
+    public ResponseEntity<Object> objectConversionException(ObjectConversionException e,HttpServletRequest request) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        ValidationError err = new ValidationError();
+        err.setTimestamp(Instant.now());
+        err.setStatus(status.value());
+        err.setError(e.getMessage());
+        err.setPath(request.getRequestURI());
+        err.setErrors(Collections.singletonList(new FieldMessage("ObjectConversionException",e.getMessage())));
+        return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(PersistFailedException.class)
+    public ResponseEntity<Object> persistFailedException(PersistFailedException e,HttpServletRequest request) {
+        HttpStatus status = HttpStatus.NOT_FOUND;
+        ValidationError err = new ValidationError();
+        err.setTimestamp(Instant.now());
+        err.setStatus(status.value());
+        err.setError(e.getMessage());
+        err.setPath(request.getRequestURI());
+        err.setErrors(Collections.singletonList(new FieldMessage("PersistFailedException",e.getMessage())));
+        return ResponseEntity.status(status).body(err);
+    }
+
+    @ExceptionHandler(DuplicateVoteAttemptException.class)
+    public ResponseEntity<Object> duplicateVoteAttemptException(DuplicateVoteAttemptException e,HttpServletRequest request) {
+        HttpStatus status = HttpStatus.FORBIDDEN;
+        ValidationError err = new ValidationError();
+        err.setTimestamp(Instant.now());
+        err.setStatus(status.value());
+        err.setError(e.getMessage());
+        err.setPath(request.getRequestURI());
+        err.setErrors(Collections.singletonList(new FieldMessage("DuplicateVoteAttemptException",e.getMessage())));
+        return ResponseEntity.status(status).body(err);
+    }
 }

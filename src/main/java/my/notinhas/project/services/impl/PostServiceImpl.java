@@ -10,6 +10,8 @@ import my.notinhas.project.entities.Posts;
 import my.notinhas.project.entities.Users;
 import my.notinhas.project.enums.LikeEnum;
 import my.notinhas.project.exception.runtime.ObjectNotFoundException;
+import my.notinhas.project.exception.runtime.PersistFailedException;
+import my.notinhas.project.exception.runtime.UnauthorizedIdTokenException;
 import my.notinhas.project.repositories.LikeRepository;
 import my.notinhas.project.repositories.PostRepository;
 import my.notinhas.project.services.PostService;
@@ -72,12 +74,12 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostResponseDTO findByID(Long id) {
+    public PostDTO findByID(Long id) {
 
         Posts post = this.postRepository.findById(id)
                 .orElseThrow(() -> new ObjectNotFoundException("Post with ID " + id + " not found."));
 
-        return mapper.map(post, PostResponseDTO.class);
+        return mapper.map(post, PostDTO.class);
     }
 
     @Override
@@ -93,7 +95,12 @@ public class PostServiceImpl implements PostService {
         request.setActive(Boolean.TRUE);
         request.setUser(mapper.map(postRequestDTO.getUser(), Users.class));
 
-        Posts newPost = this.postRepository.save(request);
+        Posts newPost;
+        try {
+            newPost = this.postRepository.save(request);
+        } catch (Exception e) {
+            throw new PersistFailedException("Fail when the object was persisted");
+        }
 
         return mapper.map(newPost, PostDTO.class);
     }
@@ -114,16 +121,16 @@ public class PostServiceImpl implements PostService {
         if (postPersisted.getUser().getUserName().equals(postRequestDTO.getUser().getUserName())) {
             postToPersist = postRepository.save(mapper.map(postPersisted, Posts.class));
         } else {
-            throw new RuntimeException("Post não pertence ao usuário");
+            throw new UnauthorizedIdTokenException("Post does not belong to the user");
         }
 
-        return this.savePost(mapper.map(postToPersist, PostRequestDTO.class));
+        return mapper.map(postToPersist, PostDTO.class);
     }
 
     @Override
     public void deleteByID(Long id) {
 
-        PostResponseDTO post = this.findByID(id);
+        PostDTO post = this.findByID(id);
 
         if (post!=null) {
             this.postRepository.deleteById(id);

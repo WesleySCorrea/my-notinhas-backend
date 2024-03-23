@@ -21,5 +21,4 @@ public class PostDTO {
     private Boolean active;
     private UserDTO user;
     private Long totalLikes;
-//    private List<LikeDTO> likes;
 }

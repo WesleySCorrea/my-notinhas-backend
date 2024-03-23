@@ -5,7 +5,8 @@ import my.notinhas.project.dtos.LikeDTO;
 import my.notinhas.project.dtos.UserDTO;
 import my.notinhas.project.dtos.request.LikeRequestDTO;
 import my.notinhas.project.entities.Likes;
-import my.notinhas.project.entities.Users;
+import my.notinhas.project.exception.runtime.DuplicateVoteAttemptException;
+import my.notinhas.project.exception.runtime.PersistFailedException;
 import my.notinhas.project.repositories.LikeRepository;
 import my.notinhas.project.services.LikeService;
 import org.modelmapper.ModelMapper;
@@ -18,33 +19,38 @@ import org.springframework.stereotype.Service;
 public class LikeServiceImpl implements LikeService {
 
     private final LikeRepository repository;
-    private final ModelMapper mapper;
 
     @Override
     public LikeDTO saveLike(LikeRequestDTO likeRequestDTO) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         UserDTO userDTO = (UserDTO) authentication.getPrincipal();
-        likeRequestDTO.setUser(userDTO);
+        likeRequestDTO.setUser(userDTO.convertUserDTOToUser());
 
         Likes existingLike = repository.findByUserIdAndPostId(userDTO.getId(), likeRequestDTO.getPost().getId());
 
-        Likes newLike = new Likes();
+        Likes newLike;
         if (existingLike != null) {
 
             if (existingLike.getLikeEnum().equals(likeRequestDTO.getLikeEnum())) {
-                throw new RuntimeException("Usuario, já votou");
+
+                throw new DuplicateVoteAttemptException("User, already voted");
             } else {
                 existingLike.setLikeEnum(likeRequestDTO.getLikeEnum());
                 newLike = repository.save(existingLike);
             }
 
         } else {
-            Likes request = mapper.map(likeRequestDTO, Likes.class);
 
-            newLike = this.repository.save(request);
+            Likes request = likeRequestDTO.converterLikeRequestToLike();
+
+            try {
+                newLike = this.repository.save(request);
+            } catch (Exception e) {
+                throw new PersistFailedException("Fail when the like was persisted");
+            }
         }
 
-        return mapper.map(newLike, LikeDTO.class);
+        return new LikeDTO().converterLikeToLikeDTO(newLike);
     }
 }

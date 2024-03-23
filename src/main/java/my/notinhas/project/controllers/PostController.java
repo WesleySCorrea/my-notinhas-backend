@@ -39,10 +39,10 @@ public class PostController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PostResponseDTO> findById(@PathVariable Long id) {
+    public ResponseEntity<PostDTO> findById(@PathVariable Long id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        PostResponseDTO post = this.service.findByID(id);
+        PostDTO post = this.service.findByID(id);
 
         return ResponseEntity.ok().body(post);
     }

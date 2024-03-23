@@ -7,9 +7,9 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class PersistFailedException extends RuntimeException {
+public class ObjectConversionException extends RuntimeException {
 
-    public PersistFailedException(String msg){
+    public ObjectConversionException(String msg){
         super(msg);
     }
 }

@@ -6,8 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import my.notinhas.project.dtos.UserDTO;
+import my.notinhas.project.entities.Likes;
 import my.notinhas.project.entities.Posts;
+import my.notinhas.project.entities.Users;
 import my.notinhas.project.enums.LikeEnum;
 
 @Getter
@@ -19,5 +20,16 @@ public class LikeRequestDTO {
     @NotNull
     private LikeEnum likeEnum;
     private Posts post;
-    private UserDTO user;
+    private Users user;
+
+    public Likes converterLikeRequestToLike () {
+
+        Likes like = new Likes(
+                null,
+                this.getLikeEnum(),
+                this.getPost(),
+                this.user
+        );
+        return like;
+    }
 }

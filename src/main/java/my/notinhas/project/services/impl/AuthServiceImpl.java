@@ -7,6 +7,7 @@ import my.notinhas.project.component.HttpRequests;
 import my.notinhas.project.dtos.UserDTO;
 import my.notinhas.project.dtos.auth.IdTokenDTO;
 import my.notinhas.project.dtos.auth.login.LoginResponseDTO;
+import my.notinhas.project.exception.runtime.UnauthorizedIdTokenException;
 import my.notinhas.project.services.AuthService;
 import my.notinhas.project.services.UserService;
 import org.springframework.stereotype.Service;
@@ -43,8 +44,7 @@ public class AuthServiceImpl implements AuthService {
 
         IdTokenDTO idTokenDTO = requests.idTokenRequest(access_token);
         if (idTokenDTO == null) {
-            System.out.println("Invalid access_token");
-            return null;
+            throw new UnauthorizedIdTokenException("Invalid or expired access token");
         }
 
         requests.validedTokenId(idTokenDTO);

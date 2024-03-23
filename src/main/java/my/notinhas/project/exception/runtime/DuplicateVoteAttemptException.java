@@ -7,9 +7,9 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class PersistFailedException extends RuntimeException {
+public class DuplicateVoteAttemptException extends RuntimeException {
 
-    public PersistFailedException(String msg){
+    public DuplicateVoteAttemptException(String msg){
         super(msg);
     }
 }

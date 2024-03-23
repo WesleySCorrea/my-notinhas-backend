@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import my.notinhas.project.entities.Users;
 
 @Getter
 @Setter
@@ -21,6 +22,20 @@ public class UserDTO {
     private String lastName;
     private String picture;
 
+    public Users convertUserDTOToUser() {
+
+        Users user = new Users(
+                this.id,
+                this.googleId,
+                this.userName,
+                this.email,
+                this.firstName,
+                this.lastName,
+                this.picture
+        );
+
+        return user;
+    }
 
     public UserDTO createUserDTOWithUserName (GoogleIdToken googleIdToken) {
 
@@ -34,13 +49,18 @@ public class UserDTO {
 
         String userName = googleIdToken.getPayload().get("given_name").toString() + number1 + number2 + number3 + number4 + number5;
 
+        String familyName = null;
+        if (googleIdToken.getPayload().containsKey("family_name")) {
+            familyName = googleIdToken.getPayload().get("family_name").toString();
+        }
+
         UserDTO userDTO = new UserDTO(
                 null,
                 googleId,
                 userName,
                 googleIdToken.getPayload().getEmail(),
                 googleIdToken.getPayload().get("given_name").toString(),
-                googleIdToken.getPayload().get("family_name").toString(),
+                familyName,
                 googleIdToken.getPayload().get("picture").toString()
         );
 
