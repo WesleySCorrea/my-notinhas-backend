@@ -13,6 +13,7 @@ import my.notinhas.project.enums.LikeEnum;
 import my.notinhas.project.exception.runtime.ObjectNotFoundException;
 import my.notinhas.project.exception.runtime.PersistFailedException;
 import my.notinhas.project.exception.runtime.UnauthorizedIdTokenException;
+import my.notinhas.project.repositories.CommentRepository;
 import my.notinhas.project.repositories.LikeRepository;
 import my.notinhas.project.repositories.PostRepository;
 import my.notinhas.project.services.PostService;
@@ -36,6 +37,7 @@ public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
     private final LikeRepository likeRepository;
+    private final CommentRepository commentRepository;
     private final ModelMapper mapper;
 
     @Override
@@ -70,6 +72,7 @@ public class PostServiceImpl implements PostService {
                     verifyUserLike(dto);
 
                     dto.setTotalLikes(this.calculeTotalLike(post.getId()));
+                    dto.setTotalComments(this.calculeTotalComment(post.getId()));
 
                     return dto;
                 })
@@ -146,6 +149,11 @@ public class PostServiceImpl implements PostService {
         Long totalDislike = likeRepository.countByPostIdAndLikeEnum(postId, LikeEnum.DISLIKE);
 
         return totalLike - totalDislike;
+    }
+
+    private Long calculeTotalComment(Long postId) {
+
+        return commentRepository.countByPostId(postId);
     }
 
     private void verifyDateActive (Posts post) {

@@ -21,6 +21,7 @@ public class PostResponseDTO {
     private String content;
     private UserPostResponseDTO user;
     private Long totalLikes;
+    private Long totalComments;
     private LikeEnum userLike;
     private Boolean postOwner;
 }

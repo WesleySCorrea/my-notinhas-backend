@@ -1,5 +1,6 @@
 package my.notinhas.project.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -11,9 +12,9 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-@Table(name = "posts")
+@Table(name = "comments")
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class Posts {
+public class Comments {
     @Id
     @Column(name = "id", unique = true)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,9 +23,17 @@ public class Posts {
     private LocalDateTime date;
     @Column(name = "content")
     private String content;
-    @Column(name = "active", columnDefinition = "BOOLEAN DEFAULT TRUE")
-    private Boolean active;
-    @ManyToOne(cascade = CascadeType.REMOVE)
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "post_id")
+    private Posts post;
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private Users user;
+    @ManyToOne
+    @JsonIgnore
+    @JoinColumn(name = "parent_comment_id")
+    private Comments parentComment;
+    @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL)
+    private List<Comments> replies;
 }
