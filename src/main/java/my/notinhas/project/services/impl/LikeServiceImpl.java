@@ -20,9 +20,7 @@ public class LikeServiceImpl implements LikeService {
 
     @Override
     public void saveLike(LikeRequestDTO likeRequestDTO) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        UserDTO userDTO = (UserDTO) authentication.getPrincipal();
+        UserDTO userDTO = extractUser();
         likeRequestDTO.setUser(userDTO.convertUserDTOToUser());
 
         Likes existingLike = repository.findByUserIdAndPostId(userDTO.getId(), likeRequestDTO.getPost().getId());
@@ -49,5 +47,11 @@ public class LikeServiceImpl implements LikeService {
                 throw new PersistFailedException("Fail when the like was persisted");
             }
         }
+    }
+
+    private UserDTO extractUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        return (UserDTO) authentication.getPrincipal();
     }
 }

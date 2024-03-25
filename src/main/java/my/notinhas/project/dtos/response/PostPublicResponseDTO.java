@@ -14,6 +14,5 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class PostPublicResponseDTO {
-    private LocalDateTime date;
     private String content;
 }

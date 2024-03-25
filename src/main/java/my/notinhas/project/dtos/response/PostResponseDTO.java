@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import my.notinhas.project.enums.LikeEnum;
 
 import java.time.LocalDateTime;
 
@@ -20,4 +21,6 @@ public class PostResponseDTO {
     private String content;
     private UserPostResponseDTO user;
     private Long totalLikes;
+    private LikeEnum userLike;
+    private Boolean postOwner;
 }

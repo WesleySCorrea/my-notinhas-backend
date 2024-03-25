@@ -6,6 +6,7 @@ import my.notinhas.project.dtos.UserDTO;
 import my.notinhas.project.dtos.request.PostRequestDTO;
 import my.notinhas.project.dtos.response.PostPublicResponseDTO;
 import my.notinhas.project.dtos.response.PostResponseDTO;
+import my.notinhas.project.entities.Likes;
 import my.notinhas.project.entities.Posts;
 import my.notinhas.project.entities.Users;
 import my.notinhas.project.enums.LikeEnum;
@@ -64,6 +65,10 @@ public class PostServiceImpl implements PostService {
 
                     PostResponseDTO dto = mapper.map(post, PostResponseDTO.class);
 
+                    verifyPostOwner(dto);
+
+                    verifyUserLike(dto);
+
                     dto.setTotalLikes(this.calculeTotalLike(post.getId()));
 
                     return dto;
@@ -84,9 +89,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public void savePost(PostRequestDTO postRequestDTO) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        UserDTO user = (UserDTO) authentication.getPrincipal();
+        UserDTO user = extractUser();
         postRequestDTO.setUser(user);
 
         Posts request = new Posts();
@@ -104,9 +107,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public void updatePost(PostRequestDTO postRequestDTO, Long id) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        UserDTO user = (UserDTO) authentication.getPrincipal();
+        UserDTO user = extractUser();
         postRequestDTO.setUser(user);
 
         mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
@@ -133,6 +134,12 @@ public class PostServiceImpl implements PostService {
         }
     }
 
+    private UserDTO extractUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        return (UserDTO) authentication.getPrincipal();
+    }
+
     private Long calculeTotalLike(Long postId) {
 
         Long totalLike = likeRepository.countByPostIdAndLikeEnum(postId, LikeEnum.LIKE);
@@ -149,5 +156,21 @@ public class PostServiceImpl implements PostService {
             post.setActive(Boolean.FALSE);
             postRepository.save(post);
         }
+    }
+
+    private void verifyUserLike(PostResponseDTO dto) {
+        UserDTO user = extractUser();
+
+        Likes like = likeRepository.findByUserIdAndPostId(user.getId(), dto.getId());
+
+        if (like != null) {
+            dto.setUserLike(like.getLikeEnum());
+        }
+    }
+
+    private void verifyPostOwner(PostResponseDTO dto) {
+        UserDTO user = extractUser();
+
+        dto.setPostOwner(postRepository.existsByUserId(user.getId()));
     }
 }
