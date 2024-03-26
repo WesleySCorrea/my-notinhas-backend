@@ -1,9 +1,8 @@
 package my.notinhas.project.controllers;
 
 import lombok.AllArgsConstructor;
-import my.notinhas.project.dtos.PostDTO;
-import my.notinhas.project.dtos.UserDTO;
 import my.notinhas.project.dtos.request.PostRequestDTO;
+import my.notinhas.project.dtos.response.PostIDResponseDTO;
 import my.notinhas.project.dtos.response.PostPublicResponseDTO;
 import my.notinhas.project.dtos.response.PostResponseDTO;
 import my.notinhas.project.services.PostService;
@@ -39,10 +38,10 @@ public class PostController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PostDTO> findById(@PathVariable Long id) {
+    public ResponseEntity<PostIDResponseDTO> findById(@PathVariable Long id) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        PostDTO post = this.service.findByID(id);
+        PostIDResponseDTO post = this.service.findByID(id);
 
         return ResponseEntity.ok().body(post);
     }

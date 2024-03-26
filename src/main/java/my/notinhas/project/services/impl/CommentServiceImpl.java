@@ -28,6 +28,17 @@ public class CommentServiceImpl implements CommentService {
 
         this.repository.save(comments);
     }
+//
+//    @Override
+//    public void saveReplies(RepliesRequestDTO repliesRequestDTO) {
+//        UserDTO userDTO = extractUser();
+//        repliesRequestDTO.setUser(userDTO.convertUserDTOToUser());
+//        repliesRequestDTO.setDate(LocalDateTime.now());
+//
+//        Comments comments = repliesRequestDTO.converterRepliesRequestToComment();
+//
+//        this.repository.save(comments);
+//    }
 
     private UserDTO extractUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

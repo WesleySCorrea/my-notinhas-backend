@@ -30,8 +30,8 @@ public class Comments {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private Users user;
-    @ManyToOne
     @JsonIgnore
+    @ManyToOne
     @JoinColumn(name = "parent_comment_id")
     private Comments parentComment;
     @OneToMany(mappedBy = "parentComment", cascade = CascadeType.ALL)

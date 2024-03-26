@@ -24,6 +24,7 @@ public class CommentRequestDTO {
     private LocalDateTime date;
     private Posts post;
     private Users user;
+    private Comments parentComment;
 
     public Comments converterCommentRequestToComment () {
 
@@ -32,6 +33,7 @@ public class CommentRequestDTO {
         comment.setDate(this.getDate());
         comment.setPost(this.getPost());
         comment.setUser(this.getUser());
+        comment.setParentComment(this.getParentComment());
         return comment;
     }
 }

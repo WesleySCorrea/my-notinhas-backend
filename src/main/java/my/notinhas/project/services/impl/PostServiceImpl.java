@@ -1,11 +1,13 @@
 package my.notinhas.project.services.impl;
 
 import lombok.AllArgsConstructor;
-import my.notinhas.project.dtos.PostDTO;
 import my.notinhas.project.dtos.UserDTO;
 import my.notinhas.project.dtos.request.PostRequestDTO;
+import my.notinhas.project.dtos.response.CommentResponseDTO;
+import my.notinhas.project.dtos.response.PostIDResponseDTO;
 import my.notinhas.project.dtos.response.PostPublicResponseDTO;
 import my.notinhas.project.dtos.response.PostResponseDTO;
+import my.notinhas.project.entities.Comments;
 import my.notinhas.project.entities.Likes;
 import my.notinhas.project.entities.Posts;
 import my.notinhas.project.entities.Users;
@@ -63,13 +65,12 @@ public class PostServiceImpl implements PostService {
 
         List<PostResponseDTO> postResponseDTO = posts.stream()
                 .map(post -> {
-                    verifyDateActive(post);
+                    this.verifyDateActive(post);
 
                     PostResponseDTO dto = mapper.map(post, PostResponseDTO.class);
 
-                    verifyPostOwner(dto);
-
-                    verifyUserLike(dto);
+                    dto.setPostOwner(this.verifyPostOwner());
+                    dto.setUserLike(this.verifyUserLike(post));
 
                     dto.setTotalLikes(this.calculeTotalLike(post.getId()));
                     dto.setTotalComments(this.calculeTotalComment(post.getId()));
@@ -82,12 +83,30 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostDTO findByID(Long id) {
+    public PostIDResponseDTO findByID(Long id) {
 
         Posts post = this.postRepository.findById(id)
                 .orElseThrow(() -> new ObjectNotFoundException("Post with ID " + id + " not found."));
 
-        return mapper.map(post, PostDTO.class);
+        PostIDResponseDTO postIDResponseDTO = mapper.map(post, PostIDResponseDTO.class);
+        postIDResponseDTO.setPostOwner(this.verifyPostOwner());
+        postIDResponseDTO.setUserLike(this.verifyUserLike(post));
+
+        postIDResponseDTO.setTotalLikes(this.calculeTotalLike(post.getId()));
+        postIDResponseDTO.setTotalComments(this.calculeTotalComment(post.getId()));
+
+        List<Comments> comments = commentRepository.findByPostIdAndParentCommentIsNull(post.getId());
+
+        List<CommentResponseDTO> commentResponseDTOs = comments.stream()
+                .map(comment -> {
+                    return new CommentResponseDTO()
+                            .converterCommentToCommentResponse(comment);
+                })
+                .toList();
+
+
+        postIDResponseDTO.setComments(commentResponseDTOs);
+        return postIDResponseDTO;
     }
 
     @Override
@@ -128,7 +147,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public void deleteByID(Long id) {
 
-        PostDTO post = this.findByID(id);
+        PostIDResponseDTO post = this.findByID(id);
 
         if (post!=null) {
             this.postRepository.deleteById(id);
@@ -166,19 +185,20 @@ public class PostServiceImpl implements PostService {
         }
     }
 
-    private void verifyUserLike(PostResponseDTO dto) {
+    private LikeEnum verifyUserLike(Posts post) {
         UserDTO user = extractUser();
 
-        Likes like = likeRepository.findByUserIdAndPostId(user.getId(), dto.getId());
+        Likes like = likeRepository.findByUserIdAndPostId(user.getId(), post.getId());
 
-        if (like != null) {
-            dto.setUserLike(like.getLikeEnum());
+        if (like == null) {
+            return null;
         }
+        return like.getLikeEnum();
     }
 
-    private void verifyPostOwner(PostResponseDTO dto) {
+    private Boolean verifyPostOwner() {
         UserDTO user = extractUser();
 
-        dto.setPostOwner(postRepository.existsByUserId(user.getId()));
+        return postRepository.existsByUserId(user.getId());
     }
 }
