@@ -23,6 +23,8 @@ public class Comments {
     private LocalDateTime date;
     @Column(name = "content")
     private String content;
+    @Column(name = "is_edited")
+    private Boolean isEdited;
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "post_id")

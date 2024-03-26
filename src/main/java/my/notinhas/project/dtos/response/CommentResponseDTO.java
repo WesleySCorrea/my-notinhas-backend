@@ -21,6 +21,7 @@ public class CommentResponseDTO {
     @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
     private LocalDateTime date;
     private String content;
+    private Boolean isEdited;
     private UserPostResponseDTO user;
     private List<CommentResponseDTO> replies;
 

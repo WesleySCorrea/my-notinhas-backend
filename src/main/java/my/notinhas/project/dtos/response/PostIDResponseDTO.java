@@ -26,5 +26,6 @@ public class PostIDResponseDTO {
     private Long totalComments;
     private LikeEnum userLike;
     private Boolean postOwner;
+    private Boolean isEdited;
     private List<CommentResponseDTO> comments;
 }

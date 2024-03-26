@@ -24,4 +24,5 @@ public class PostResponseDTO {
     private Long totalComments;
     private LikeEnum userLike;
     private Boolean postOwner;
+    private Boolean isEdited;
 }

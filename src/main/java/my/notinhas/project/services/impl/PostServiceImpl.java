@@ -137,8 +137,13 @@ public class PostServiceImpl implements PostService {
         var postPersisted = this.findByID(id);
         postPersisted.setContent(postRequestDTO.getContent());
 
+
         if (postPersisted.getUser().getUserName().equals(postRequestDTO.getUser().getUserName())) {
-            this.postRepository.save(mapper.map(postPersisted, Posts.class));
+            Posts postsToPersistd = mapper.map(postPersisted, Posts.class);
+            postsToPersistd.setUser(user.convertUserDTOToUser());
+            postsToPersistd.setIsEdited(Boolean.TRUE);
+
+            this.postRepository.save(postsToPersistd);
         } else {
             throw new UnauthorizedIdTokenException("Post does not belong to the user");
         }

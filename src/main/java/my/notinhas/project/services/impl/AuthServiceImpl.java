@@ -7,6 +7,7 @@ import my.notinhas.project.component.HttpRequests;
 import my.notinhas.project.dtos.UserDTO;
 import my.notinhas.project.dtos.auth.IdTokenDTO;
 import my.notinhas.project.dtos.auth.login.LoginResponseDTO;
+import my.notinhas.project.exception.runtime.PersistFailedException;
 import my.notinhas.project.exception.runtime.UnauthorizedIdTokenException;
 import my.notinhas.project.services.AuthService;
 import my.notinhas.project.services.UserService;
@@ -56,8 +57,13 @@ public class AuthServiceImpl implements AuthService {
     public UserDTO register(GoogleIdToken googleIdToken) {
 
         UserDTO userDTO = new UserDTO().createUserDTOWithUserName(googleIdToken);
+        UserDTO newUserDTO;
 
-        UserDTO newUserDTO = service.saveUsers(userDTO);
+        try {
+            newUserDTO = service.saveUsers(userDTO);
+        } catch (Exception e) {
+            throw new PersistFailedException("Fail when the object was persisted");
+        }
 
         return newUserDTO;
     }

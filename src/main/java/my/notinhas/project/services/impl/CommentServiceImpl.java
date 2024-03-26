@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import my.notinhas.project.dtos.UserDTO;
 import my.notinhas.project.dtos.request.CommentRequestDTO;
 import my.notinhas.project.entities.Comments;
+import my.notinhas.project.exception.runtime.PersistFailedException;
 import my.notinhas.project.repositories.CommentRepository;
 import my.notinhas.project.services.CommentService;
 import org.springframework.security.core.Authentication;
@@ -25,20 +26,12 @@ public class CommentServiceImpl implements CommentService {
         commentRequestDTO.setDate(LocalDateTime.now());
 
         Comments comments = commentRequestDTO.converterCommentRequestToComment();
-
-        this.repository.save(comments);
+        try {
+            this.repository.save(comments);
+        } catch (Exception e) {
+            throw new PersistFailedException("Fail when the object was persisted");
+        }
     }
-//
-//    @Override
-//    public void saveReplies(RepliesRequestDTO repliesRequestDTO) {
-//        UserDTO userDTO = extractUser();
-//        repliesRequestDTO.setUser(userDTO.convertUserDTOToUser());
-//        repliesRequestDTO.setDate(LocalDateTime.now());
-//
-//        Comments comments = repliesRequestDTO.converterRepliesRequestToComment();
-//
-//        this.repository.save(comments);
-//    }
 
     private UserDTO extractUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

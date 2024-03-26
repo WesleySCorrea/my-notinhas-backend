@@ -3,6 +3,7 @@ package my.notinhas.project.services.impl;
 import lombok.AllArgsConstructor;
 import my.notinhas.project.dtos.UserDTO;
 import my.notinhas.project.entities.Users;
+import my.notinhas.project.exception.runtime.PersistFailedException;
 import my.notinhas.project.repositories.UserRepository;
 import my.notinhas.project.services.UserService;
 import org.modelmapper.Conditions;
@@ -46,7 +47,7 @@ public class UserServiceImpl implements UserService {
         try {
             user = this.repository.findByEmail(email);
         } catch (Exception e) {
-            throw new RuntimeException("User with email " + email + " not found.");
+            throw new PersistFailedException("Fail when the object was persisted");
         }
 
         return mapper.map(user, UserDTO.class);
