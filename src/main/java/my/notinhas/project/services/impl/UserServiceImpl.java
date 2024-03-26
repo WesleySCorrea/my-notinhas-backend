@@ -68,8 +68,7 @@ public class UserServiceImpl implements UserService {
         try {
             newUser = this.repository.save(request);
         } catch (Exception e) {
-//            throw new PersistFailedException("Failed when trying to persist the object");
-            throw new RuntimeException("Failed when trying to persist the object");
+            throw new PersistFailedException("Failed when trying to persist the object");
         }
 
         return mapper.map(newUser, UserDTO.class);
