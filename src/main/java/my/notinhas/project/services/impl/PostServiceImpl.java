@@ -44,8 +44,11 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Page<PostPublicResponseDTO> findAllPublic(Pageable pageable) {
+        UserDTO user = this.extractUser();
 
-        Page<Posts> posts = this.postRepository.findAllByActiveTrue(pageable);
+
+        Page<Posts> posts = this.postRepository
+                .findAllByActiveTrueOrderByDateDesc(pageable);
 
         List<PostPublicResponseDTO> postResponseDTO = posts.stream()
                 .map(post -> {
@@ -60,8 +63,10 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Page<PostResponseDTO> findAll(Pageable pageable) {
+        UserDTO user = this.extractUser();
 
-        Page<Posts> posts = this.postRepository.findAllByActiveTrue(pageable);
+        Page<Posts> posts = this.postRepository
+                .findAllByActiveTrueOrderByDateDesc(pageable);
 
         List<PostResponseDTO> postResponseDTO = posts.stream()
                 .map(post -> {
@@ -69,8 +74,8 @@ public class PostServiceImpl implements PostService {
 
                     PostResponseDTO dto = mapper.map(post, PostResponseDTO.class);
 
-                    dto.setPostOwner(this.verifyPostOwner());
-                    dto.setUserLike(this.verifyUserLike(post));
+                    dto.setPostOwner(this.verifyPostOwner(user));
+                    dto.setUserLike(this.verifyUserLike(post, user));
 
                     dto.setTotalLikes(this.calculeTotalLike(post.getId()));
                     dto.setTotalComments(this.calculeTotalComment(post.getId()));
@@ -84,13 +89,14 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PostIDResponseDTO findByID(Long id) {
+        UserDTO user = this.extractUser();
 
         Posts post = this.postRepository.findById(id)
                 .orElseThrow(() -> new ObjectNotFoundException("Post with ID " + id + " not found."));
 
         PostIDResponseDTO postIDResponseDTO = mapper.map(post, PostIDResponseDTO.class);
-        postIDResponseDTO.setPostOwner(this.verifyPostOwner());
-        postIDResponseDTO.setUserLike(this.verifyUserLike(post));
+        postIDResponseDTO.setPostOwner(this.verifyPostOwner(user));
+        postIDResponseDTO.setUserLike(this.verifyUserLike(post, user));
 
         postIDResponseDTO.setTotalLikes(this.calculeTotalLike(post.getId()));
         postIDResponseDTO.setTotalComments(this.calculeTotalComment(post.getId()));
@@ -98,10 +104,8 @@ public class PostServiceImpl implements PostService {
         List<Comments> comments = commentRepository.findByPostIdAndParentCommentIsNull(post.getId());
 
         List<CommentResponseDTO> commentResponseDTOs = comments.stream()
-                .map(comment -> {
-                    return new CommentResponseDTO()
-                            .converterCommentToCommentResponse(comment);
-                })
+                .map(comment -> new CommentResponseDTO()
+                        .converterCommentToCommentResponse(comment))
                 .toList();
 
 
@@ -191,8 +195,7 @@ public class PostServiceImpl implements PostService {
         }
     }
 
-    private LikeEnum verifyUserLike(Posts post) {
-        UserDTO user = extractUser();
+    private LikeEnum verifyUserLike(Posts post, UserDTO user) {
 
         Likes like = likeRepository.findByUserIdAndPostId(user.getId(), post.getId());
 
@@ -202,8 +205,7 @@ public class PostServiceImpl implements PostService {
         return like.getLikeEnum();
     }
 
-    private Boolean verifyPostOwner() {
-        UserDTO user = extractUser();
+    private Boolean verifyPostOwner(UserDTO user) {
 
         return postRepository.existsByUserId(user.getId());
     }
