@@ -18,7 +18,7 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class PostIDResponseDTO {
     private Long id;
-    @JsonFormat(pattern = "dd-MM-yyyy HH:mm:ss")
+    @JsonFormat(pattern = "dd-MM-yy HH:mm:ss")
     private LocalDateTime date;
     private String content;
     private UserPostResponseDTO user;
