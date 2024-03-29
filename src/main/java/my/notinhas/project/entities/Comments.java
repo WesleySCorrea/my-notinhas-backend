@@ -24,7 +24,7 @@ public class Comments {
     @Column(name = "content")
     private String content;
     @Column(name = "is_edited")
-    private Boolean isEdited;
+    private Boolean isEdited = Boolean.FALSE;
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "post_id")

@@ -25,7 +25,7 @@ public class Posts {
     @Column(name = "active", columnDefinition = "BOOLEAN DEFAULT TRUE")
     private Boolean active;
     @Column(name = "is_edited")
-    private Boolean isEdited;
+    private Boolean isEdited = Boolean.FALSE;
     @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "user_id")
     private Users user;

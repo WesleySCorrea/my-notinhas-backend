@@ -44,8 +44,6 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Page<PostPublicResponseDTO> findAllPublic(Pageable pageable) {
-        UserDTO user = this.extractUser();
-
 
         Page<Posts> posts = this.postRepository
                 .findAllByActiveTrueOrderByDateDesc(pageable);
