@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -60,8 +59,14 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public void delete(Long id) {
+        UserDTO userDTO = extractUser();
 
-        this.repository.deleteById(id);
+        Comments comment = this.repository.findById(id)
+                .orElseThrow(() -> new ObjectNotFoundException("Comment with ID " + id + " not found."));
+
+        if (comment.getUser().getUserName().equals(userDTO.getUserName())) {
+            this.repository.deleteById(id);
+        }
     }
 
     private UserDTO extractUser() {
