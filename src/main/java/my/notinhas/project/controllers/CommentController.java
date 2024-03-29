@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import my.notinhas.project.dtos.request.CommentRequestDTO;
 import my.notinhas.project.dtos.response.CommentResponseDTO;
 import my.notinhas.project.services.CommentService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,9 +21,9 @@ public class CommentController {
     private final CommentService service;
 
     @GetMapping("/post/{postId}")
-    public ResponseEntity<List<CommentResponseDTO>> findByPostId(@PathVariable Long postId) {
+    public ResponseEntity<Page<CommentResponseDTO>> findByPostId(@PathVariable Long postId, Pageable pageable) {
 
-        List<CommentResponseDTO> comments = this.service.findByPostId(postId);
+        Page<CommentResponseDTO> comments = this.service.findByPostId(postId, pageable);
 
         return ResponseEntity.ok().body(comments);
     }

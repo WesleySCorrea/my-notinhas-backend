@@ -9,6 +9,9 @@ import my.notinhas.project.exception.runtime.ObjectNotFoundException;
 import my.notinhas.project.exception.runtime.PersistFailedException;
 import my.notinhas.project.repositories.CommentRepository;
 import my.notinhas.project.services.CommentService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -24,18 +27,21 @@ public class CommentServiceImpl implements CommentService {
     private final CommentRepository repository;
 
     @Override
-    public List<CommentResponseDTO> findByPostId(Long postId) {
+    public Page<CommentResponseDTO> findByPostId(Long postId, Pageable pageable) {
 
-        List<Comments> comments;
+        Page<Comments> comments;
         try {
-            comments = this.repository.findByPostIdAndParentCommentIsNull(postId);
+            comments = this.repository.findByPostIdAndParentCommentIsNull(postId, pageable);
         } catch (Exception e) {
             throw new ObjectNotFoundException("Comment with post ID " + postId + "not found");
         }
+        List<CommentResponseDTO> commentResponseDTOS = comments.stream()
+                .map(comment ->
+                        new CommentResponseDTO()
+                        .converterCommentToCommentResponse(comment))
+                .toList();
 
-        return comments.stream()
-                .map(comment -> new CommentResponseDTO().converterCommentToCommentResponse(comment))
-                .collect(Collectors.toList());
+        return new PageImpl<>(commentResponseDTOS, pageable, comments.getTotalElements());
     }
 
     @Override
