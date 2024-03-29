@@ -52,6 +52,12 @@ public class CommentServiceImpl implements CommentService {
         }
     }
 
+    @Override
+    public void delete(Long id) {
+
+        this.repository.deleteById(id);
+    }
+
     private UserDTO extractUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 

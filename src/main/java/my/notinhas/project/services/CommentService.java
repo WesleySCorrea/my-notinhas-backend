@@ -9,4 +9,5 @@ import java.util.List;
 public interface CommentService {
     List<CommentResponseDTO> findByPostId(Long postId);
     void saveComment(CommentRequestDTO commentRequestDTO);
+    void delete(Long id);
 }

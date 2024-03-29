@@ -33,4 +33,12 @@ public class CommentController {
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+
+        this.service.delete(id);
+
+        return ResponseEntity.noContent().build();
+    }
 }
