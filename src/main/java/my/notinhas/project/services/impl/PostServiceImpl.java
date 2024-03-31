@@ -72,7 +72,7 @@ public class PostServiceImpl implements PostService {
 
                     PostResponseDTO dto = mapper.map(post, PostResponseDTO.class);
 
-                    dto.setPostOwner(this.verifyPostOwner(user));
+                    dto.setPostOwner(this.verifyPostOwner(user,post));
                     dto.setUserLike(this.verifyUserLike(post, user));
 
                     dto.setTotalLikes(this.calculeTotalLike(post.getId()));
@@ -93,7 +93,7 @@ public class PostServiceImpl implements PostService {
                 .orElseThrow(() -> new ObjectNotFoundException("Post with ID " + id + " not found."));
 
         PostIDResponseDTO postIDResponseDTO = mapper.map(post, PostIDResponseDTO.class);
-        postIDResponseDTO.setPostOwner(this.verifyPostOwner(user));
+        postIDResponseDTO.setPostOwner(this.verifyPostOwner(user,post));
         postIDResponseDTO.setUserLike(this.verifyUserLike(post, user));
 
         postIDResponseDTO.setTotalLikes(this.calculeTotalLike(post.getId()));
@@ -204,8 +204,8 @@ public class PostServiceImpl implements PostService {
         return like.getLikeEnum();
     }
 
-    private Boolean verifyPostOwner(UserDTO user) {
+    private Boolean verifyPostOwner(UserDTO user,Posts post) {
 
-        return postRepository.existsByUserId(user.getId());
+        return post.getUser().getEmail().equals(user.getEmail());
     }
 }
