@@ -154,11 +154,12 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public void deleteByID(Long id) {
-
-        PostIDResponseDTO post = this.findByID(id);
-
-        if (post!=null) {
-            this.postRepository.deleteById(id);
+        var user = extractUser();
+        var post = this.postRepository.findById(id);
+        if (post.isPresent() && post.get().getUser().getEmail().equals(user.getEmail())) {
+            var entity = post.get();
+                entity.setActive(Boolean.FALSE);
+                this.postRepository.save(entity);
         } else {
             throw new NoSuchElementException("Post with ID: " + id + " not found!");
         }
