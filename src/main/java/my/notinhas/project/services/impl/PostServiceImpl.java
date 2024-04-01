@@ -103,7 +103,7 @@ public class PostServiceImpl implements PostService {
 
         List<CommentResponseDTO> commentResponseDTOs = comments.stream()
                 .map(comment -> new CommentResponseDTO()
-                        .converterCommentToCommentResponse(comment))
+                        .converterCommentToCommentResponse(comment, user))
                 .toList();
 
 

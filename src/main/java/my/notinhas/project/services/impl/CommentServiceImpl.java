@@ -28,6 +28,8 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public Page<CommentResponseDTO> findByPostId(Long postId, Pageable pageable) {
 
+        UserDTO userDTO = extractUser();
+
         Page<Comments> comments;
         try {
             comments = this.repository.findByPostIdAndParentCommentIsNull(postId, pageable);
@@ -37,7 +39,7 @@ public class CommentServiceImpl implements CommentService {
         List<CommentResponseDTO> commentResponseDTOS = comments.stream()
                 .map(comment ->
                         new CommentResponseDTO()
-                        .converterCommentToCommentResponse(comment))
+                                .converterCommentToCommentResponse(comment, userDTO))
                 .toList();
 
         return new PageImpl<>(commentResponseDTOS, pageable, comments.getTotalElements());
@@ -48,6 +50,16 @@ public class CommentServiceImpl implements CommentService {
         UserDTO userDTO = extractUser();
         commentRequestDTO.setUser(userDTO.convertUserDTOToUser());
         commentRequestDTO.setDate(LocalDateTime.now());
+
+        if (commentRequestDTO.getParentComment() != null) {
+            Long fatherCommentId = commentRequestDTO.getParentComment().getId();
+
+            Comments fatherComment = this.repository.findById(fatherCommentId)
+                    .orElseThrow(() -> new ObjectNotFoundException("Comment with ID " + fatherCommentId + " not found."));
+            if (fatherComment.getParentComment() != null) {
+                commentRequestDTO.setParentComment(fatherComment.getParentComment());
+            }
+        }
 
         Comments comments = commentRequestDTO.converterCommentRequestToComment();
         try {

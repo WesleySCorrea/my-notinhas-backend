@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import my.notinhas.project.dtos.UserDTO;
 import my.notinhas.project.entities.Comments;
 
 import java.time.LocalDateTime;
@@ -22,21 +23,27 @@ public class CommentResponseDTO {
     private LocalDateTime date;
     private String content;
     private Boolean isEdited;
+    private Boolean commentOwner;
     private UserPostResponseDTO user;
     private List<CommentResponseDTO> replies;
 
-    public CommentResponseDTO converterCommentToCommentResponse(Comments comment) {
+    public CommentResponseDTO converterCommentToCommentResponse(Comments comment, UserDTO user) {
 
         CommentResponseDTO commentResponseDTO = new CommentResponseDTO();
         commentResponseDTO.setId(comment.getId());
         commentResponseDTO.setDate(comment.getDate());
         commentResponseDTO.setContent(comment.getContent());
+        commentResponseDTO.setIsEdited(comment.getIsEdited());
+        if (comment.getUser().getUserName().equals(user.getUserName())) {
+            commentResponseDTO.setCommentOwner(Boolean.TRUE);
+        } else commentResponseDTO.setCommentOwner(Boolean.FALSE);
+
         commentResponseDTO.setUser(new UserPostResponseDTO(comment.getUser().getUserName()));
 
         List<CommentResponseDTO> replies = comment.getReplies().stream()
                 .map(comments -> {
                     return new CommentResponseDTO()
-                            .converterCommentToCommentResponse(comments);
+                            .converterCommentToCommentResponse(comments, user);
                 })
                 .toList();
 
