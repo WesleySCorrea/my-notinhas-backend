@@ -116,9 +116,12 @@ public class PostServiceImpl implements PostService {
         UserDTO user = extractUser();
         postRequestDTO.setUser(user);
 
+        String filteredContent = postRequestDTO.getContent();
+        filteredContent = filteredContent.replaceAll("\\n+", "\n");
+
         Posts request = new Posts();
         request.setDate(LocalDateTime.now());
-        request.setContent(postRequestDTO.getContent());
+        request.setContent(filteredContent);
         request.setActive(Boolean.TRUE);
         request.setUser(mapper.map(postRequestDTO.getUser(), Users.class));
 
