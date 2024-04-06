@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import my.notinhas.project.dtos.UserDTO;
 import my.notinhas.project.entities.Comments;
+import my.notinhas.project.enums.LikeEnum;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,6 +24,9 @@ public class CommentResponseDTO {
     private LocalDateTime date;
     private String content;
     private Boolean isEdited;
+    private Long totalLikes;
+    private Integer totalReplies;
+    private LikeEnum userLike;
     private Boolean commentOwner;
     private UserPostResponseDTO user;
     private List<CommentResponseDTO> replies;
@@ -34,6 +38,7 @@ public class CommentResponseDTO {
         commentResponseDTO.setDate(comment.getDate());
         commentResponseDTO.setContent(comment.getContent());
         commentResponseDTO.setIsEdited(comment.getIsEdited());
+        commentResponseDTO.setTotalReplies(comment.getReplies().size());
         if (comment.getUser().getUserName().equals(user.getUserName())) {
             commentResponseDTO.setCommentOwner(Boolean.TRUE);
         } else commentResponseDTO.setCommentOwner(Boolean.FALSE);

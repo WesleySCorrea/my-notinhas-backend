@@ -27,5 +27,5 @@ public class PostIDResponseDTO {
     private LikeEnum userLike;
     private Boolean postOwner;
     private Boolean isEdited;
-    private List<CommentResponseDTO> comments;
+//    private List<CommentResponseDTO> comments;
 }

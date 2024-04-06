@@ -99,15 +99,15 @@ public class PostServiceImpl implements PostService {
         postIDResponseDTO.setTotalLikes(this.calculeTotalLike(post.getId()));
         postIDResponseDTO.setTotalComments(this.calculeTotalComment(post.getId()));
 
-        List<Comments> comments = commentRepository.findByPostIdAndParentCommentIsNull(post.getId());
-
-        List<CommentResponseDTO> commentResponseDTOs = comments.stream()
-                .map(comment -> new CommentResponseDTO()
-                        .converterCommentToCommentResponse(comment, user))
-                .toList();
-
-
-        postIDResponseDTO.setComments(commentResponseDTOs);
+//        List<Comments> comments = commentRepository.findByPostIdAndParentCommentIsNull(post.getId());
+//
+//        List<CommentResponseDTO> commentResponseDTOs = comments.stream()
+//                .map(comment -> new CommentResponseDTO()
+//                        .converterCommentToCommentResponse(comment, user))
+//                .toList();
+//
+//
+//        postIDResponseDTO.setComments(commentResponseDTOs);
         return postIDResponseDTO;
     }
 

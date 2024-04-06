@@ -2,6 +2,7 @@ package my.notinhas.project.controllers;
 
 import lombok.AllArgsConstructor;
 import my.notinhas.project.dtos.UserDTO;
+import my.notinhas.project.dtos.response.UserIDResponseDTO;
 import my.notinhas.project.services.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,9 +26,9 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDTO> findById(@PathVariable Long id) {
+    public ResponseEntity<UserIDResponseDTO> findById(@PathVariable Long id) {
 
-        UserDTO user = this.service.findByID(id);
+        UserIDResponseDTO user = this.service.findByID(id);
 
         return ResponseEntity.ok().body(user);
     }
