@@ -5,9 +5,14 @@ import my.notinhas.project.dtos.UserDTO;
 import my.notinhas.project.dtos.request.CommentRequestDTO;
 import my.notinhas.project.dtos.response.CommentResponseDTO;
 import my.notinhas.project.entities.Comments;
+import my.notinhas.project.entities.Likes;
+import my.notinhas.project.entities.LikesComments;
+import my.notinhas.project.entities.Posts;
+import my.notinhas.project.enums.LikeEnum;
 import my.notinhas.project.exception.runtime.ObjectNotFoundException;
 import my.notinhas.project.exception.runtime.PersistFailedException;
 import my.notinhas.project.repositories.CommentRepository;
+import my.notinhas.project.repositories.LikeCommentRepository;
 import my.notinhas.project.services.CommentService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -24,6 +29,7 @@ import java.util.List;
 public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository repository;
+    private final LikeCommentRepository likeCommentRepository;
 
     @Override
     public Page<CommentResponseDTO> findByPostId(Long postId, Pageable pageable) {
@@ -37,9 +43,21 @@ public class CommentServiceImpl implements CommentService {
             throw new ObjectNotFoundException("Comment with post ID " + postId + "not found");
         }
         List<CommentResponseDTO> commentResponseDTOS = comments.stream()
-                .map(comment ->
-                        new CommentResponseDTO()
-                                .converterCommentToCommentResponse(comment, userDTO))
+                .map(comment -> {
+                    CommentResponseDTO commentResponseDTO = new CommentResponseDTO()
+                            .converterCommentToCommentResponse(comment, userDTO);
+
+                    commentResponseDTO.setTotalLikes(this.calculeTotalLike(comment.getId()));
+                    commentResponseDTO.setUserLike(this.verifyUserLike(commentResponseDTO, userDTO));
+
+                    for (CommentResponseDTO replies : commentResponseDTO.getReplies()) {
+
+                        replies.setTotalLikes(this.calculeTotalLike(replies.getId()));
+                        replies.setUserLike(this.verifyUserLike(replies, userDTO));
+                    }
+
+                    return commentResponseDTO;
+                })
                 .toList();
 
         return new PageImpl<>(commentResponseDTOS, pageable, comments.getTotalElements());
@@ -85,5 +103,23 @@ public class CommentServiceImpl implements CommentService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         return (UserDTO) authentication.getPrincipal();
+    }
+
+    private Long calculeTotalLike(Long commentId) {
+
+        Long totalLike = likeCommentRepository.countByCommentIdAndLikeEnum(commentId, LikeEnum.LIKE);
+        Long totalDislike = likeCommentRepository.countByCommentIdAndLikeEnum(commentId, LikeEnum.DISLIKE);
+
+        return totalLike - totalDislike;
+    }
+
+    private LikeEnum verifyUserLike(CommentResponseDTO comments, UserDTO user) {
+
+        LikesComments like = likeCommentRepository.findByUserIdAndCommentId(user.getId(), comments.getId());
+
+        if (like == null) {
+            return null;
+        }
+        return like.getLikeEnum();
     }
 }

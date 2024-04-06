@@ -2,14 +2,22 @@ package my.notinhas.project.services.impl;
 
 import lombok.AllArgsConstructor;
 import my.notinhas.project.dtos.UserDTO;
+import my.notinhas.project.dtos.response.CommentToUserDTO;
+import my.notinhas.project.dtos.response.LikeToUserDTO;
+import my.notinhas.project.dtos.response.UserIDResponseDTO;
+import my.notinhas.project.entities.Comments;
+import my.notinhas.project.entities.Likes;
 import my.notinhas.project.entities.Users;
 import my.notinhas.project.exception.runtime.PersistFailedException;
+import my.notinhas.project.repositories.CommentRepository;
+import my.notinhas.project.repositories.LikeRepository;
 import my.notinhas.project.repositories.UserRepository;
 import my.notinhas.project.services.UserService;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -19,6 +27,8 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository repository;
+    private final LikeRepository likeRepository;
+    private final CommentRepository commentRepository;
     private final ModelMapper mapper;
 
     @Override
@@ -32,12 +42,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDTO findByID(Long id) {
+    public UserIDResponseDTO findByID(Long id) {
 
         Users user = this.repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User with ID " + id + " not found."));
 
-        return mapper.map(user, UserDTO.class);
+        UserIDResponseDTO userResponse = new UserIDResponseDTO().converterUserToUserIDResponse(user);
+
+        userResponse.setLikeReactions(this.extratListLikes(user.getId()));
+        userResponse.setCommentsOwner(this.extratListComment(user.getId()));
+
+        return userResponse;
     }
 
     @Override
@@ -89,12 +104,39 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteByID(Long id) {
 
-        UserDTO user = this.findByID(id);
+        UserIDResponseDTO user = this.findByID(id);
 
         if (user != null) {
             this.repository.deleteById(id);
         } else {
             throw new NoSuchElementException("User with ID: " + id + " not found!");
         }
+    }
+
+    private List<CommentToUserDTO> extratListComment(Long userId){
+        List<Comments> commentsList = commentRepository.findByUserId(userId);
+        List<CommentToUserDTO> commentToUserDTOList = new ArrayList<>();
+
+        for (Comments comment : commentsList) {
+            CommentToUserDTO commentToUserDTO = new CommentToUserDTO()
+                    .converterCommentToCommentToUser(comment);
+            commentToUserDTOList.add(commentToUserDTO);
+        }
+
+        return commentToUserDTOList;
+    }
+
+    private List<LikeToUserDTO> extratListLikes(Long userId){
+
+        List<Likes> likesList = likeRepository.findByUserId(userId);
+        List<LikeToUserDTO> likeToUserDTOList = new ArrayList<>();
+
+        for (Likes like : likesList) {
+            LikeToUserDTO likeToUserDTO = new LikeToUserDTO()
+                    .converterLikeToLikeToUserDTO(like);
+            likeToUserDTOList.add(likeToUserDTO);
+        }
+
+        return likeToUserDTOList;
     }
 }
