@@ -34,6 +34,7 @@ public class CommentRequestDTO {
         comment.setPost(this.getPost());
         comment.setUser(this.getUser());
         comment.setParentComment(this.getParentComment());
+        comment.setActive(Boolean.TRUE);
         return comment;
     }
 }
