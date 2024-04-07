@@ -5,9 +5,7 @@ import my.notinhas.project.dtos.UserDTO;
 import my.notinhas.project.dtos.request.CommentRequestDTO;
 import my.notinhas.project.dtos.response.CommentResponseDTO;
 import my.notinhas.project.entities.Comments;
-import my.notinhas.project.entities.Likes;
 import my.notinhas.project.entities.LikesComments;
-import my.notinhas.project.entities.Posts;
 import my.notinhas.project.enums.LikeEnum;
 import my.notinhas.project.exception.runtime.ObjectNotFoundException;
 import my.notinhas.project.exception.runtime.PersistFailedException;
@@ -38,7 +36,7 @@ public class CommentServiceImpl implements CommentService {
 
         Page<Comments> comments;
         try {
-            comments = this.repository.findByPostIdAndParentCommentIsNull(postId, pageable);
+            comments = this.repository.findByPostIdAndParentCommentIsNullAndActiveIsTrue(postId, pageable);
         } catch (Exception e) {
             throw new ObjectNotFoundException("Comment with post ID " + postId + "not found");
         }
@@ -95,7 +93,8 @@ public class CommentServiceImpl implements CommentService {
                 .orElseThrow(() -> new ObjectNotFoundException("Comment with ID " + id + " not found."));
 
         if (comment.getUser().getUserName().equals(userDTO.getUserName())) {
-            this.repository.deleteById(id);
+            comment.setActive(Boolean.FALSE);
+            this.repository.save(comment);
         }
     }
 

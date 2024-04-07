@@ -25,6 +25,8 @@ public class Comments {
     private String content;
     @Column(name = "is_edited")
     private Boolean isEdited = Boolean.FALSE;
+    @Column(name = "active", columnDefinition = "BOOLEAN DEFAULT TRUE")
+    private Boolean active;
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "post_id")

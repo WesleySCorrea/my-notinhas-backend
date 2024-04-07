@@ -8,8 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface CommentRepository extends JpaRepository<Comments, Long> {
-    Long countByPostId(Long postId);
-    List<Comments> findByUserId(Long userId);
-    List<Comments> findByPostIdAndParentCommentIsNull(Long postId);
-    Page<Comments> findByPostIdAndParentCommentIsNull(Long userId, Pageable pageable);
+    Long countByPostIdAndActiveIsTrue(Long postId);
+    List<Comments> findByUserIdAndActiveIsTrue(Long userId);
+    List<Comments> findByPostIdAndParentCommentIsNullAndActiveIsTrue(Long postId);
+    Page<Comments> findByPostIdAndParentCommentIsNullAndActiveIsTrue(Long userId, Pageable pageable);
 }

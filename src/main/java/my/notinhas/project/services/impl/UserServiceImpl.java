@@ -114,7 +114,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private List<CommentToUserDTO> extratListComment(Long userId){
-        List<Comments> commentsList = commentRepository.findByUserId(userId);
+        List<Comments> commentsList = commentRepository.findByUserIdAndActiveIsTrue(userId);
         List<CommentToUserDTO> commentToUserDTOList = new ArrayList<>();
 
         for (Comments comment : commentsList) {

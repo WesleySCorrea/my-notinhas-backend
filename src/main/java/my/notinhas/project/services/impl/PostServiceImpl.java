@@ -184,7 +184,7 @@ public class PostServiceImpl implements PostService {
 
     private Long calculeTotalComment(Long postId) {
 
-        return commentRepository.countByPostId(postId);
+        return commentRepository.countByPostIdAndActiveIsTrue(postId);
     }
 
     private void verifyDateActive (Posts post) {
