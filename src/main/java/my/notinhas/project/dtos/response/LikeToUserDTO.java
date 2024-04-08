@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import my.notinhas.project.entities.Likes;
-import my.notinhas.project.entities.Posts;
 import my.notinhas.project.enums.LikeEnum;
 
 @Getter

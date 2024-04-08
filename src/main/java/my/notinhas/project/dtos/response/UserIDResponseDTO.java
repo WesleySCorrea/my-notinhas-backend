@@ -5,10 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import my.notinhas.project.entities.Likes;
 import my.notinhas.project.entities.Users;
-
-import java.util.List;
 
 @Getter
 @Setter
@@ -20,8 +17,6 @@ public class UserIDResponseDTO {
     private String firstName;
     private String lastName;
     private String picture;
-    private List<LikeToUserDTO> likeReactions;
-    private List<CommentToUserDTO> commentsOwner;
 
     public UserIDResponseDTO converterUserToUserIDResponse(Users user) {
 

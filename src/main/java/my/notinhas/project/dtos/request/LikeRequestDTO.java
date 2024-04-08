@@ -26,6 +26,7 @@ public class LikeRequestDTO {
 
         Likes like = new Likes(
                 null,
+                null,
                 this.getLikeEnum(),
                 this.getPost(),
                 this.user

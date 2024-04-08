@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import my.notinhas.project.enums.LikeEnum;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @Setter
@@ -19,6 +21,8 @@ public class LikesComments {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(name = "date")
+    private LocalDateTime date;
     @NotNull
     @Column(name = "like_enum")
     @Enumerated(value = EnumType.STRING)

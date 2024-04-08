@@ -9,5 +9,6 @@ import java.util.List;
 
 public interface PostRepository extends JpaRepository<Posts, Long> {
     Page<Posts> findAllByActiveTrueOrderByDateDesc(Pageable pageable);
+    List<Posts> findByUserIdAndActiveIsTrueOrderByDateDesc(Long userId);
     Boolean existsByUserId(Long userId);
 }

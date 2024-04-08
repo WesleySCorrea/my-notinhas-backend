@@ -26,6 +26,7 @@ public class LikeCommentRequestDTO {
 
         LikesComments like = new LikesComments(
                 null,
+                null,
                 this.getLikeEnum(),
                 this.getComment(),
                 this.user

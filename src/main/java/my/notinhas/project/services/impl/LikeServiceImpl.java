@@ -1,7 +1,6 @@
 package my.notinhas.project.services.impl;
 
 import lombok.AllArgsConstructor;
-import my.notinhas.project.dtos.LikeDTO;
 import my.notinhas.project.dtos.UserDTO;
 import my.notinhas.project.dtos.request.LikeRequestDTO;
 import my.notinhas.project.entities.Likes;
@@ -11,6 +10,8 @@ import my.notinhas.project.services.LikeService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @Service
 @AllArgsConstructor
@@ -34,6 +35,7 @@ public class LikeServiceImpl implements LikeService {
 
             } else {
                 existingLike.setLikeEnum(likeRequestDTO.getLikeEnum());
+                existingLike.setDate(LocalDateTime.now());
                 this.repository.save(existingLike);
             }
 
@@ -42,6 +44,7 @@ public class LikeServiceImpl implements LikeService {
             Likes request = likeRequestDTO.converterLikeRequestToLike();
 
             try {
+                request.setDate(LocalDateTime.now());
                 this.repository.save(request);
             } catch (Exception e) {
                 throw new PersistFailedException("Fail when the like was persisted");
