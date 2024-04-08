@@ -31,7 +31,4 @@ public class Users {
     private String lastName;
     @Column(name = "picture")
     private String picture;
-
-//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-//    private List<Posts> posts;
 }

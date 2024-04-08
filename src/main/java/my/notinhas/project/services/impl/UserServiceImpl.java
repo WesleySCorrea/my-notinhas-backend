@@ -161,7 +161,7 @@ public class UserServiceImpl implements UserService {
 
     private List<UserHistoryResponseDTO> extratListCommentsByUser(Long userId) {
 
-        List<Comments> comments = this.commentRepository.findByUserIdAndActiveIsTrueOrderByDateDesc(userId);
+        List<Comments> comments = this.commentRepository.findByUserIdAndPostActiveIsTrueOrderByDateDesc(userId);
 
         return comments.stream().map(
                 comment -> new UserHistoryResponseDTO()
