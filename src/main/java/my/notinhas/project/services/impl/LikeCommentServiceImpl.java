@@ -12,6 +12,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 @AllArgsConstructor
 public class LikeCommentServiceImpl implements LikeCommentService {
@@ -33,6 +35,7 @@ public class LikeCommentServiceImpl implements LikeCommentService {
 
             } else {
                 existingLike.setLikeEnum(likeCommentRequestDTO.getLikeEnum());
+                existingLike.setDate(LocalDateTime.now());
                 this.repository.save(existingLike);
             }
 
@@ -41,6 +44,7 @@ public class LikeCommentServiceImpl implements LikeCommentService {
             LikesComments request = likeCommentRequestDTO.converterLikeCommentRequestToLike();
 
             try {
+                request.setDate(LocalDateTime.now());
                 this.repository.save(request);
             } catch (Exception e) {
                 throw new PersistFailedException("Fail when the like was persisted");

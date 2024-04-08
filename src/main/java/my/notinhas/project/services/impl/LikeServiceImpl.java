@@ -26,7 +26,6 @@ public class LikeServiceImpl implements LikeService {
 
         Likes existingLike = repository.findByUserIdAndPostId(userDTO.getId(), likeRequestDTO.getPost().getId());
 
-        Likes newLike;
         if (existingLike != null) {
 
             if (existingLike.getLikeEnum() == likeRequestDTO.getLikeEnum()) {
