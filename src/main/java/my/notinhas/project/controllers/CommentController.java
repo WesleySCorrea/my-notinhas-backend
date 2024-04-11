@@ -11,8 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @AllArgsConstructor
 @RequestMapping("/comment")
@@ -34,6 +32,14 @@ public class CommentController {
         this.service.saveComment(commentRequestDTO);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<Void> update(@RequestBody CommentRequestDTO commentRequestDTO, @PathVariable Long id) {
+
+        this.service.updateComment(commentRequestDTO, id);
+
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{id}")

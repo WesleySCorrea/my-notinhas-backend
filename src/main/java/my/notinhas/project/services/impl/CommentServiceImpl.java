@@ -3,15 +3,19 @@ package my.notinhas.project.services.impl;
 import lombok.AllArgsConstructor;
 import my.notinhas.project.dtos.UserDTO;
 import my.notinhas.project.dtos.request.CommentRequestDTO;
+import my.notinhas.project.dtos.request.PostRequestDTO;
 import my.notinhas.project.dtos.response.CommentResponseDTO;
 import my.notinhas.project.entities.Comments;
 import my.notinhas.project.entities.LikesComments;
+import my.notinhas.project.entities.Posts;
 import my.notinhas.project.enums.LikeEnum;
 import my.notinhas.project.exception.runtime.ObjectNotFoundException;
 import my.notinhas.project.exception.runtime.PersistFailedException;
+import my.notinhas.project.exception.runtime.UnauthorizedIdTokenException;
 import my.notinhas.project.repositories.CommentRepository;
 import my.notinhas.project.repositories.LikeCommentRepository;
 import my.notinhas.project.services.CommentService;
+import org.modelmapper.Conditions;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -82,6 +87,26 @@ public class CommentServiceImpl implements CommentService {
             this.repository.save(comments);
         } catch (Exception e) {
             throw new PersistFailedException("Fail when the object was persisted");
+        }
+    }
+
+    @Override
+    public void updateComment(CommentRequestDTO commentRequestDTO, Long id) {
+
+        UserDTO user = extractUser();
+
+        Comments commentPersisted = this.repository.findById(id)
+                .orElseThrow(() -> new ObjectNotFoundException("Comment with ID " + id + " not found."));
+
+
+        if (commentPersisted.getUser().getUserName().equals(user.getUserName())) {
+            commentPersisted.setContent(commentRequestDTO.getContent());
+            commentPersisted.setDate(LocalDateTime.now());
+            commentPersisted.setIsEdited(Boolean.TRUE);
+
+            this.repository.save(commentPersisted);
+        } else {
+            throw new UnauthorizedIdTokenException("Comment does not belong to the user");
         }
     }
 
