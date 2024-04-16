@@ -35,13 +35,13 @@ public class CommentServiceImpl implements CommentService {
     private final LikeCommentRepository likeCommentRepository;
 
     @Override
-    public Page<CommentResponseDTO> findAllCommentSon(Pageable pageable) {
+    public Page<CommentResponseDTO> findAllCommentSon(Pageable pageable, Long id) {
 
         UserDTO userDTO = extractUser();
 
         Page<Comments> comments;
         try {
-            comments = this.repository.findAllByParentCommentNotNullAndPostActiveTrue(pageable);
+            comments = this.repository.findAllByParentCommentIdAndPostActiveTrue(pageable, id);
         } catch (Exception e) {
             throw new ObjectNotFoundException("Comments not found");
         }

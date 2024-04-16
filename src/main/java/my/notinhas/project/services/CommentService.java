@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface CommentService {
 
-    Page<CommentResponseDTO> findAllCommentSon(Pageable pageable);
+    Page<CommentResponseDTO> findAllCommentSon(Pageable pageable, Long id);
     Page<CommentResponseDTO> findByPostId(Long postId, Pageable pageable);
     void saveComment(CommentRequestDTO commentRequestDTO);
     void updateComment(CommentRequestDTO commentRequestDTO, Long id);

@@ -18,10 +18,10 @@ public class CommentController {
 
     private final CommentService service;
 
-    @GetMapping("/son")
-    public ResponseEntity<Page<CommentResponseDTO>> findAllCommentSon(Pageable pageable) {
+    @GetMapping("/son/{id}")
+    public ResponseEntity<Page<CommentResponseDTO>> findAllCommentSon(@PathVariable Long id, Pageable pageable) {
 
-        Page<CommentResponseDTO> comments = this.service.findAllCommentSon(pageable);
+        Page<CommentResponseDTO> comments = this.service.findAllCommentSon(pageable, id);
 
         return ResponseEntity.ok().body(comments);
     }

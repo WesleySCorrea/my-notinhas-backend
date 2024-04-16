@@ -18,12 +18,4 @@ public class LikeDTO {
     private Long id;
     private LikeEnum likeEnum;
     private Posts post;
-
-    public LikeDTO converterLikeToLikeDTO(Likes likes) {
-        LikeDTO likeDTO = new LikeDTO();
-        likeDTO.setId(likes.getId());
-        likeDTO.setLikeEnum(likes.getLikeEnum());
-        likeDTO.setPost(likes.getPost());
-        return likeDTO;
-    }
 }
