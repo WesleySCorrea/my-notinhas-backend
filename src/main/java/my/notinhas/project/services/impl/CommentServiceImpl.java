@@ -41,7 +41,7 @@ public class CommentServiceImpl implements CommentService {
 
         Page<Comments> comments;
         try {
-            comments = this.repository.findAllByParentCommentIdAndPostActiveTrue(pageable, id);
+            comments = this.repository.findAllByParentCommentIdAndActiveIsTrue(pageable, id);
         } catch (Exception e) {
             throw new ObjectNotFoundException("Comments not found");
         }

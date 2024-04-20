@@ -38,7 +38,13 @@ public class CommentResponseDTO {
         commentResponseDTO.setDate(comment.getDate());
         commentResponseDTO.setContent(comment.getContent());
         commentResponseDTO.setIsEdited(comment.getIsEdited());
-        commentResponseDTO.setTotalReplies(comment.getReplies().size());
+        Integer sizes = 0;
+        if (comment.getReplies() != null) {
+            for(Comments comments : comment.getReplies()) {
+                if (comments.getActive()) sizes++;
+            }
+        }
+        commentResponseDTO.setTotalReplies(sizes);
         if (comment.getUser().getUserName().equals(user.getUserName())) {
             commentResponseDTO.setCommentOwner(Boolean.TRUE);
         } else commentResponseDTO.setCommentOwner(Boolean.FALSE);

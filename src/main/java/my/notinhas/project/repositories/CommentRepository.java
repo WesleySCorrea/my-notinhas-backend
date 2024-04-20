@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface CommentRepository extends JpaRepository<Comments, Long> {
     Long countByPostIdAndActiveIsTrue(Long postId);
-    Page<Comments> findAllByParentCommentIdAndPostActiveTrue(Pageable pageable, Long id);
+    Page<Comments> findAllByParentCommentIdAndActiveIsTrue(Pageable pageable, Long id);
     Page<Comments> findByUserIdAndActiveIsTrue(Long userId, Pageable pageable);
     List<Comments> findByUserIdAndPostActiveIsTrueOrderByDateDesc(Long userId);
     List<Comments> findByPostIdAndParentCommentIsNullAndActiveIsTrue(Long postId);
