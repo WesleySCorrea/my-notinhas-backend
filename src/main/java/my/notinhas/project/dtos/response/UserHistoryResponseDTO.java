@@ -9,7 +9,6 @@ import lombok.Setter;
 import my.notinhas.project.entities.Comments;
 import my.notinhas.project.entities.Likes;
 import my.notinhas.project.entities.Posts;
-import my.notinhas.project.entities.Users;
 import my.notinhas.project.enums.LikeEnum;
 import my.notinhas.project.enums.ReactionEnum;
 

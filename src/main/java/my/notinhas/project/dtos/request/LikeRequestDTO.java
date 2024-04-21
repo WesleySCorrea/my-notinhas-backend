@@ -6,10 +6,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import my.notinhas.project.dtos.PostDTO;
+import my.notinhas.project.dtos.UserDTO;
 import my.notinhas.project.entities.Likes;
-import my.notinhas.project.entities.Posts;
 import my.notinhas.project.entities.Users;
 import my.notinhas.project.enums.LikeEnum;
+
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -19,17 +22,16 @@ import my.notinhas.project.enums.LikeEnum;
 public class LikeRequestDTO {
     @NotNull
     private LikeEnum likeEnum;
-    private Posts post;
-    private Users user;
+    private PostDTO post;
 
-    public Likes converterLikeRequestToLike () {
+    public Likes converterLikeRequestToLike (UserDTO user) {
 
         Likes like = new Likes(
                 null,
-                null,
+                LocalDateTime.now(),
                 this.getLikeEnum(),
-                this.getPost(),
-                this.user
+                this.getPost().convertPostDTOToPost(),
+                user.convertUserDTOToUser()
         );
         return like;
     }

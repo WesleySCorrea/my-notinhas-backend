@@ -22,7 +22,6 @@ public class LikeServiceImpl implements LikeService {
     @Override
     public void saveLike(LikeRequestDTO likeRequestDTO) {
         UserDTO userDTO = extractUser();
-        likeRequestDTO.setUser(userDTO.convertUserDTOToUser());
 
         Likes existingLike = repository.findByUserIdAndPostId(userDTO.getId(), likeRequestDTO.getPost().getId());
 
@@ -40,10 +39,9 @@ public class LikeServiceImpl implements LikeService {
 
         } else {
 
-            Likes request = likeRequestDTO.converterLikeRequestToLike();
+            Likes request = likeRequestDTO.converterLikeRequestToLike(userDTO);
 
             try {
-                request.setDate(LocalDateTime.now());
                 this.repository.save(request);
             } catch (Exception e) {
                 throw new PersistFailedException("Fail when the like was persisted");

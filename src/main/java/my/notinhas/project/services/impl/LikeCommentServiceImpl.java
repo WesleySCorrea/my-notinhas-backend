@@ -23,7 +23,6 @@ public class LikeCommentServiceImpl implements LikeCommentService {
     @Override
     public void saveLike(LikeCommentRequestDTO likeCommentRequestDTO) {
         UserDTO userDTO = extractUser();
-        likeCommentRequestDTO.setUser(userDTO.convertUserDTOToUser());
 
         LikesComments existingLike = repository.findByUserIdAndCommentId(userDTO.getId(), likeCommentRequestDTO.getComment().getId());
 
@@ -41,10 +40,9 @@ public class LikeCommentServiceImpl implements LikeCommentService {
 
         } else {
 
-            LikesComments request = likeCommentRequestDTO.converterLikeCommentRequestToLike();
+            LikesComments request = likeCommentRequestDTO.converterLikeCommentRequestToLike(userDTO);
 
             try {
-                request.setDate(LocalDateTime.now());
                 this.repository.save(request);
             } catch (Exception e) {
                 throw new PersistFailedException("Fail when the like was persisted");

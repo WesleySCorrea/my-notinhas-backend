@@ -1,41 +1,44 @@
-package my.notinhas.project.dtos.request;
+package my.notinhas.project.dtos;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import my.notinhas.project.dtos.CommentDTO;
-import my.notinhas.project.dtos.PostDTO;
-import my.notinhas.project.dtos.UserDTO;
 import my.notinhas.project.entities.Comments;
-import my.notinhas.project.entities.Users;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class CommentRequestDTO {
-    @NotNull
+public class CommentDTO {
+
+    private Long id;
+    private LocalDateTime date;
     private String content;
+    private Boolean isEdited = Boolean.FALSE;
+    private Boolean active;
     private PostDTO post;
+    private UserDTO user;
     private CommentDTO parentComment;
+    private List<CommentDTO> replies;
 
-    public Comments converterCommentRequestToComment (LocalDateTime date, UserDTO user) {
-
+    public Comments toComment() {
         Comments comment = new Comments();
+        comment.setId(this.getId());
+        comment.setDate(this.getDate());
         comment.setContent(this.getContent());
-        comment.setDate(date);
+        comment.setIsEdited(this.getIsEdited());
+        comment.setActive(this.getActive());
         comment.setPost(this.getPost().convertPostDTOToPost());
-        comment.setUser(user.convertUserDTOToUser());
+
         if (this.getParentComment() != null) {
-            comment.setParentComment(this.getParentComment().toComment());
+            comment.setUser(this.getUser().convertUserDTOToUser());
         }
-        comment.setActive(Boolean.TRUE);
 
         return comment;
     }

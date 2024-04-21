@@ -3,14 +3,11 @@ package my.notinhas.project.services.impl;
 import lombok.AllArgsConstructor;
 import my.notinhas.project.dtos.UserDTO;
 import my.notinhas.project.dtos.request.PostRequestDTO;
-import my.notinhas.project.dtos.response.CommentResponseDTO;
 import my.notinhas.project.dtos.response.PostIDResponseDTO;
 import my.notinhas.project.dtos.response.PostPublicResponseDTO;
 import my.notinhas.project.dtos.response.PostResponseDTO;
-import my.notinhas.project.entities.Comments;
 import my.notinhas.project.entities.Likes;
 import my.notinhas.project.entities.Posts;
-import my.notinhas.project.entities.Users;
 import my.notinhas.project.enums.LikeEnum;
 import my.notinhas.project.exception.runtime.ObjectNotFoundException;
 import my.notinhas.project.exception.runtime.PersistFailedException;
@@ -114,7 +111,6 @@ public class PostServiceImpl implements PostService {
     @Override
     public void savePost(PostRequestDTO postRequestDTO) {
         UserDTO user = extractUser();
-        postRequestDTO.setUser(user);
 
         String filteredContent = postRequestDTO.getContent();
         filteredContent = filteredContent.replaceAll("\\n+", "\n");
@@ -123,7 +119,7 @@ public class PostServiceImpl implements PostService {
         request.setDate(LocalDateTime.now());
         request.setContent(filteredContent);
         request.setActive(Boolean.TRUE);
-        request.setUser(mapper.map(postRequestDTO.getUser(), Users.class));
+        request.setUser(user.convertUserDTOToUser());
 
         try {
             this.postRepository.save(request);
@@ -135,7 +131,6 @@ public class PostServiceImpl implements PostService {
     @Override
     public void updatePost(PostRequestDTO postRequestDTO, Long id) {
         UserDTO user = extractUser();
-        postRequestDTO.setUser(user);
 
         mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
 
@@ -143,7 +138,7 @@ public class PostServiceImpl implements PostService {
         postPersisted.setContent(postRequestDTO.getContent());
 
 
-        if (postPersisted.getUser().getUserName().equals(postRequestDTO.getUser().getUserName())) {
+        if (postPersisted.getUser().getUserName().equals(user.getUserName())) {
             Posts postsToPersistd = mapper.map(postPersisted, Posts.class);
             postsToPersistd.setUser(user.convertUserDTOToUser());
             postsToPersistd.setIsEdited(Boolean.TRUE);
@@ -207,7 +202,7 @@ public class PostServiceImpl implements PostService {
         return like.getLikeEnum();
     }
 
-    private Boolean verifyPostOwner(UserDTO user,Posts post) {
+    private Boolean verifyPostOwner(UserDTO user, Posts post) {
 
         return post.getUser().getEmail().equals(user.getEmail());
     }

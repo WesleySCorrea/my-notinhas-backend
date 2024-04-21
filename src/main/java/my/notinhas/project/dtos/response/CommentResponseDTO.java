@@ -52,10 +52,8 @@ public class CommentResponseDTO {
         commentResponseDTO.setUser(new UserPostResponseDTO(comment.getUser().getUserName()));
 
         List<CommentResponseDTO> replies = comment.getReplies().stream()
-                .map(comments -> {
-                    return new CommentResponseDTO()
-                            .converterCommentToCommentResponse(comments, user);
-                })
+                .map(comments -> new CommentResponseDTO()
+                        .converterCommentToCommentResponse(comments, user))
                 .toList();
 
         commentResponseDTO.setReplies(replies);

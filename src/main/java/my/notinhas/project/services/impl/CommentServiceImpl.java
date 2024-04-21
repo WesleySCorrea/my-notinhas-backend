@@ -1,13 +1,12 @@
 package my.notinhas.project.services.impl;
 
 import lombok.AllArgsConstructor;
+import my.notinhas.project.dtos.CommentDTO;
 import my.notinhas.project.dtos.UserDTO;
 import my.notinhas.project.dtos.request.CommentRequestDTO;
-import my.notinhas.project.dtos.request.PostRequestDTO;
 import my.notinhas.project.dtos.response.CommentResponseDTO;
 import my.notinhas.project.entities.Comments;
 import my.notinhas.project.entities.LikesComments;
-import my.notinhas.project.entities.Posts;
 import my.notinhas.project.enums.LikeEnum;
 import my.notinhas.project.exception.runtime.ObjectNotFoundException;
 import my.notinhas.project.exception.runtime.PersistFailedException;
@@ -15,7 +14,6 @@ import my.notinhas.project.exception.runtime.UnauthorizedIdTokenException;
 import my.notinhas.project.repositories.CommentRepository;
 import my.notinhas.project.repositories.LikeCommentRepository;
 import my.notinhas.project.services.CommentService;
-import org.modelmapper.Conditions;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -25,7 +23,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -94,8 +91,6 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public void saveComment(CommentRequestDTO commentRequestDTO) {
         UserDTO userDTO = extractUser();
-        commentRequestDTO.setUser(userDTO.convertUserDTOToUser());
-        commentRequestDTO.setDate(LocalDateTime.now());
 
         if (commentRequestDTO.getParentComment() != null) {
             Long fatherCommentId = commentRequestDTO.getParentComment().getId();
@@ -103,11 +98,11 @@ public class CommentServiceImpl implements CommentService {
             Comments fatherComment = this.repository.findById(fatherCommentId)
                     .orElseThrow(() -> new ObjectNotFoundException("Comment with ID " + fatherCommentId + " not found."));
             if (fatherComment.getParentComment() != null) {
-                commentRequestDTO.setParentComment(fatherComment.getParentComment());
+                commentRequestDTO.setParentComment(new CommentDTO());
             }
         }
 
-        Comments comments = commentRequestDTO.converterCommentRequestToComment();
+        Comments comments = commentRequestDTO.converterCommentRequestToComment(LocalDateTime.now(), userDTO);
         try {
             this.repository.save(comments);
         } catch (Exception e) {

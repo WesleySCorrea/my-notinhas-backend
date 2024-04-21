@@ -1,6 +1,7 @@
 package my.notinhas.project.services.impl;
 
 import lombok.AllArgsConstructor;
+import my.notinhas.project.dtos.PostDTO;
 import my.notinhas.project.dtos.UserDTO;
 import my.notinhas.project.dtos.response.CommentToUserDTO;
 import my.notinhas.project.dtos.response.LikeToUserDTO;
