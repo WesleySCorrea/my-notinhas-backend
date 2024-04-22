@@ -34,8 +34,9 @@ public class CommentDTO {
         comment.setContent(this.getContent());
         comment.setIsEdited(this.getIsEdited());
         comment.setActive(this.getActive());
-        comment.setPost(this.getPost().convertPostDTOToPost());
-
+        if (this.getParentComment() != null) {
+            comment.setPost(this.getPost().convertPostDTOToPost());
+        }
         if (this.getParentComment() != null) {
             comment.setUser(this.getUser().convertUserDTOToUser());
         }
