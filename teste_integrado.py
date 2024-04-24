@@ -3,7 +3,8 @@ import requests
 def main():
     # Aguarda o input do accessToken
     accessToken = input("Insira o accessToken do Google: ")
-
+    accessToken = accessToken.strip("'\"")
+    
     # Primeira chamada para o endpoint de login
     login_url = 'http://localhost:8090/api/auth/login'
     login_data = {'accessToken': accessToken}
@@ -101,15 +102,62 @@ def main():
                                         if like_comment_reply_response.status_code == 201:
                                             print("10 - TESTE LIKES REPLICA OK")
                                             
+                                            
                                             patch_comment_reply_url = f'http://localhost:8090/api/comment/{comment_reply_id}'
                                             patch_comment_reply_data = {'content': 'Comentário réplica teste automático EDITADO', 'post': {'id': post_id}}
                                             patch_comment_reply_response = requests.patch(patch_comment_reply_url, json=patch_comment_reply_data, headers=post_headers)
                                             
                                             if patch_comment_reply_response.status_code == 200:
                                                 print("11 - TESTE EDITAR REPLICA OK")
+                                                
+                                                
+                                                patch_comment_url = f'http://localhost:8090/api/comment/{comment_id}'
+                                                patch_comment_data = {'content': 'Comentário teste automático EDITADO', 'post': {'id': post_id}}
+                                                patch_comment_response = requests.patch(patch_comment_url, json=patch_comment_data, headers=post_headers)
+                                                
+                                                if patch_comment_response.status_code == 200:
+                                                    print("12 - TESTE EDITAR COMENTÁRIO OK")
+                                                    
+                                                    
+                                                    patch_post_url = f'http://localhost:8090/api/post/{post_id}'
+                                                    patch_post_data = {'content': 'TESTE AUTOMATIZADO EDITADO'}
+                                                    patch_post_response = requests.patch(patch_post_url, json=patch_post_data, headers=post_headers)
+                                                    
+                                                    if patch_post_response.status_code == 200:
+                                                        print("13 - TESTE EDITAR POSTAGEM OK")
+                                                        
+                                                        delete_comment_reply_url = f'http://localhost:8090/api/comment/{comment_reply_id}'
+                                                        delete_comment_reply_response = requests.delete(delete_comment_reply_url, headers=post_headers)
+                                                        
+                                                        if delete_comment_reply_response.status_code == 204:
+                                                            print("14 - TESTE DELETAR REPLICA OK")
+                                                            
+                                                            
+                                                            delete_comment_url = f'http://localhost:8090/api/comment/{comment_id}'
+                                                            delete_comment_response = requests.delete(delete_comment_url, headers=post_headers)
+                                                            
+                                                            if delete_comment_response.status_code == 204:
+                                                                print("15 - TESTE DELETAR COMENTÁRIO OK")
+                                                                
+                                                                delete_post_url = f'http://localhost:8090/api/post/{post_id}'
+                                                                delete_post_response = requests.delete(delete_post_url, headers=post_headers)
+                                                                
+                                                                if delete_post_response.status_code == 204:
+                                                                    print("16 - TESTE DELETAR POSTAGEM OK")
+                                                                
+                                                                
+                                                                else:
+                                                                    print(f"Erro ao deletar postagem: {delete_post_response.status_code}")                                                                
+                                                            else:
+                                                                print(f"Erro ao deletar comentário: {delete_comment_response.status_code}")
+                                                        else:
+                                                            print(f"Erro ao deletar replica: {delete_comment_reply_response.status_code}")
+                                                    else:
+                                                        print(f"Erro ao editar postagem: {patch_post_response.status_code}")
+                                                else:
+                                                    print(f"Erro ao editar comentário: {patch_comment_response.status_code}")
                                             else:
                                                 print(f"Erro ao editar replica: {patch_comment_reply_response.status_code}")
-                                            
                                         else:
                                             print(f"Erro no teste de likes da replica: {like_comment_reply_response.status_code}")
                                     else:
