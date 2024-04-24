@@ -2,7 +2,7 @@ import requests
 
 def main():
     # Aguarda o input do accessToken
-    accessToken = input("Aguardando accessToken: ")
+    accessToken = input("Insira o accessToken do Google: ")
 
     # Primeira chamada para o endpoint de login
     login_url = 'http://localhost:8090/api/auth/login'
@@ -12,7 +12,7 @@ def main():
 
     # Verifica se o login foi bem-sucedido
     if login_response.status_code == 201:
-        print("1 - TESTE LOGIN OK")
+        print("01 - TESTE LOGIN OK")
         # Extrai o id_token da resposta
         token = login_response.json().get('token').get('id_token')
 
@@ -27,7 +27,7 @@ def main():
 
         # Verifica se a postagem foi bem-sucedida
         if post_response.status_code == 201:
-            print("2 - TESTE POSTAGEM OK")
+            print("02 - TESTE POSTAGEM OK")
 
             # Chamada GET para recuperar as postagens
             get_url = f'http://localhost:8090/api/post?page=0&size=10'
@@ -36,7 +36,7 @@ def main():
 
             # Verifica se a recuperação das postagens foi bem-sucedida
             if get_response.status_code == 200:
-                print("3 - TESTE GET POSTAGENS OK")
+                print("03 - TESTE GET POSTAGENS OK")
                 post_id = get_response.json()['content'][0]['id']  # Obtém o ID do primeiro post
 
                 # Chamadas para teste de likes
@@ -50,22 +50,22 @@ def main():
                     like_response = requests.post(like_url, json=like_data, headers=post_headers)
 
                 if like_response.status_code == 201:
-                    print("4 - TESTE LIKES OK")
+                    print("04 - TESTE LIKES OK")
 
                     # Teste para criação de um comentário
                     comment_url = 'http://localhost:8090/api/comment'
                     comment_data = {'content': 'Comentário teste automático', 'post': {'id': post_id}}
                     comment_response = requests.post(comment_url, json=comment_data, headers=post_headers)
-
                     if comment_response.status_code == 201:
-                        print("5 - TESTE CRIAR COMENTARIO OK")
+                        print("05 - TESTE CRIAR COMENTARIO OK")
 
                         # Teste de recuperação do comentário
                         get_comment_url = f'http://localhost:8090/api/comment/post/{post_id}?page=0&size=10'
                         get_comment_response = requests.get(get_comment_url, headers=post_headers)
-
                         if get_comment_response.status_code == 200:
-                            print("6 - TESTE GET COMENTARIO OK")
+                            print("06 - TESTE GET COMENTARIO OK")
+                            
+                            
                             comments_data = get_comment_response.json()
                             if comments_data['content']:
                                 comment_id = comments_data['content'][0]['id']
@@ -77,11 +77,43 @@ def main():
                                 like_comment_response = requests.post(like_comment_url, json=like_comment_data, headers=post_headers)
 
                             if like_comment_response.status_code == 201:
-                                print("7 - TESTE LIKES COMENTARIOS OK")
+                                print("07 - TESTE LIKES COMENTARIOS OK")
+                                
+                                
                                 comment_reply_data = {'content': 'Comentário réplica teste automático', 'post': {'id': post_id}, 'parentComment': {'id': comment_id}}
                                 comment_reply_response = requests.post(comment_url, json=comment_reply_data, headers=post_headers)
                                 if comment_reply_response.status_code == 201:
-                                    print("8 - TESTE CRIAR REPLICA OK")
+                                    print("08 - TESTE CRIAR REPLICA OK")
+                                    
+                        
+                                    get_comment_reply_url = f'http://localhost:8090/api/comment/son/{comment_id}?page=0&size=10'
+                                    get_comment_reply_response = requests.get(get_comment_reply_url, headers=post_headers)
+                                    if get_comment_reply_response.status_code == 200:
+                                        print("09 - TESTE GET REPLICA OK")
+                                        
+                                        
+                                        comments_reply_data = get_comment_reply_response.json()
+                                        if comments_reply_data['content']:
+                                            comment_reply_id = comments_reply_data['content'][0]['id']
+                                        for likeType in like_types:
+                                            like_comment_data = {'likeEnum': likeType, 'comment': {'id': comment_reply_id}}
+                                            like_comment_reply_response = requests.post(like_comment_url, json=like_comment_data, headers=post_headers)
+                                        if like_comment_reply_response.status_code == 201:
+                                            print("10 - TESTE LIKES REPLICA OK")
+                                            
+                                            patch_comment_reply_url = f'http://localhost:8090/api/comment/{comment_reply_id}'
+                                            patch_comment_reply_data = {'content': 'Comentário réplica teste automático EDITADO', 'post': {'id': post_id}}
+                                            patch_comment_reply_response = requests.patch(patch_comment_reply_url, json=patch_comment_reply_data, headers=post_headers)
+                                            
+                                            if patch_comment_reply_response.status_code == 200:
+                                                print("11 - TESTE EDITAR REPLICA OK")
+                                            else:
+                                                print(f"Erro ao editar replica: {patch_comment_reply_response.status_code}")
+                                            
+                                        else:
+                                            print(f"Erro no teste de likes da replica: {like_comment_reply_response.status_code}")
+                                    else:
+                                        print(f"Erro ao recuperar replicas: {get_comment_reply_response.status_code}")
                                 else:
                                     print(f"Erro no teste de criar replica: {comment_reply_response.status_code}")
                             else:
