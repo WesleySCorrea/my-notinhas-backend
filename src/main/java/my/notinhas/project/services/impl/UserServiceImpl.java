@@ -22,6 +22,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -48,6 +50,14 @@ public class UserServiceImpl implements UserService {
         return users.stream()
                 .map(user -> mapper.map(user, UserDTO.class))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public  UserDTO findByToken() {
+        var user =  this.extractUser();
+        user.setGoogleId(null);
+        user.setPicture(null);
+        return user;
     }
 
     @Override
@@ -206,5 +216,11 @@ public class UserServiceImpl implements UserService {
         }
 
         return new PageImpl<>(likeToUserDTOList, pageable, likesList.getTotalElements());
+    }
+
+    private UserDTO extractUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        return (UserDTO) authentication.getPrincipal();
     }
 }

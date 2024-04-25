@@ -23,9 +23,9 @@ public class UserController {
     private final UserService service;
 
     @GetMapping
-    public ResponseEntity<List<UserDTO>> findAll() {
+    public ResponseEntity<UserDTO> findTokenUser() {
 
-        List<UserDTO> users = this.service.findAll();
+        var users = this.service.findByToken();
 
         return ResponseEntity.ok().body(users);
     }

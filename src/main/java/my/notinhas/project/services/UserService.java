@@ -29,4 +29,6 @@ public interface UserService {
 
     void deleteByID(Long id);
 
+    UserDTO findByToken();
+
 }

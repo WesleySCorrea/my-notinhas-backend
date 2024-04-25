@@ -2,11 +2,14 @@ package my.notinhas.project.dtos;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import my.notinhas.project.entities.Users;
+
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -21,6 +24,8 @@ public class UserDTO {
     private String firstName;
     private String lastName;
     private String picture;
+    private LocalDateTime created;
+    private String bio;
 
     public Users convertUserDTOToUser() {
 
@@ -31,7 +36,9 @@ public class UserDTO {
                 this.email,
                 this.firstName,
                 this.lastName,
-                this.picture
+                this.picture,
+                this.created,
+                this.bio
         );
 
         return user;
@@ -61,7 +68,9 @@ public class UserDTO {
                 googleIdToken.getPayload().getEmail(),
                 googleIdToken.getPayload().get("given_name").toString(),
                 familyName,
-                googleIdToken.getPayload().get("picture").toString()
+                googleIdToken.getPayload().get("picture").toString(),
+                LocalDateTime.now(),
+                null
         );
 
         return userDTO;

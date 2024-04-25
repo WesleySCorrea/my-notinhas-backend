@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -31,4 +32,8 @@ public class Users {
     private String lastName;
     @Column(name = "picture")
     private String picture;
+    @Column(name = "created")
+    private LocalDateTime created;
+    @Column(name = "bio")
+    private String bio;
 }
