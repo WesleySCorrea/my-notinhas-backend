@@ -41,6 +41,10 @@ public class UserController {
 
         Page<UserProfileDTO> users = this.service.findByUserNameContaining(userName, pageable);
 
+        if (users == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+
         return ResponseEntity.ok().body(users);
     }
 
