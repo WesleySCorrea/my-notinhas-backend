@@ -27,6 +27,19 @@ public class UserDTO {
     private LocalDateTime created;
     private String bio;
 
+    public UserDTO (Users user) {
+
+        this.id = user.getId();
+        this.googleId = user.getGoogleId();
+        this.userName = user.getUserName();
+        this.email = user.getEmail();
+        this.firstName = user.getFirstName();
+        this.lastName = user.getLastName();
+        this.picture = user.getPicture();
+        this.created = user.getCreated();
+        this.bio = user.getBio();
+    }
+
     public Users convertUserDTOToUser() {
 
         Users user = new Users(

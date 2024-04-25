@@ -1,16 +1,14 @@
 package my.notinhas.project.services.impl;
 
 import lombok.AllArgsConstructor;
-import my.notinhas.project.dtos.PostDTO;
 import my.notinhas.project.dtos.UserDTO;
-import my.notinhas.project.dtos.response.CommentToUserDTO;
-import my.notinhas.project.dtos.response.LikeToUserDTO;
-import my.notinhas.project.dtos.response.UserHistoryResponseDTO;
-import my.notinhas.project.dtos.response.UserIDResponseDTO;
+import my.notinhas.project.dtos.request.UpdateUserRequestDTO;
+import my.notinhas.project.dtos.response.*;
 import my.notinhas.project.entities.Comments;
 import my.notinhas.project.entities.Likes;
 import my.notinhas.project.entities.Posts;
 import my.notinhas.project.entities.Users;
+import my.notinhas.project.exception.runtime.ObjectNotFoundException;
 import my.notinhas.project.exception.runtime.PersistFailedException;
 import my.notinhas.project.repositories.CommentRepository;
 import my.notinhas.project.repositories.LikeRepository;
@@ -53,6 +51,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserProfileDTO findByUserName(String userName) {
+
+        Users user;
+        try {
+            user = this.repository.findByUserNameIgnoreCase(userName);
+        } catch (Exception e) {
+            throw new ObjectNotFoundException("User with username " + userName + " not found.");
+        }
+
+        return new UserProfileDTO().converterUserToUserProfile(user);
+    }
+
+    @Override
     public  UserDTO findByToken() {
         var user =  this.extractUser();
         user.setGoogleId(null);
@@ -67,6 +78,22 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new RuntimeException("User with ID " + id + " not found."));
 
         return new UserIDResponseDTO().converterUserToUserIDResponse(user);
+    }
+
+    @Override
+    public Page<UserProfileDTO> findByUserNameContaining(String userName, Pageable pageable) {
+
+        Page<Users> users;
+        try {
+            users = this.repository.findByUserNameContainingIgnoreCase(userName, pageable);
+        } catch (Exception e) {
+            throw new ObjectNotFoundException("User with username " + userName + " not found.");
+        }
+        List<UserProfileDTO> userProfiles = users.stream()
+                .map(user -> new UserProfileDTO().converterUserToUserProfile(user))
+                .toList();
+
+        return new PageImpl<>(userProfiles, pageable, users.getTotalElements());
     }
 
     @Override
@@ -118,7 +145,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public Boolean existsByEmail(String email) {
 
-        return repository.existsByEmail(email);
+        return this.repository.existsByEmail(email);
+    }
+
+    @Override
+    public Boolean existsByUserName(String userName) {
+
+        return this.repository.existsByUserNameIgnoreCase(userName);
     }
 
     @Override
@@ -137,15 +170,26 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDTO updateUser(UserDTO userDTO, Long id) {
+    public UserDTO updateUser(UpdateUserRequestDTO updateUserRequestDTO) {
+        var user =  this.extractUser();
 
-        mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
+        Users userPersisted;
+        try {
+            userPersisted = this.repository.findByUserNameIgnoreCase(user.getUserName());
+        } catch (Exception e) {
+            throw new ObjectNotFoundException("User with username " + user.getUserName() + " not found.");
+        }
 
-        var userPersisted = this.findByID(id);
-        mapper.map(userDTO, userPersisted);
-        UserDTO userToPersist = mapper.map(userPersisted, UserDTO.class);
+        if (updateUserRequestDTO.getUserName() != null) {
+            userPersisted.setUserName(updateUserRequestDTO.getUserName());
+        }
+        if (updateUserRequestDTO.getBio() != null) {
+        userPersisted.setBio(updateUserRequestDTO.getBio());
+        }
 
-        return this.saveUsers(mapper.map(userToPersist, UserDTO.class));
+        var savedUser = this.repository.save(userPersisted);
+
+        return new UserDTO(savedUser);
     }
 
     @Override

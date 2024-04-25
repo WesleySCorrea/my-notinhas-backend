@@ -2,10 +2,8 @@ package my.notinhas.project.controllers;
 
 import lombok.AllArgsConstructor;
 import my.notinhas.project.dtos.UserDTO;
-import my.notinhas.project.dtos.response.CommentToUserDTO;
-import my.notinhas.project.dtos.response.LikeToUserDTO;
-import my.notinhas.project.dtos.response.UserHistoryResponseDTO;
-import my.notinhas.project.dtos.response.UserIDResponseDTO;
+import my.notinhas.project.dtos.request.UpdateUserRequestDTO;
+import my.notinhas.project.dtos.response.*;
 import my.notinhas.project.services.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +27,31 @@ public class UserController {
 
         return ResponseEntity.ok().body(users);
     }
+
+    @GetMapping("/username/{userName}")
+    public ResponseEntity<UserProfileDTO> findByUsername(@PathVariable String userName) {
+
+        UserProfileDTO user = this.service.findByUserName(userName);
+
+        return ResponseEntity.ok().body(user);
+    }
+
+    @GetMapping("/username/with/{userName}")
+    public ResponseEntity<Page<UserProfileDTO>> findByUsernameWith(@PathVariable String userName, Pageable pageable) {
+
+        Page<UserProfileDTO> users = this.service.findByUserNameContaining(userName, pageable);
+
+        return ResponseEntity.ok().body(users);
+    }
+
+    @GetMapping("/username/exists/{userName}")
+    public ResponseEntity<Boolean> existsByUsername(@PathVariable String userName) {
+
+        Boolean exists = this.service.existsByUserName(userName);
+
+        return ResponseEntity.ok().body(exists);
+    }
+
 
     @GetMapping("/{id}/history")
     public ResponseEntity<Page<UserHistoryResponseDTO>> userHistory(@PathVariable Long id, Pageable pageable) {
@@ -70,10 +93,10 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<UserDTO> update(@RequestBody UserDTO userDTO, @PathVariable Long id) {
+    @PatchMapping()
+    public ResponseEntity<UserDTO> update(@RequestBody UpdateUserRequestDTO userDTO) {
 
-        UserDTO userUpdated = this.service.updateUser(userDTO, id);
+        UserDTO userUpdated = this.service.updateUser(userDTO);
 
         return ResponseEntity.ok(userUpdated);
     }
