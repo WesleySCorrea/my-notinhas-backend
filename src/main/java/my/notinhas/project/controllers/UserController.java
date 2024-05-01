@@ -105,10 +105,10 @@ public class UserController {
         return ResponseEntity.ok(userUpdated);
     }
 
-    @DeleteMapping("{id}")
-    public ResponseEntity<Void> delete (@PathVariable Long id) {
+    @DeleteMapping()
+    public ResponseEntity<Void> delete () {
 
-        this.service.deleteByID(id);
+        this.service.delete();
 
         return ResponseEntity.noContent().build();
     }

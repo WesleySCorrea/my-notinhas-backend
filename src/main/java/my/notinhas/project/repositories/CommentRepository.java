@@ -14,4 +14,5 @@ public interface CommentRepository extends JpaRepository<Comments, Long> {
     List<Comments> findByUserIdAndPostActiveIsTrueOrderByDateDesc(Long userId);
     List<Comments> findByPostIdAndParentCommentIsNullAndActiveIsTrue(Long postId);
     Page<Comments> findByPostIdAndParentCommentIsNullAndActiveIsTrue(Long userId, Pageable pageable);
+    List<Comments> findByUserUserNameAndActiveIsTrue(String username);
 }

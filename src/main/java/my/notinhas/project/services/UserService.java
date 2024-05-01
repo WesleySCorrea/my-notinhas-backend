@@ -24,9 +24,7 @@ public interface UserService {
     UserDTO saveUsers(UserDTO userDTO);
 
     UserDTO updateUser(UpdateUserRequestDTO updateUserRequestDTO);
-
-    void deleteByID(Long id);
-
+    void delete();
     UserDTO findByToken();
 
 }

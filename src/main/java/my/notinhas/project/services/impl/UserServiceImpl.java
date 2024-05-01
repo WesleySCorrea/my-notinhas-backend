@@ -4,18 +4,11 @@ import lombok.AllArgsConstructor;
 import my.notinhas.project.dtos.UserDTO;
 import my.notinhas.project.dtos.request.UpdateUserRequestDTO;
 import my.notinhas.project.dtos.response.*;
-import my.notinhas.project.entities.Comments;
-import my.notinhas.project.entities.Likes;
-import my.notinhas.project.entities.Posts;
-import my.notinhas.project.entities.Users;
+import my.notinhas.project.entities.*;
 import my.notinhas.project.exception.runtime.ObjectNotFoundException;
 import my.notinhas.project.exception.runtime.PersistFailedException;
-import my.notinhas.project.repositories.CommentRepository;
-import my.notinhas.project.repositories.LikeRepository;
-import my.notinhas.project.repositories.PostRepository;
-import my.notinhas.project.repositories.UserRepository;
+import my.notinhas.project.repositories.*;
 import my.notinhas.project.services.UserService;
-import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -27,7 +20,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -38,6 +30,7 @@ public class UserServiceImpl implements UserService {
     private final LikeRepository likeRepository;
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
+    private final LikeCommentRepository likeCommentRepository;
     private final ModelMapper mapper;
 
     @Override
@@ -197,15 +190,38 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteByID(Long id) {
+    public void delete() {
+        UserDTO userDTO = this.extractUser();
 
-        UserIDResponseDTO user = this.findByID(id);
+        List<Comments> comments = this.commentRepository.findByUserUserNameAndActiveIsTrue(userDTO.getUserName());
 
-        if (user != null) {
-            this.repository.deleteById(id);
-        } else {
-            throw new NoSuchElementException("User with ID: " + id + " not found!");
+        for (Comments comment : comments) {
+            comment.setActive(false);
+            this.commentRepository.save(comment);
         }
+
+        List<Posts> posts = this.postRepository.findByUserUserNameAndActiveIsTrue(userDTO.getUserName());
+
+        for (Posts post : posts) {
+            post.setActive(false);
+            this.postRepository.save(post);
+        }
+
+        List<Likes> likes = this.likeRepository.findByUserUserName(userDTO.getUserName());
+
+        for (Likes like : likes) {
+            this.likeRepository.delete(like);
+        }
+
+        List<LikesComments> likesComments = this.likeCommentRepository.findByUserUserName(userDTO.getUserName());
+
+        for (LikesComments likeComment : likesComments) {
+            this.likeCommentRepository.delete(likeComment);
+        }
+
+        Users user = this.repository.findByEmail(userDTO.getEmail());
+        user.setActive(false);
+        this.repository.save(user);
     }
 
     private List<UserHistoryResponseDTO> extratListPostByUser(Long userId) {

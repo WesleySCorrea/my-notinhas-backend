@@ -36,4 +36,6 @@ public class Users {
     private LocalDateTime created;
     @Column(name = "bio")
     private String bio;
+    @Column(name = "active")
+    private Boolean active;
 }

@@ -26,6 +26,7 @@ public class UserDTO {
     private String picture;
     private LocalDateTime created;
     private String bio;
+    private Boolean active;
 
     public UserDTO (Users user) {
 
@@ -38,6 +39,7 @@ public class UserDTO {
         this.picture = user.getPicture();
         this.created = user.getCreated();
         this.bio = user.getBio();
+        this.active = user.getActive();
     }
 
     public Users convertUserDTOToUser() {
@@ -51,7 +53,8 @@ public class UserDTO {
                 this.lastName,
                 this.picture,
                 this.created,
-                this.bio
+                this.bio,
+                this.active
         );
 
         return user;
@@ -83,7 +86,8 @@ public class UserDTO {
                 familyName,
                 googleIdToken.getPayload().get("picture").toString(),
                 LocalDateTime.now(),
-                null
+                null,
+                true
         );
 
         return userDTO;
