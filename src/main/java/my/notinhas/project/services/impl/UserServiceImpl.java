@@ -5,6 +5,7 @@ import my.notinhas.project.dtos.UserDTO;
 import my.notinhas.project.dtos.request.UpdateUserRequestDTO;
 import my.notinhas.project.dtos.response.*;
 import my.notinhas.project.entities.*;
+import my.notinhas.project.exception.runtime.InvalidUserNameException;
 import my.notinhas.project.exception.runtime.ObjectNotFoundException;
 import my.notinhas.project.exception.runtime.PersistFailedException;
 import my.notinhas.project.repositories.*;
@@ -20,6 +21,8 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -57,8 +60,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public  UserDTO findByToken() {
-        var user =  this.extractUser();
+    public UserDTO findByToken() {
+        var user = this.extractUser();
         user.setGoogleId(null);
         user.setPicture(null);
         return user;
@@ -168,7 +171,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO updateUser(UpdateUserRequestDTO updateUserRequestDTO) {
-        var user =  this.extractUser();
+
+        if (!isValidUsername(updateUserRequestDTO.getUserName())) {
+            throw new InvalidUserNameException("Invalid username");
+        }
+
+        var user = this.extractUser();
 
         Users userPersisted;
         try {
@@ -181,7 +189,7 @@ public class UserServiceImpl implements UserService {
             userPersisted.setUserName(updateUserRequestDTO.getUserName());
         }
         if (updateUserRequestDTO.getBio() != null) {
-        userPersisted.setBio(updateUserRequestDTO.getBio());
+            userPersisted.setBio(updateUserRequestDTO.getBio());
         }
 
         var savedUser = this.repository.save(userPersisted);
@@ -229,8 +237,8 @@ public class UserServiceImpl implements UserService {
         List<Posts> posts = this.postRepository.findByUserIdAndActiveIsTrueOrderByDateDesc(userId);
 
         return posts.stream().map(
-            post -> new UserHistoryResponseDTO()
-                    .converterPostToUserHistory(post)
+                post -> new UserHistoryResponseDTO()
+                        .converterPostToUserHistory(post)
         ).collect(Collectors.toList());
     }
 
@@ -254,7 +262,7 @@ public class UserServiceImpl implements UserService {
         ).collect(Collectors.toList());
     }
 
-    private Page<CommentToUserDTO> extratPageComments(Long userId, Pageable pageable){
+    private Page<CommentToUserDTO> extratPageComments(Long userId, Pageable pageable) {
 
         Page<Comments> commentsList = commentRepository.findByUserIdAndActiveIsTrue(userId, pageable);
         List<CommentToUserDTO> commentToUserDTOList = new ArrayList<>();
@@ -268,7 +276,7 @@ public class UserServiceImpl implements UserService {
         return new PageImpl<>(commentToUserDTOList, pageable, commentsList.getTotalElements());
     }
 
-    private Page<LikeToUserDTO> extratPageLikes(Long userId, Pageable pageable){
+    private Page<LikeToUserDTO> extratPageLikes(Long userId, Pageable pageable) {
 
         Page<Likes> likesList = likeRepository.findByUserId(userId, pageable);
         List<LikeToUserDTO> likeToUserDTOList = new ArrayList<>();
@@ -286,5 +294,15 @@ public class UserServiceImpl implements UserService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         return (UserDTO) authentication.getPrincipal();
+    }
+
+    public static boolean isValidUsername(String username) {
+
+        String regex = "^[^\\sçáéíóúàèìòùâêîôûãõäëïöü]+$";
+
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(username);
+
+        return matcher.matches();
     }
 }

@@ -85,4 +85,16 @@ public class ResourceExceptionHandler extends ResponseEntityExceptionHandler {
         err.setErrors(Collections.singletonList(new FieldMessage("DuplicateVoteAttemptException",e.getMessage())));
         return ResponseEntity.status(status).body(err);
     }
+
+    @ExceptionHandler(InvalidUserNameException.class)
+    public ResponseEntity<Object> invalidUserNameException(InvalidUserNameException e, HttpServletRequest request) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        ValidationError err = new ValidationError();
+        err.setTimestamp(Instant.now());
+        err.setStatus(status.value());
+        err.setError(e.getMessage());
+        err.setPath(request.getRequestURI());
+        err.setErrors(Collections.singletonList(new FieldMessage("InvalidUserNameException",e.getMessage())));
+        return ResponseEntity.status(status).body(err);
+    }
 }
