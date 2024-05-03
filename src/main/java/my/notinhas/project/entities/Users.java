@@ -36,8 +36,12 @@ public class Users {
     private String picture;
     @Column(name = "created")
     private LocalDateTime created;
+    @Column(name = "edited_username")
+    private LocalDateTime editatedUsername;
     @Column(name = "bio")
     private String bio;
+    @Column(name = "editated_bio")
+    private LocalDateTime editatedBio;
     @Column(name = "active")
     private Boolean active;
 }

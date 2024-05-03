@@ -33,6 +33,11 @@ public class AuthServiceImpl implements AuthService {
         UserDTO userDTO;
         if (service.existsByEmail(userEmail)) {
             userDTO = service.findByEmail(userEmail);
+
+            if (userDTO.getActive().equals(false)) {
+                userDTO.setActive(true);
+                this.activeUser(userDTO);
+            }
         } else {
             userDTO = this.register(googleIdToken);
         }
@@ -68,4 +73,16 @@ public class AuthServiceImpl implements AuthService {
         return newUserDTO;
     }
 
+    @Override
+    public UserDTO activeUser(UserDTO userDTO) {
+
+        UserDTO newUserDTO;
+        try {
+            newUserDTO = service.saveUsers(userDTO);
+        } catch (Exception e) {
+            throw new PersistFailedException("Fail when the object was persisted");
+        }
+
+        return newUserDTO;
+    }
 }

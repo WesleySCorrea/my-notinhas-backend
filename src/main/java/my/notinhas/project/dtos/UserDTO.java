@@ -1,8 +1,8 @@
 package my.notinhas.project.dtos;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
-import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,7 +25,12 @@ public class UserDTO {
     private String lastName;
     private String picture;
     private LocalDateTime created;
+    @JsonFormat(pattern = "dd-MM-yy HH:mm:ss")
+    private LocalDateTime editatedUsername;
     private String bio;
+    @JsonFormat(pattern = "dd-MM-yy HH:mm:ss")
+
+    private LocalDateTime editatedBio;
     private Boolean active;
 
     public UserDTO (Users user) {
@@ -38,13 +43,15 @@ public class UserDTO {
         this.lastName = user.getLastName();
         this.picture = user.getPicture();
         this.created = user.getCreated();
+        this.editatedUsername = user.getEditatedUsername();
         this.bio = user.getBio();
+        this.editatedBio = user.getEditatedBio();
         this.active = user.getActive();
     }
 
     public Users convertUserDTOToUser() {
 
-        Users user = new Users(
+        return new Users(
                 this.id,
                 this.googleId,
                 this.userName,
@@ -53,11 +60,11 @@ public class UserDTO {
                 this.lastName,
                 this.picture,
                 this.created,
+                this.editatedUsername,
                 this.bio,
+                this.editatedBio,
                 this.active
         );
-
-        return user;
     }
 
     public UserDTO createUserDTOWithUserName (GoogleIdToken googleIdToken) {
@@ -77,7 +84,7 @@ public class UserDTO {
             familyName = googleIdToken.getPayload().get("family_name").toString();
         }
 
-        UserDTO userDTO = new UserDTO(
+        return new UserDTO(
                 null,
                 googleId,
                 userName,
@@ -87,9 +94,9 @@ public class UserDTO {
                 googleIdToken.getPayload().get("picture").toString(),
                 LocalDateTime.now(),
                 null,
+                null,
+                null,
                 true
         );
-
-        return userDTO;
     }
 }

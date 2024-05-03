@@ -18,6 +18,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -187,9 +188,11 @@ public class UserServiceImpl implements UserService {
 
         if (updateUserRequestDTO.getUserName() != null) {
             userPersisted.setUserName(updateUserRequestDTO.getUserName());
+            userPersisted.setEditatedUsername(LocalDateTime.now());
         }
         if (updateUserRequestDTO.getBio() != null) {
             userPersisted.setBio(updateUserRequestDTO.getBio());
+            userPersisted.setEditatedBio(LocalDateTime.now());
         }
 
         var savedUser = this.repository.save(userPersisted);
@@ -229,6 +232,9 @@ public class UserServiceImpl implements UserService {
 
         Users user = this.repository.findByEmail(userDTO.getEmail());
         user.setActive(false);
+        user.setUserName(this.resetUserName(user.getGoogleId(), user.getFirstName()));
+        user.setEditatedBio(null);
+        user.setEditatedUsername(null);
         this.repository.save(user);
     }
 
@@ -296,7 +302,7 @@ public class UserServiceImpl implements UserService {
         return (UserDTO) authentication.getPrincipal();
     }
 
-    public static boolean isValidUsername(String username) {
+    private static boolean isValidUsername(String username) {
 
         String regex = "^[^\\sçáéíóúàèìòùâêîôûãõäëïöü]+$";
 
@@ -304,5 +310,18 @@ public class UserServiceImpl implements UserService {
         Matcher matcher = pattern.matcher(username);
 
         return matcher.matches();
+    }
+
+    private String resetUserName(String googleId, String firstName) {
+
+        char number1 = googleId.charAt(3);
+        char number2 = googleId.charAt(9);
+        char number3 = googleId.charAt(11);
+        char number4 = googleId.charAt(15);
+        char number5 = googleId.charAt(20);
+
+        String userName = firstName + number1 + number2 + number3 + number4 + number5;
+
+        return userName;
     }
 }

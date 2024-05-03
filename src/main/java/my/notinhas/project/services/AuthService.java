@@ -9,4 +9,5 @@ public interface AuthService {
     LoginResponseDTO login(String accessToken);
     IdTokenDTO createIdToken(String accessToken);
     UserDTO register(GoogleIdToken googleIdToken);
+    UserDTO activeUser(UserDTO userDTO);
 }
