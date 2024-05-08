@@ -12,5 +12,5 @@ import lombok.Setter;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class LoginRequestDTO {
-    private String accessToken;
+    private String code;
 }

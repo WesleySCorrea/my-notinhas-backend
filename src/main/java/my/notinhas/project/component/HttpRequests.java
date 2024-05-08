@@ -23,15 +23,14 @@ import java.util.Collections;
 
 @Component
 public class HttpRequests {
-    @Autowired
-    private ObjectMapper objectMapper;
+
     @Value("${google.client-id}")
     private String clientId;
     @Value("${google.client-secret}")
     private String clientSecret;
 
 
-    public IdTokenDTO idTokenRequest(String access_token) {
+    public IdTokenDTO idTokenRequest(String code) {
 
         WebClient webClient = WebClient.create("https://oauth2.googleapis.com");
 
@@ -40,10 +39,13 @@ public class HttpRequests {
             idTokenString = webClient.post()
                     .uri("/token")
                     .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                    .body(BodyInserters.fromFormData("client_id", clientId)
+                    .body(BodyInserters.fromFormData(
+                            "client_id", clientId)
+                            .with("code", code)
                             .with("client_secret", clientSecret)
-                            .with("refresh_token", access_token)
-                            .with("grant_type", "refresh_token"))
+                            .with("redirect_uri", "postmessage")
+                            .with("access_type", "offline")
+                            .with("grant_type", "authorization_code"))
                     .retrieve()
                     .bodyToMono(String.class)
                     .block();
@@ -53,7 +55,7 @@ public class HttpRequests {
 
         if (idTokenString != null) {
             try {
-                return objectMapper.readValue(idTokenString, IdTokenDTO.class);
+                return new ObjectMapper().readValue(idTokenString, IdTokenDTO.class);
             } catch (JsonProcessingException e) {
                 throw new ObjectConversionException("error when trying to convert the object to IdToken");
             }

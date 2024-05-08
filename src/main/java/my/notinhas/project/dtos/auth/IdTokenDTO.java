@@ -13,6 +13,7 @@ import lombok.Setter;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class IdTokenDTO {
     public String access_token;
+    public String refresh_token;
     public int expires_in;
     public String scope;
     public String token_type;

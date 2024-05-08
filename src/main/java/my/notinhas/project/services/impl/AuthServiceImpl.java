@@ -22,9 +22,9 @@ public class AuthServiceImpl implements AuthService {
     private final HttpRequests requests;
 
     @Override
-    public LoginResponseDTO login(String accessToken) {
+    public LoginResponseDTO login(String code) {
 
-        IdTokenDTO idTokenDTO = this.createIdToken(accessToken);
+        IdTokenDTO idTokenDTO = this.createIdToken(code);
 
         GoogleIdToken googleIdToken = auth.extractAndVerifyIdToken(idTokenDTO.getId_token());
 
@@ -46,9 +46,9 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public IdTokenDTO createIdToken(String access_token) {
+    public IdTokenDTO createIdToken(String code) {
 
-        IdTokenDTO idTokenDTO = requests.idTokenRequest(access_token);
+        IdTokenDTO idTokenDTO = requests.idTokenRequest(code);
         if (idTokenDTO == null) {
             throw new UnauthorizedIdTokenException("Invalid or expired access token");
         }
