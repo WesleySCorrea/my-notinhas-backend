@@ -1,6 +1,7 @@
 package my.notinhas.project.services.impl;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import my.notinhas.project.component.Auth;
 import my.notinhas.project.component.GoogleHttpRequests;
@@ -13,9 +14,9 @@ import my.notinhas.project.exception.runtime.UnauthorizedIdTokenException;
 import my.notinhas.project.services.AuthService;
 import my.notinhas.project.services.AuthenticationTokenService;
 import my.notinhas.project.services.UserService;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Service
 @AllArgsConstructor
@@ -47,8 +48,7 @@ public class AuthServiceImpl implements AuthService {
         }
         var token = idTokenDTO.getId_token();
         var refreshToken = idTokenDTO.getRefresh_token();
-        var tokenLength = token.length();
-        var cacheToken = token.substring(tokenLength - 50);
+        var cacheToken = this.shroten(token);
         this.authenticationTokenService.saveRefreshToken(new AuthenticationToken(cacheToken, refreshToken));
         return new LoginResponseDTO(idTokenDTO.getId_token(), userDTO.getUserName(), userDTO.getPicture());
     }
@@ -96,13 +96,34 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public LoginResponseDTO refresh() {
-        var user = extractUser();
-        return null;
+        var token = this.extractToken();
+        var tokenLength = token.length();
+        var cacheToken = token.substring(tokenLength - 50);
+        var authenticationToken = this.authenticationTokenService.getRefreshToken(cacheToken);
+        if (authenticationToken.isPresent()) {
+            var refreshToken = authenticationToken.get().getRefreshToken();
+            this.authenticationTokenService.deleteRefreshToken(cacheToken);
+            var idTokenDTO = this.requests.refreshTokenRequest(refreshToken);
+            var newCacheToken = this.shroten(idTokenDTO.getId_token());
+            this.authenticationTokenService.saveRefreshToken(new AuthenticationToken(newCacheToken, refreshToken));
+            return new LoginResponseDTO(idTokenDTO.getId_token());
+        }
+        throw new UnauthorizedIdTokenException("Invalid or expired refresh token");
     }
 
-    private UserDTO extractUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    private String extractToken() {
+        ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        HttpServletRequest request = attrs.getRequest();
+        String token = request.getHeader("Authorization");
 
-        return (UserDTO) authentication.getPrincipal();
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
+        return token;
+    }
+
+    private String shroten(String token) {
+        var tokenLength = token.length();
+        return token.substring(tokenLength - 50);
     }
 }

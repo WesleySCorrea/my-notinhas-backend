@@ -5,8 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import my.notinhas.project.dtos.UserDTO;
-import my.notinhas.project.dtos.auth.IdTokenDTO;
 
 @Getter
 @Setter
@@ -18,4 +16,8 @@ public class LoginResponseDTO {
     private String idToken;
     private String userName;
     private String picture;
+
+    public LoginResponseDTO(String idToken) {
+        this.idToken = idToken;
+    }
 }

@@ -26,7 +26,7 @@ public class AuthController {
     @GetMapping("/refresh")
     public ResponseEntity<LoginResponseDTO> login() {
 
-        LoginResponseDTO loginResponseDTO = service.login(loginRequestDTO.getCode());
+        LoginResponseDTO loginResponseDTO = service.refresh();
 
         return ResponseEntity.status(HttpStatus.CREATED).body(loginResponseDTO);
     }

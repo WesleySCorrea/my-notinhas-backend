@@ -10,7 +10,6 @@ import my.notinhas.project.dtos.CommentDTO;
 import my.notinhas.project.dtos.PostDTO;
 import my.notinhas.project.dtos.UserDTO;
 import my.notinhas.project.entities.Comments;
-import my.notinhas.project.entities.Users;
 
 import java.time.LocalDateTime;
 

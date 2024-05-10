@@ -3,7 +3,10 @@ package my.notinhas.project.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import my.notinhas.project.enums.LikeEnum;
 
 import java.time.LocalDateTime;

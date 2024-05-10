@@ -1,7 +1,6 @@
 package my.notinhas.project.services;
 
 import my.notinhas.project.dtos.UserDTO;
-import my.notinhas.project.dtos.auth.IdTokenDTO;
 import my.notinhas.project.dtos.request.UpdateUserRequestDTO;
 import my.notinhas.project.dtos.response.*;
 import org.springframework.data.domain.Page;

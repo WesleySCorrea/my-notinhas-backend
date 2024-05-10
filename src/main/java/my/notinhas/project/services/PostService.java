@@ -1,6 +1,5 @@
 package my.notinhas.project.services;
 
-import my.notinhas.project.dtos.PostDTO;
 import my.notinhas.project.dtos.request.PostRequestDTO;
 import my.notinhas.project.dtos.response.PostIDResponseDTO;
 import my.notinhas.project.dtos.response.PostPublicResponseDTO;

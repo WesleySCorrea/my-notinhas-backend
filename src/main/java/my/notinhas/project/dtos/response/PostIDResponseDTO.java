@@ -9,7 +9,6 @@ import lombok.Setter;
 import my.notinhas.project.enums.LikeEnum;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @Setter

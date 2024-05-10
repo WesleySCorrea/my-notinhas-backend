@@ -9,7 +9,6 @@ import lombok.Setter;
 import my.notinhas.project.dtos.PostDTO;
 import my.notinhas.project.dtos.UserDTO;
 import my.notinhas.project.entities.Likes;
-import my.notinhas.project.entities.Users;
 import my.notinhas.project.enums.LikeEnum;
 
 import java.time.LocalDateTime;

@@ -71,16 +71,7 @@ public class OAuth2AuthorizationRequestFilter extends OncePerRequestFilter {
                             new UsernamePasswordAuthenticationToken(userDTO, null, null));
 
         } else {
-            var tokenLength = idToken.length();
-            var cacheToken = idToken.substring(tokenLength - 50);
-            var refreshToken = this.authenticationTokenService.getRefreshToken(cacheToken);
-            this.authenticationTokenService.deleteRefreshToken(cacheToken);
-            if (refreshToken.isEmpty()){
-                throw new UnauthorizedIdTokenException("Token invalid or expired");
-            }
-            var idTokenDTO = this.googleHttpRequests.refreshTokenRequest(refreshToken.get().getRefreshToken());
             throw new UnauthorizedIdTokenException("Token invalid or expired");
-
         }
 
         chain.doFilter(request, response);
