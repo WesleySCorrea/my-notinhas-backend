@@ -8,10 +8,13 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import my.notinhas.project.component.Auth;
+import my.notinhas.project.component.GoogleHttpRequests;
 import my.notinhas.project.dtos.UserDTO;
 import my.notinhas.project.exception.runtime.CallHttpErrorException;
 import my.notinhas.project.exception.runtime.UnauthorizedIdTokenException;
+import my.notinhas.project.services.AuthenticationTokenService;
 import my.notinhas.project.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,9 +31,13 @@ import java.util.Collections;
 import java.util.List;
 
 @Component
+@RequiredArgsConstructor
 public class OAuth2AuthorizationRequestFilter extends OncePerRequestFilter {
-    @Autowired
-    private UserService userService;
+
+    private final UserService userService;
+    private final GoogleHttpRequests googleHttpRequests;
+    private final AuthenticationTokenService authenticationTokenService;
+
 
     @Autowired
     private Auth auth;
@@ -48,16 +55,32 @@ public class OAuth2AuthorizationRequestFilter extends OncePerRequestFilter {
 
         String idToken = extractTokenFromHeader(request);
 
+        if (idToken == null) {
+            throw new UnauthorizedIdTokenException("Without Token");
+        }
         GoogleIdToken googleIdToken = this.extractAndVerifyIdToken(idToken);
 
+
+
         if (googleIdToken != null) {
+
             UserDTO userDTO = userService.findByEmail(googleIdToken.getPayload().getEmail());
 
             SecurityContextHolder.getContext()
                     .setAuthentication(
                             new UsernamePasswordAuthenticationToken(userDTO, null, null));
+
         } else {
+            var tokenLength = idToken.length();
+            var cacheToken = idToken.substring(tokenLength - 50);
+            var refreshToken = this.authenticationTokenService.getRefreshToken(cacheToken);
+            this.authenticationTokenService.deleteRefreshToken(cacheToken);
+            if (refreshToken.isEmpty()){
+                throw new UnauthorizedIdTokenException("Token invalid or expired");
+            }
+            var idTokenDTO = this.googleHttpRequests.refreshTokenRequest(refreshToken.get().getRefreshToken());
             throw new UnauthorizedIdTokenException("Token invalid or expired");
+
         }
 
         chain.doFilter(request, response);

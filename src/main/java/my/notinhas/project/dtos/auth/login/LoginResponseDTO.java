@@ -15,7 +15,7 @@ import my.notinhas.project.dtos.auth.IdTokenDTO;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class LoginResponseDTO {
 
-    public IdTokenDTO token;
-
-    public UserDTO user;
+    private String idToken;
+    private String userName;
+    private String picture;
 }

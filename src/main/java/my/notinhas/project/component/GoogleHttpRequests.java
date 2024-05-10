@@ -10,7 +10,6 @@ import my.notinhas.project.dtos.auth.IdTokenDTO;
 import my.notinhas.project.exception.runtime.CallHttpErrorException;
 import my.notinhas.project.exception.runtime.ObjectConversionException;
 import my.notinhas.project.exception.runtime.UnauthorizedIdTokenException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -22,7 +21,7 @@ import java.security.GeneralSecurityException;
 import java.util.Collections;
 
 @Component
-public class HttpRequests {
+public class GoogleHttpRequests {
 
     @Value("${google.client-id}")
     private String clientId;
@@ -62,6 +61,35 @@ public class HttpRequests {
         }
         return null;
     }
+
+    public IdTokenDTO refreshTokenRequest(String refreshToken) {
+        WebClient webClient = WebClient.create("https://oauth2.googleapis.com");
+
+        String refreshTokenResponse;
+        try {
+            refreshTokenResponse = webClient.post()
+                    .uri("/token")
+                    .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                    .body(BodyInserters.fromFormData("client_id", clientId)
+                            .with("client_secret", clientSecret)
+                            .with("refresh_token", refreshToken)
+                            .with("grant_type", "refresh_token"))
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+        } catch (Exception e) {
+            throw new CallHttpErrorException("Error making the HTTP call: " + e.getMessage());
+        }
+
+        if (refreshTokenResponse != null) {
+            try {
+                return new ObjectMapper().readValue(refreshTokenResponse, IdTokenDTO.class);
+            } catch (JsonProcessingException e) {
+                throw new ObjectConversionException("Error when trying to convert the object to IdToken");
+            }
+        }
+        return null;
+    }
     public Boolean validedTokenId (IdTokenDTO idTokenDTO) {
 
         NetHttpTransport transport = new NetHttpTransport();
@@ -78,4 +106,6 @@ public class HttpRequests {
         }
         return true;
     }
+
+
 }

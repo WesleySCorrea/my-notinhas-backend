@@ -3,14 +3,18 @@ package my.notinhas.project.services.impl;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import lombok.AllArgsConstructor;
 import my.notinhas.project.component.Auth;
-import my.notinhas.project.component.HttpRequests;
+import my.notinhas.project.component.GoogleHttpRequests;
 import my.notinhas.project.dtos.UserDTO;
 import my.notinhas.project.dtos.auth.IdTokenDTO;
 import my.notinhas.project.dtos.auth.login.LoginResponseDTO;
+import my.notinhas.project.entities.AuthenticationToken;
 import my.notinhas.project.exception.runtime.PersistFailedException;
 import my.notinhas.project.exception.runtime.UnauthorizedIdTokenException;
 import my.notinhas.project.services.AuthService;
+import my.notinhas.project.services.AuthenticationTokenService;
 import my.notinhas.project.services.UserService;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,8 +23,8 @@ public class AuthServiceImpl implements AuthService {
 
     private final Auth auth;
     private final UserService service;
-    private final HttpRequests requests;
-
+    private final GoogleHttpRequests requests;
+    private final AuthenticationTokenService authenticationTokenService;
     @Override
     public LoginResponseDTO login(String code) {
 
@@ -41,8 +45,12 @@ public class AuthServiceImpl implements AuthService {
         } else {
             userDTO = this.register(googleIdToken);
         }
-
-        return new LoginResponseDTO(idTokenDTO, userDTO);
+        var token = idTokenDTO.getId_token();
+        var refreshToken = idTokenDTO.getRefresh_token();
+        var tokenLength = token.length();
+        var cacheToken = token.substring(tokenLength - 50);
+        this.authenticationTokenService.saveRefreshToken(new AuthenticationToken(cacheToken, refreshToken));
+        return new LoginResponseDTO(idTokenDTO.getId_token(), userDTO.getUserName(), userDTO.getPicture());
     }
 
     @Override
@@ -84,5 +92,17 @@ public class AuthServiceImpl implements AuthService {
         }
 
         return newUserDTO;
+    }
+
+    @Override
+    public LoginResponseDTO refresh() {
+        var user = extractUser();
+        return null;
+    }
+
+    private UserDTO extractUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        return (UserDTO) authentication.getPrincipal();
     }
 }

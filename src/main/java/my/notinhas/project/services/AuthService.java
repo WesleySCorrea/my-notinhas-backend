@@ -10,4 +10,6 @@ public interface AuthService {
     IdTokenDTO createIdToken(String accessToken);
     UserDTO register(GoogleIdToken googleIdToken);
     UserDTO activeUser(UserDTO userDTO);
+
+    LoginResponseDTO refresh();
 }
