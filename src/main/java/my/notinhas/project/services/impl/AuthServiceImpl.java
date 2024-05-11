@@ -97,8 +97,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public LoginResponseDTO refresh() {
         var token = this.extractToken();
-        var tokenLength = token.length();
-        var cacheToken = token.substring(tokenLength - 50);
+        var cacheToken = this.shroten(token);
         var authenticationToken = this.authenticationTokenService.getRefreshToken(cacheToken);
         if (authenticationToken.isPresent()) {
             var refreshToken = authenticationToken.get().getRefreshToken();
