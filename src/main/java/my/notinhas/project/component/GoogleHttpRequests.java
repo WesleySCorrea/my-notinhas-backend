@@ -49,7 +49,7 @@ public class GoogleHttpRequests {
                     .bodyToMono(String.class)
                     .block();
         } catch (Exception e) {
-            throw new CallHttpErrorException("Error making the HTTP call: " + e.getMessage());
+            throw new UnauthorizedIdTokenException("Error making the HTTP call: " + e.getMessage());
         }
 
         if (idTokenString != null) {
@@ -78,7 +78,7 @@ public class GoogleHttpRequests {
                     .bodyToMono(String.class)
                     .block();
         } catch (Exception e) {
-            throw new CallHttpErrorException("Error making the HTTP call: " + e.getMessage());
+            throw new UnauthorizedIdTokenException("Error making the HTTP call: " + e.getMessage());
         }
 
         if (refreshTokenResponse != null) {

@@ -2,12 +2,12 @@ import requests
 
 def main():
     # Aguarda o input do accessToken
-    accessToken = input("Insira o accessToken do Google: ")
-    accessToken = accessToken.strip("'\"")
+    code = input("Insira o authCode do Google: ")
+    code = code.strip("'\"")
     
     # Primeira chamada para o endpoint de login
     login_url = 'http://localhost:8090/api/auth/login'
-    login_data = {'accessToken': accessToken}
+    login_data = {'code': code}
     login_headers = {'Content-Type': 'application/json'}
     login_response = requests.post(login_url, json=login_data, headers=login_headers)
 
@@ -15,7 +15,7 @@ def main():
     if login_response.status_code == 201:
         print("01 - TESTE LOGIN OK")
         # Extrai o id_token da resposta
-        token = login_response.json().get('token').get('id_token')
+        token = login_response.json().get('idToken')
 
         # Segunda chamada para o endpoint de postagem
         post_url = 'http://localhost:8090/api/post'
