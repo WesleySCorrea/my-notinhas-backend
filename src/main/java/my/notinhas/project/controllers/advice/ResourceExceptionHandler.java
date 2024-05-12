@@ -1,16 +1,20 @@
-package my.notinhas.project.exception;
+package my.notinhas.project.controllers.advice;
 
 import jakarta.servlet.http.HttpServletRequest;
+import my.notinhas.project.exception.FieldMessage;
+import my.notinhas.project.exception.ValidationError;
 import my.notinhas.project.exception.runtime.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.time.Instant;
 import java.util.Collections;
 
+@EnableWebMvc
 @ControllerAdvice
 public class ResourceExceptionHandler extends ResponseEntityExceptionHandler {
 

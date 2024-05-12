@@ -9,6 +9,7 @@ import my.notinhas.project.dtos.UserDTO;
 import my.notinhas.project.dtos.auth.IdTokenDTO;
 import my.notinhas.project.dtos.auth.login.LoginResponseDTO;
 import my.notinhas.project.entities.AuthenticationToken;
+import my.notinhas.project.exception.runtime.ObjectNotFoundException;
 import my.notinhas.project.exception.runtime.PersistFailedException;
 import my.notinhas.project.exception.runtime.UnauthorizedIdTokenException;
 import my.notinhas.project.services.AuthService;
@@ -17,6 +18,8 @@ import my.notinhas.project.services.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+
+import java.time.LocalDateTime;
 
 @Service
 @AllArgsConstructor
@@ -49,7 +52,9 @@ public class AuthServiceImpl implements AuthService {
         var token = idTokenDTO.getId_token();
         var refreshToken = idTokenDTO.getRefresh_token();
         var cacheToken = this.shroten(token);
-        this.authenticationTokenService.saveRefreshToken(new AuthenticationToken(cacheToken, refreshToken));
+        this.authenticationTokenService
+                .saveRefreshToken(
+                        new AuthenticationToken(cacheToken, refreshToken, LocalDateTime.now().plusHours(1L)));
         return new LoginResponseDTO(idTokenDTO.getId_token(), userDTO.getUserName(), userDTO.getPicture());
     }
 
@@ -104,10 +109,12 @@ public class AuthServiceImpl implements AuthService {
             this.authenticationTokenService.deleteRefreshToken(cacheToken);
             var idTokenDTO = this.requests.refreshTokenRequest(refreshToken);
             var newCacheToken = this.shroten(idTokenDTO.getId_token());
-            this.authenticationTokenService.saveRefreshToken(new AuthenticationToken(newCacheToken, refreshToken));
+            this.authenticationTokenService
+                    .saveRefreshToken(
+                            new AuthenticationToken(newCacheToken, refreshToken, LocalDateTime.now().plusHours(1L)));
             return new LoginResponseDTO(idTokenDTO.getId_token());
         }
-        throw new UnauthorizedIdTokenException("Invalid or expired refresh token");
+        throw new ObjectNotFoundException("Invalid token");
     }
 
     private String extractToken() {

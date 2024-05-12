@@ -139,6 +139,7 @@ public class CommentServiceImpl implements CommentService {
 
         if (comment.getUser().getUserName().equals(userDTO.getUserName())) {
             comment.setActive(Boolean.FALSE);
+            this.repository.deactivateCommentsByParentId(id);
             this.repository.save(comment);
         }
     }

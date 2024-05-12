@@ -1,5 +1,6 @@
 package my.notinhas.project.config.auth;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
@@ -12,12 +13,15 @@ import lombok.RequiredArgsConstructor;
 import my.notinhas.project.component.Auth;
 import my.notinhas.project.component.GoogleHttpRequests;
 import my.notinhas.project.dtos.UserDTO;
+import my.notinhas.project.exception.FieldMessage;
+import my.notinhas.project.exception.ValidationError;
 import my.notinhas.project.exception.runtime.CallHttpErrorException;
 import my.notinhas.project.exception.runtime.UnauthorizedIdTokenException;
 import my.notinhas.project.services.AuthenticationTokenService;
 import my.notinhas.project.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -26,6 +30,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -61,7 +67,7 @@ public class OAuth2AuthorizationRequestFilter extends OncePerRequestFilter {
         GoogleIdToken googleIdToken = this.extractAndVerifyIdToken(idToken);
 
 
-
+        try {
         if (googleIdToken != null) {
 
             UserDTO userDTO = userService.findByEmail(googleIdToken.getPayload().getEmail());
@@ -73,8 +79,24 @@ public class OAuth2AuthorizationRequestFilter extends OncePerRequestFilter {
         } else {
             throw new UnauthorizedIdTokenException("Token invalid or expired");
         }
-
         chain.doFilter(request, response);
+
+        } catch (UnauthorizedIdTokenException e) {
+            HttpStatus status = HttpStatus.UNAUTHORIZED;
+            ValidationError err = new ValidationError();
+            err.setStatus(status.value());
+            err.setTimestamp(Instant.now());
+            err.setError(e.getMessage());
+            err.setPath(request.getRequestURI());
+            err.setErrors(Collections.singletonList(new FieldMessage("UnauthorizedIdTokenException", e.getMessage())));
+            response.setStatus(status.value());
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.findAndRegisterModules();
+            response.getWriter().write(mapper.writeValueAsString(err));
+            return;
+        }
     }
 
     public static String extractTokenFromHeader(HttpServletRequest request) {

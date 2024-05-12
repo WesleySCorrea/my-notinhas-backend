@@ -28,6 +28,6 @@ public class AuthController {
 
         LoginResponseDTO loginResponseDTO = service.refresh();
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(loginResponseDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(loginResponseDTO);
     }
 }

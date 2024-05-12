@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 
 @Entity
 @Getter
@@ -24,4 +26,7 @@ public class AuthenticationToken {
 
     @Column(name = "refresh_token", nullable = false, length = 300)
     private String refreshToken;
+
+    @Column(name = "expiry_date", nullable = false)
+    private LocalDateTime expiryDate;
 }
