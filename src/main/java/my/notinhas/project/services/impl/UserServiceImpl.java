@@ -173,7 +173,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO updateUser(UpdateUserRequestDTO updateUserRequestDTO) {
 
-        if (!isValidUsername(updateUserRequestDTO.getUserName())) {
+        if (updateUserRequestDTO.getUserName() != null &&!isValidUsername(updateUserRequestDTO.getUserName())) {
             throw new InvalidUserNameException("Invalid username");
         }
 
@@ -234,6 +234,8 @@ public class UserServiceImpl implements UserService {
         user.setActive(false);
         user.setUserName(this.resetUserName(user.getGoogleId(), user.getFirstName()));
         user.setEditatedBio(null);
+        user.setEditatedUsername(null);
+        user.setBio(null);
         user.setEditatedUsername(null);
         this.repository.save(user);
     }
