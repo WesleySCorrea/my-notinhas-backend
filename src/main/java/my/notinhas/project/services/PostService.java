@@ -11,6 +11,8 @@ public interface PostService {
 
     Page<PostPublicResponseDTO> findAllPublic(Pageable pageable);
     Page<PostResponseDTO> findAll(Pageable pageable);
+
+    Page<PostResponseDTO> searchPosts(Pageable pageable,String content);
     PostIDResponseDTO findByID(Long id);
     void savePost(PostRequestDTO postRequestDTO);
     void updatePost(PostRequestDTO postRequestDTO, Long id);

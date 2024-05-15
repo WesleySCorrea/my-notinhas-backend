@@ -27,6 +27,12 @@ public class AuthenticationToken {
     @Column(name = "refresh_token", nullable = false, length = 300)
     private String refreshToken;
 
+    @Column(name = "user_name")
+    private String userName;
+
+    @Column(name = "picture")
+    private String picture;
+
     @Column(name = "expiry_date", nullable = false)
     private LocalDateTime expiryDate;
 }

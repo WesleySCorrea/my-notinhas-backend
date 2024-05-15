@@ -54,7 +54,12 @@ public class AuthServiceImpl implements AuthService {
         var cacheToken = this.shroten(token);
         this.authenticationTokenService
                 .saveRefreshToken(
-                        new AuthenticationToken(cacheToken, refreshToken, LocalDateTime.now().plusHours(1L)));
+                        new AuthenticationToken(
+                                cacheToken,
+                                refreshToken,
+                                userDTO.getUserName(),
+                                userDTO.getPicture(),
+                                LocalDateTime.now().plusMinutes(65L)));
         return new LoginResponseDTO(idTokenDTO.getId_token(), userDTO.getUserName(), userDTO.getPicture());
     }
 
@@ -106,13 +111,20 @@ public class AuthServiceImpl implements AuthService {
         var authenticationToken = this.authenticationTokenService.getRefreshToken(cacheToken);
         if (authenticationToken.isPresent()) {
             var refreshToken = authenticationToken.get().getRefreshToken();
+            var picture = authenticationToken.get().getPicture();
+            var userName = authenticationToken.get().getUserName();
             this.authenticationTokenService.deleteRefreshToken(cacheToken);
             var idTokenDTO = this.requests.refreshTokenRequest(refreshToken);
             var newCacheToken = this.shroten(idTokenDTO.getId_token());
             this.authenticationTokenService
                     .saveRefreshToken(
-                            new AuthenticationToken(newCacheToken, refreshToken, LocalDateTime.now().plusHours(1L)));
-            return new LoginResponseDTO(idTokenDTO.getId_token());
+                            new AuthenticationToken(
+                                    newCacheToken,
+                                    refreshToken,
+                                    userName,
+                                    picture,
+                                    LocalDateTime.now().plusMinutes(65L)));
+            return new LoginResponseDTO(idTokenDTO.getId_token(), userName, picture);
         }
         throw new ObjectNotFoundException("Invalid token");
     }

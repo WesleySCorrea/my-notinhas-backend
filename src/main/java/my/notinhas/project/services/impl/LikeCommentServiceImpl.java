@@ -6,6 +6,7 @@ import my.notinhas.project.dtos.request.LikeCommentRequestDTO;
 import my.notinhas.project.entities.LikesComments;
 import my.notinhas.project.exception.runtime.PersistFailedException;
 import my.notinhas.project.repositories.LikeCommentRepository;
+import my.notinhas.project.services.ExtractUser;
 import my.notinhas.project.services.LikeCommentService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,7 +22,7 @@ public class LikeCommentServiceImpl implements LikeCommentService {
 
     @Override
     public void saveLike(LikeCommentRequestDTO likeCommentRequestDTO) {
-        UserDTO userDTO = extractUser();
+        UserDTO userDTO = ExtractUser.get();
 
         LikesComments existingLike = repository.findByUserIdAndCommentId(userDTO.getId(), likeCommentRequestDTO.getComment().getId());
 
@@ -49,9 +50,4 @@ public class LikeCommentServiceImpl implements LikeCommentService {
         }
     }
 
-    private UserDTO extractUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        return (UserDTO) authentication.getPrincipal();
-    }
 }

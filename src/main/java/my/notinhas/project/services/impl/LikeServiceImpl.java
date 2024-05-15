@@ -6,6 +6,7 @@ import my.notinhas.project.dtos.request.LikeRequestDTO;
 import my.notinhas.project.entities.Likes;
 import my.notinhas.project.exception.runtime.PersistFailedException;
 import my.notinhas.project.repositories.LikeRepository;
+import my.notinhas.project.services.ExtractUser;
 import my.notinhas.project.services.LikeService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,7 +22,7 @@ public class LikeServiceImpl implements LikeService {
 
     @Override
     public void saveLike(LikeRequestDTO likeRequestDTO) {
-        UserDTO userDTO = extractUser();
+        UserDTO userDTO = ExtractUser.get();
 
         Likes existingLike = repository.findByUserIdAndPostId(userDTO.getId(), likeRequestDTO.getPost().getId());
 
@@ -49,9 +50,4 @@ public class LikeServiceImpl implements LikeService {
         }
     }
 
-    private UserDTO extractUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        return (UserDTO) authentication.getPrincipal();
-    }
 }

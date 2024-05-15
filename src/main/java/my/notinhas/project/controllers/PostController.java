@@ -39,11 +39,16 @@ public class PostController {
 
     @GetMapping("/{id}")
     public ResponseEntity<PostIDResponseDTO> findById(@PathVariable Long id) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         PostIDResponseDTO post = this.service.findByID(id);
 
         return ResponseEntity.ok().body(post);
+    }
+
+    @GetMapping("/search/{content}")
+    public ResponseEntity<Page<PostResponseDTO>> searchPosts(Pageable pageable, @PathVariable String content) {
+
+        return ResponseEntity.ok().body(this.service.searchPosts(pageable, content));
     }
 
     @PostMapping

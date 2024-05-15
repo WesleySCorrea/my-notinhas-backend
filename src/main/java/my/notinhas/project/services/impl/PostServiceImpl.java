@@ -15,6 +15,7 @@ import my.notinhas.project.exception.runtime.UnauthorizedIdTokenException;
 import my.notinhas.project.repositories.CommentRepository;
 import my.notinhas.project.repositories.LikeRepository;
 import my.notinhas.project.repositories.PostRepository;
+import my.notinhas.project.services.ExtractUser;
 import my.notinhas.project.services.PostService;
 import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
@@ -58,7 +59,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Page<PostResponseDTO> findAll(Pageable pageable) {
-        UserDTO user = this.extractUser();
+        UserDTO user = ExtractUser.get();
 
         Page<Posts> posts = this.postRepository
                 .findAllByActiveTrueOrderByDateDesc(pageable);
@@ -83,8 +84,30 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    public Page<PostResponseDTO> searchPosts(Pageable pageable, String content) {
+        UserDTO user = ExtractUser.get();
+        Page<Posts> posts = this.postRepository.findByContentContainingCaseSensitiveAndActiveTrue(content, pageable);
+        List<PostResponseDTO> postResponseDTO = posts.stream()
+                .map(post -> {
+                    this.verifyDateActive(post);
+
+                    PostResponseDTO dto = mapper.map(post, PostResponseDTO.class);
+
+                    dto.setPostOwner(this.verifyPostOwner(user,post));
+                    dto.setUserLike(this.verifyUserLike(post, user));
+
+                    dto.setTotalLikes(this.calculeTotalLike(post.getId()));
+                    dto.setTotalComments(this.calculeTotalComment(post.getId()));
+
+                    return dto;
+                })
+                .toList();
+        return new PageImpl<>(postResponseDTO, pageable, posts.getTotalElements());
+    }
+
+    @Override
     public PostIDResponseDTO findByID(Long id) {
-        UserDTO user = this.extractUser();
+        UserDTO user = ExtractUser.get();
 
         Posts post = this.postRepository.findById(id)
                 .orElseThrow(() -> new ObjectNotFoundException("Post with ID " + id + " not found."));
@@ -110,7 +133,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public void savePost(PostRequestDTO postRequestDTO) {
-        UserDTO user = extractUser();
+        UserDTO user = ExtractUser.get();
 
         String filteredContent = postRequestDTO.getContent();
         filteredContent = filteredContent.replaceAll("\\n+", "\n");
@@ -130,7 +153,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public void updatePost(PostRequestDTO postRequestDTO, Long id) {
-        UserDTO user = extractUser();
+        UserDTO user = ExtractUser.get();
 
         mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
 
@@ -152,7 +175,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public void deleteByID(Long id) {
-        var user = extractUser();
+        var user = ExtractUser.get();
         var post = this.postRepository.findById(id);
         if (post.isPresent() && post.get().getUser().getEmail().equals(user.getEmail())) {
             var entity = post.get();
@@ -163,11 +186,6 @@ public class PostServiceImpl implements PostService {
         }
     }
 
-    private UserDTO extractUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        return (UserDTO) authentication.getPrincipal();
-    }
 
     private Long calculeTotalLike(Long postId) {
 

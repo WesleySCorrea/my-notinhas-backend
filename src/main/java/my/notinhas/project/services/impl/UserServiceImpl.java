@@ -9,6 +9,7 @@ import my.notinhas.project.exception.runtime.InvalidUserNameException;
 import my.notinhas.project.exception.runtime.ObjectNotFoundException;
 import my.notinhas.project.exception.runtime.PersistFailedException;
 import my.notinhas.project.repositories.*;
+import my.notinhas.project.services.ExtractUser;
 import my.notinhas.project.services.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -62,7 +63,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO findByToken() {
-        var user = this.extractUser();
+        var user = ExtractUser.get();
         user.setGoogleId(null);
         user.setPicture(null);
         return user;
@@ -177,7 +178,7 @@ public class UserServiceImpl implements UserService {
             throw new InvalidUserNameException("Invalid username");
         }
 
-        var user = this.extractUser();
+        var user = ExtractUser.get();
 
         Users userPersisted;
         try {
@@ -202,7 +203,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void delete() {
-        UserDTO userDTO = this.extractUser();
+        UserDTO userDTO = ExtractUser.get();
 
         List<Comments> comments = this.commentRepository.findByUserUserNameAndActiveIsTrue(userDTO.getUserName());
 
@@ -298,11 +299,6 @@ public class UserServiceImpl implements UserService {
         return new PageImpl<>(likeToUserDTOList, pageable, likesList.getTotalElements());
     }
 
-    private UserDTO extractUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        return (UserDTO) authentication.getPrincipal();
-    }
 
     private static boolean isValidUsername(String username) {
 

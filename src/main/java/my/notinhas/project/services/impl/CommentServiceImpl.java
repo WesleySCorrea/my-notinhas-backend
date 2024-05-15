@@ -14,6 +14,7 @@ import my.notinhas.project.exception.runtime.UnauthorizedIdTokenException;
 import my.notinhas.project.repositories.CommentRepository;
 import my.notinhas.project.repositories.LikeCommentRepository;
 import my.notinhas.project.services.CommentService;
+import my.notinhas.project.services.ExtractUser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -34,7 +35,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public Page<CommentResponseDTO> findAllCommentSon(Pageable pageable, Long id) {
 
-        UserDTO userDTO = extractUser();
+        UserDTO userDTO = ExtractUser.get();
 
         Page<Comments> comments;
         try {
@@ -59,7 +60,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public Page<CommentResponseDTO> findByPostId(Long postId, Pageable pageable) {
 
-        UserDTO userDTO = extractUser();
+        UserDTO userDTO = ExtractUser.get();
 
         Page<Comments> comments;
         try {
@@ -90,7 +91,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public void saveComment(CommentRequestDTO commentRequestDTO) {
-        UserDTO userDTO = extractUser();
+        UserDTO userDTO = ExtractUser.get();
 
         if (commentRequestDTO.getParentComment() != null) {
             Long fatherCommentId = commentRequestDTO.getParentComment().getId();
@@ -113,7 +114,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public void updateComment(CommentRequestDTO commentRequestDTO, Long id) {
 
-        UserDTO user = extractUser();
+        UserDTO user = ExtractUser.get();
 
         Comments commentPersisted = this.repository.findById(id)
                 .orElseThrow(() -> new ObjectNotFoundException("Comment with ID " + id + " not found."));
@@ -132,7 +133,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public void delete(Long id) {
-        UserDTO userDTO = extractUser();
+        UserDTO userDTO = ExtractUser.get();
 
         Comments comment = this.repository.findById(id)
                 .orElseThrow(() -> new ObjectNotFoundException("Comment with ID " + id + " not found."));
@@ -144,11 +145,6 @@ public class CommentServiceImpl implements CommentService {
         }
     }
 
-    private UserDTO extractUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        return (UserDTO) authentication.getPrincipal();
-    }
 
     private Long calculeTotalLike(Long commentId) {
 
