@@ -8,8 +8,6 @@ import my.notinhas.project.exception.runtime.PersistFailedException;
 import my.notinhas.project.repositories.LikeCommentRepository;
 import my.notinhas.project.services.ExtractUser;
 import my.notinhas.project.services.LikeCommentService;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;

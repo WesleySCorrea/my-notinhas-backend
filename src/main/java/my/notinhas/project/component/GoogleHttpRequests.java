@@ -7,7 +7,6 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import my.notinhas.project.dtos.auth.IdTokenDTO;
-import my.notinhas.project.exception.runtime.CallHttpErrorException;
 import my.notinhas.project.exception.runtime.ObjectConversionException;
 import my.notinhas.project.exception.runtime.UnauthorizedIdTokenException;
 import org.springframework.beans.factory.annotation.Value;

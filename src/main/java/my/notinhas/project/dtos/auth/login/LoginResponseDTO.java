@@ -17,7 +17,4 @@ public class LoginResponseDTO {
     private String userName;
     private String picture;
 
-    public LoginResponseDTO(String idToken) {
-        this.idToken = idToken;
-    }
 }
