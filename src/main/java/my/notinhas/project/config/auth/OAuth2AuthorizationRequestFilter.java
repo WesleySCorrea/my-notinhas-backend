@@ -31,7 +31,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -43,10 +42,7 @@ public class OAuth2AuthorizationRequestFilter extends OncePerRequestFilter {
     private final UserService userService;
     private final GoogleHttpRequests googleHttpRequests;
     private final AuthenticationTokenService authenticationTokenService;
-
-
-    @Autowired
-    private Auth auth;
+    private final Auth auth;
 
     @Value("${google.client-id}")
     private String clientId;
@@ -99,7 +95,7 @@ public class OAuth2AuthorizationRequestFilter extends OncePerRequestFilter {
         }
     }
 
-    public static String extractTokenFromHeader(HttpServletRequest request) {
+    private static String extractTokenFromHeader(HttpServletRequest request) {
         String idToken = request.getHeader("Authorization");
         if (idToken != null && idToken.startsWith("Bearer ")) {
             return idToken.replace("Bearer ", "").trim();
