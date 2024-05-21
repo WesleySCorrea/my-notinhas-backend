@@ -1,6 +1,7 @@
 package my.notinhas.project.services.impl;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import my.notinhas.project.component.Variables;
 import my.notinhas.project.dtos.UserDTO;
 import my.notinhas.project.dtos.request.PostRequestDTO;
 import my.notinhas.project.dtos.response.PostIDResponseDTO;
@@ -22,8 +23,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -32,14 +31,14 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class PostServiceImpl implements PostService {
 
+    private final ModelMapper mapper;
+    private final Variables variables;
     private final PostRepository postRepository;
     private final LikeRepository likeRepository;
     private final CommentRepository commentRepository;
-    private final ModelMapper mapper;
-
     @Override
     public Page<PostPublicResponseDTO> findAllPublic(Pageable pageable) {
 
@@ -48,7 +47,9 @@ public class PostServiceImpl implements PostService {
 
         List<PostPublicResponseDTO> postResponseDTO = posts.stream()
                 .map(post -> {
-                    verifyDateActive(post);
+                    if (variables.getDeleteAfterOneDay()) {
+                        this.verifyDateActive(post);
+                    }
 
                     return mapper.map(post, PostPublicResponseDTO.class);
                 })
@@ -66,7 +67,9 @@ public class PostServiceImpl implements PostService {
 
         List<PostResponseDTO> postResponseDTO = posts.stream()
                 .map(post -> {
-                    this.verifyDateActive(post);
+                    if (variables.getDeleteAfterOneDay()) {
+                        this.verifyDateActive(post);
+                    }
 
                     PostResponseDTO dto = mapper.map(post, PostResponseDTO.class);
 
