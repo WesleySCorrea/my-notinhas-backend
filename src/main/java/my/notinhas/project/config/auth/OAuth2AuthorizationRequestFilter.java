@@ -127,7 +127,14 @@ public class OAuth2AuthorizationRequestFilter extends OncePerRequestFilter {
 
     private boolean isAuthenticationNotRequired(HttpServletRequest request) {
         AntPathMatcher matcher = new AntPathMatcher();
-        List<String> permitAllPatterns = Arrays.asList("/post/public", "/auth/**");
+        List<String> permitAllPatterns = Arrays.asList(
+                "/post/public",
+                "/auth/**",
+                "/swagger-ui/**",
+                "/v3/api-docs/**",
+                "/swagger-resources/**",
+                "/webjars/**"
+        );
 
         return permitAllPatterns.stream().anyMatch(pattern -> matcher.match(pattern, request.getServletPath()));
     }
