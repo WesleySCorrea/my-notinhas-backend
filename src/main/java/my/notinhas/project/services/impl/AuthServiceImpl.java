@@ -34,7 +34,7 @@ public class AuthServiceImpl implements AuthService {
 
         IdTokenDTO idTokenDTO = this.createIdToken(code);
 
-        GoogleIdToken googleIdToken = auth.extractAndVerifyIdToken(idTokenDTO.getId_token());
+        GoogleIdToken googleIdToken = auth.extractAndVerifyIdToken(idTokenDTO.getIdToken());
 
         String userEmail = googleIdToken.getPayload().getEmail();
 
@@ -49,8 +49,8 @@ public class AuthServiceImpl implements AuthService {
         } else {
             userDTO = this.register(googleIdToken);
         }
-        var token = idTokenDTO.getId_token();
-        var refreshToken = idTokenDTO.getRefresh_token();
+        var token = idTokenDTO.getIdToken();
+        var refreshToken = idTokenDTO.getRefreshToken();
         var cacheToken = this.shroten(token);
         this.authenticationTokenService
                 .saveRefreshToken(
@@ -60,7 +60,7 @@ public class AuthServiceImpl implements AuthService {
                                 userDTO.getUserName(),
                                 userDTO.getPicture(),
                                 LocalDateTime.now().plusMinutes(65L)));
-        return new LoginResponseDTO(idTokenDTO.getId_token(), userDTO.getUserName(), userDTO.getPicture());
+        return new LoginResponseDTO(idTokenDTO.getIdToken(), userDTO.getUserName(), userDTO.getPicture());
     }
 
     @Override
@@ -115,7 +115,7 @@ public class AuthServiceImpl implements AuthService {
             var userName = authenticationToken.get().getUserName();
             this.authenticationTokenService.deleteRefreshToken(cacheToken);
             var idTokenDTO = this.requests.refreshTokenRequest(refreshToken);
-            var newCacheToken = this.shroten(idTokenDTO.getId_token());
+            var newCacheToken = this.shroten(idTokenDTO.getIdToken());
             this.authenticationTokenService
                     .saveRefreshToken(
                             new AuthenticationToken(
@@ -124,7 +124,7 @@ public class AuthServiceImpl implements AuthService {
                                     userName,
                                     picture,
                                     LocalDateTime.now().plusMinutes(65L)));
-            return new LoginResponseDTO(idTokenDTO.getId_token(), userName, picture);
+            return new LoginResponseDTO(idTokenDTO.getIdToken(), userName, picture);
         }
         throw new ObjectNotFoundException("Invalid token");
     }

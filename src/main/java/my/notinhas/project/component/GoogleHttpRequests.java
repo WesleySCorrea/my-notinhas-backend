@@ -99,7 +99,7 @@ public class GoogleHttpRequests {
                 .build();
 
         try {
-            verifier.verify(idTokenDTO.getId_token());
+            verifier.verify(idTokenDTO.getIdToken());
         } catch (GeneralSecurityException | IOException e) {
             throw new UnauthorizedIdTokenException("Invalid or expired token id");
         }

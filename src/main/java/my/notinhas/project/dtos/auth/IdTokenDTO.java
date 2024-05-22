@@ -15,9 +15,14 @@ import lombok.Setter;
 public class IdTokenDTO {
     @JsonProperty("access_token")
     public String accessToken;
-    public String refresh_token;
-    public int expires_in;
+    @JsonProperty("refresh_token")
+    public String refreshToken;
+    @JsonProperty("expires_in")
+    public int expiresIn;
+    @JsonProperty("scope")
     public String scope;
-    public String token_type;
-    public String id_token;
+    @JsonProperty("token_type")
+    public String tokenType;
+    @JsonProperty("id_token")
+    public String idToken;
 }
