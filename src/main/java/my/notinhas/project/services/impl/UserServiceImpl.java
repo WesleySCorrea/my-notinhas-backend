@@ -34,7 +34,6 @@ public class UserServiceImpl implements UserService {
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
     private final LikeCommentRepository likeCommentRepository;
-    private final ModelMapper mapper;
 
     @Override
     public List<UserDTO> findAll() {
@@ -42,7 +41,7 @@ public class UserServiceImpl implements UserService {
         List<Users> users = this.repository.findAll();
 
         return users.stream()
-                .map(user -> mapper.map(user, UserDTO.class))
+                .map(UserDTO::new)
                 .collect(Collectors.toList());
     }
 
@@ -139,7 +138,7 @@ public class UserServiceImpl implements UserService {
             throw new PersistFailedException("Fail when the object was persisted");
         }
 
-        return mapper.map(user, UserDTO.class);
+        return new UserDTO(user);
     }
 
     @Override
@@ -157,7 +156,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO saveUsers(UserDTO userDTO) {
 
-        Users request = mapper.map(userDTO, Users.class);
+        Users request = userDTO.convertUserDTOToUser();
 
         Users newUser;
         try {
@@ -166,7 +165,7 @@ public class UserServiceImpl implements UserService {
             throw new PersistFailedException("Failed when trying to persist the object");
         }
 
-        return mapper.map(newUser, UserDTO.class);
+        return new UserDTO(newUser);
     }
 
     @Override

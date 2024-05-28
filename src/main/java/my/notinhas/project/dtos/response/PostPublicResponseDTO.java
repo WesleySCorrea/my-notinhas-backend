@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import my.notinhas.project.entities.Posts;
 
 import java.time.LocalDateTime;
 
@@ -17,4 +18,10 @@ public class PostPublicResponseDTO {
     private Long id;
     private String content;
     private LocalDateTime date;
+
+    public PostPublicResponseDTO(Posts post) {
+        this.id = post.getId();
+        this.content = post.getContent();
+        this.date = post.getDate();
+    }
 }

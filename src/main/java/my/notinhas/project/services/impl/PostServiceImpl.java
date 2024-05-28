@@ -18,8 +18,6 @@ import my.notinhas.project.repositories.LikeRepository;
 import my.notinhas.project.repositories.PostRepository;
 import my.notinhas.project.services.ExtractUser;
 import my.notinhas.project.services.PostService;
-import org.modelmapper.Conditions;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -33,8 +31,6 @@ import java.util.NoSuchElementException;
 @Service
 @RequiredArgsConstructor
 public class PostServiceImpl implements PostService {
-
-    private final ModelMapper mapper;
     private final Variables variables;
     private final PostRepository postRepository;
     private final LikeRepository likeRepository;
@@ -51,7 +47,7 @@ public class PostServiceImpl implements PostService {
                         this.verifyDateActive(post);
                     }
 
-                    return mapper.map(post, PostPublicResponseDTO.class);
+                    return new PostPublicResponseDTO(post);
                 })
                 .toList();
 
@@ -71,7 +67,7 @@ public class PostServiceImpl implements PostService {
                         this.verifyDateActive(post);
                     }
 
-                    PostResponseDTO dto = mapper.map(post, PostResponseDTO.class);
+                    PostResponseDTO dto = new PostResponseDTO(post);
 
                     dto.setPostOwner(this.verifyPostOwner(user,post));
                     dto.setUserLike(this.verifyUserLike(post, user));
@@ -96,7 +92,7 @@ public class PostServiceImpl implements PostService {
                         this.verifyDateActive(post);
                     }
 
-                    PostResponseDTO dto = mapper.map(post, PostResponseDTO.class);
+                    PostResponseDTO dto = new PostResponseDTO(post);
 
                     dto.setPostOwner(this.verifyPostOwner(user,post));
                     dto.setUserLike(this.verifyUserLike(post, user));
@@ -117,22 +113,13 @@ public class PostServiceImpl implements PostService {
         Posts post = this.postRepository.findById(id)
                 .orElseThrow(() -> new ObjectNotFoundException("Post with ID " + id + " not found."));
 
-        PostIDResponseDTO postIDResponseDTO = mapper.map(post, PostIDResponseDTO.class);
+        PostIDResponseDTO postIDResponseDTO = new PostIDResponseDTO(post);
         postIDResponseDTO.setPostOwner(this.verifyPostOwner(user,post));
         postIDResponseDTO.setUserLike(this.verifyUserLike(post, user));
 
         postIDResponseDTO.setTotalLikes(this.calculeTotalLike(post.getId()));
         postIDResponseDTO.setTotalComments(this.calculeTotalComment(post.getId()));
 
-//        List<Comments> comments = commentRepository.findByPostIdAndParentCommentIsNull(post.getId());
-//
-//        List<CommentResponseDTO> commentResponseDTOs = comments.stream()
-//                .map(comment -> new CommentResponseDTO()
-//                        .converterCommentToCommentResponse(comment, user))
-//                .toList();
-//
-//
-//        postIDResponseDTO.setComments(commentResponseDTOs);
         return postIDResponseDTO;
     }
 
@@ -160,19 +147,20 @@ public class PostServiceImpl implements PostService {
     public void updatePost(PostRequestDTO postRequestDTO, Long id) {
         UserDTO user = ExtractUser.get();
 
-        mapper.getConfiguration().setPropertyCondition(Conditions.isNotNull());
-
-        var postPersisted = this.findByID(id);
-        postPersisted.setContent(postRequestDTO.getContent());
-
+        PostIDResponseDTO postPersisted = this.findByID(id);
 
         if (postPersisted.getUser().getUserName().equals(user.getUserName())) {
-            Posts postsToPersistd = mapper.map(postPersisted, Posts.class);
-            postsToPersistd.setUser(user.convertUserDTOToUser());
-            postsToPersistd.setIsEdited(Boolean.TRUE);
-            postsToPersistd.setActive(Boolean.TRUE);
 
-            this.postRepository.save(postsToPersistd);
+            int updatedRows = postRepository.updatePostContentAndDate(
+                    postPersisted.getId(),
+                    postRequestDTO.getContent(),
+                    LocalDateTime.now(),
+                    Boolean.TRUE
+            );
+
+            if (updatedRows == 0) {
+                throw new ObjectNotFoundException("Post not found or update failed");
+            }
         } else {
             throw new UnauthorizedIdTokenException("Post does not belong to the user");
         }
@@ -183,9 +171,9 @@ public class PostServiceImpl implements PostService {
         var user = ExtractUser.get();
         var post = this.postRepository.findById(id);
         if (post.isPresent() && post.get().getUser().getEmail().equals(user.getEmail())) {
-            var entity = post.get();
-                entity.setActive(Boolean.FALSE);
-                this.postRepository.save(entity);
+            var postToDelete = post.get();
+                postToDelete.setActive(Boolean.FALSE);
+                this.postRepository.save(postToDelete);
         } else {
             throw new NoSuchElementException("Post with ID: " + id + " not found!");
         }

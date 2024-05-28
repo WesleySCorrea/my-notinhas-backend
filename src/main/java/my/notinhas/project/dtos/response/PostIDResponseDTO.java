@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import my.notinhas.project.entities.Posts;
 import my.notinhas.project.enums.LikeEnum;
 
 import java.time.LocalDateTime;
@@ -26,4 +27,12 @@ public class PostIDResponseDTO {
     private LikeEnum userLike;
     private Boolean postOwner;
     private Boolean isEdited;
+
+    public PostIDResponseDTO(Posts post) {
+        this.id = post.getId();
+        this.date = post.getDate();
+        this.content = post.getContent();
+        this.user = new UserPostResponseDTO(post.getUser().getUserName());
+        this.isEdited = post.getIsEdited();
+    }
 }
