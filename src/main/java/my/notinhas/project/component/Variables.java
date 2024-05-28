@@ -10,4 +10,8 @@ public class Variables {
 
     @Value("${delete.after.one.day}")
     private Boolean deleteAfterOneDay;
+    @Value("${google.client-id}")
+    private String clientId;
+    @Value("${google.client-secret}")
+    private String clientSecret;
 }

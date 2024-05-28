@@ -6,10 +6,10 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
+import lombok.RequiredArgsConstructor;
 import my.notinhas.project.dtos.auth.IdTokenDTO;
 import my.notinhas.project.exception.runtime.ObjectConversionException;
 import my.notinhas.project.exception.runtime.UnauthorizedIdTokenException;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -20,12 +20,10 @@ import java.security.GeneralSecurityException;
 import java.util.Collections;
 
 @Component
+@RequiredArgsConstructor
 public class GoogleHttpRequests {
 
-    @Value("${google.client-id}")
-    private String clientId;
-    @Value("${google.client-secret}")
-    private String clientSecret;
+    private final Variables variables;
 
 
     public IdTokenDTO idTokenRequest(String code) {
@@ -38,9 +36,9 @@ public class GoogleHttpRequests {
                     .uri("/token")
                     .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                     .body(BodyInserters.fromFormData(
-                            "client_id", clientId)
+                            "client_id", variables.getClientId())
                             .with("code", code)
-                            .with("client_secret", clientSecret)
+                            .with("client_secret", variables.getClientSecret())
                             .with("redirect_uri", "postmessage")
                             .with("access_type", "offline")
                             .with("grant_type", "authorization_code"))
@@ -69,8 +67,8 @@ public class GoogleHttpRequests {
             refreshTokenResponse = webClient.post()
                     .uri("/token")
                     .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                    .body(BodyInserters.fromFormData("client_id", clientId)
-                            .with("client_secret", clientSecret)
+                    .body(BodyInserters.fromFormData("client_id", variables.getClientId())
+                            .with("client_secret", variables.getClientSecret())
                             .with("refresh_token", refreshToken)
                             .with("grant_type", "refresh_token"))
                     .retrieve()
@@ -95,7 +93,7 @@ public class GoogleHttpRequests {
         JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
 
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(transport, jsonFactory)
-                .setAudience(Collections.singletonList(clientId))
+                .setAudience(Collections.singletonList(variables.getClientId()))
                 .build();
 
         try {
