@@ -92,7 +92,9 @@ public class PostServiceImpl implements PostService {
         Page<Posts> posts = this.postRepository.findByContentContainingCaseSensitiveAndActiveTrue(content, pageable);
         List<PostResponseDTO> postResponseDTO = posts.stream()
                 .map(post -> {
-                    this.verifyDateActive(post);
+                    if (variables.getDeleteAfterOneDay()) {
+                        this.verifyDateActive(post);
+                    }
 
                     PostResponseDTO dto = mapper.map(post, PostResponseDTO.class);
 
