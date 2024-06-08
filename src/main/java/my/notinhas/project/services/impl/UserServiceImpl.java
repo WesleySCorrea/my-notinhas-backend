@@ -78,13 +78,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public Page<UserProfileDTO> findByUserNameContaining(String userName, Pageable pageable) {
 
-        if (userName.length() < 5) {
+        if (userName.length() < 3) {
             return null;
         }
 
         Page<Users> users;
         try {
-            users = this.repository.findByUserNameContainingIgnoreCase(userName, pageable);
+            users = this.repository.findByUserNameContainingIgnoreCaseAndActiveTrue(userName, pageable);
         } catch (Exception e) {
             throw new ObjectNotFoundException("User with username " + userName + " not found.");
         }
