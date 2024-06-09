@@ -48,11 +48,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserProfileDTO findByUserName(String userName) {
 
-        Users user;
-        try {
-            user = this.repository.findByUserNameIgnoreCase(userName);
-        } catch (Exception e) {
-            throw new ObjectNotFoundException("User with username " + userName + " not found.");
+        var user = this.repository.findByUserNameIgnoreCase(userName);
+        if (user == null) {
+            var notFoundEntity = new Users();
+            notFoundEntity.setId(-2L);
+            notFoundEntity.setUserName("Usuário: " + userName);
+            notFoundEntity.setBio("Não encontrado \uD83E\uDD7A");
+            notFoundEntity.setCreated(LocalDateTime.now());
+            return new UserProfileDTO().converterUserToUserProfile(notFoundEntity);
         }
 
         return new UserProfileDTO().converterUserToUserProfile(user);
