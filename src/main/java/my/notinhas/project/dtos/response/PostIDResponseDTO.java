@@ -31,7 +31,7 @@ public class PostIDResponseDTO {
         this.id = post.getId();
         this.date = post.getDate();
         this.content = post.getContent();
-        this.user = new UserPostResponseDTO(post.getUser().getUserName());
+        this.user = new UserPostResponseDTO(post.getUser().getId(), post.getUser().getUserName());
         this.isEdited = post.getIsEdited();
     }
 }

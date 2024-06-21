@@ -11,6 +11,7 @@ import my.notinhas.project.dtos.UserDTO;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserPostResponseDTO {
+    private Long id;
     private String userName;
 
 }

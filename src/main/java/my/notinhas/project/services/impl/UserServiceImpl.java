@@ -11,7 +11,6 @@ import my.notinhas.project.exception.runtime.PersistFailedException;
 import my.notinhas.project.repositories.*;
 import my.notinhas.project.services.ExtractUser;
 import my.notinhas.project.services.UserService;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;

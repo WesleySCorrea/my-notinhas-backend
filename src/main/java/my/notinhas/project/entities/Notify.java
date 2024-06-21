@@ -21,8 +21,9 @@ public class Notify {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "notify_owner")
-    private String NotifyOwner;
+    @ManyToOne
+    @JoinColumn(name = "notify_owner_id")
+    private Users notifyOwner;
     @ManyToOne
     @JoinColumn(name = "user_id")
     private Users user;

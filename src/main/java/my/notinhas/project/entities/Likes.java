@@ -28,7 +28,7 @@ public class Likes {
     @Column(name = "like_enum")
     @Enumerated(value = EnumType.STRING)
     private LikeEnum likeEnum;
-    @JsonIgnore
+//    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "post_id")
     private Posts post;

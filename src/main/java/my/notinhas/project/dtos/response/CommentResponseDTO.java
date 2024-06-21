@@ -49,7 +49,7 @@ public class CommentResponseDTO {
             commentResponseDTO.setCommentOwner(Boolean.TRUE);
         } else commentResponseDTO.setCommentOwner(Boolean.FALSE);
 
-        commentResponseDTO.setUser(new UserPostResponseDTO(comment.getUser().getUserName()));
+        commentResponseDTO.setUser(new UserPostResponseDTO(comment.getUser().getId(), comment.getUser().getUserName()));
 
         List<CommentResponseDTO> replies = comment.getReplies().stream()
                 .map(comments -> new CommentResponseDTO()
