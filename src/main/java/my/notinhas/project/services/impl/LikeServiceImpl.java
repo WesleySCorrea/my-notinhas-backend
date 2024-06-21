@@ -27,7 +27,7 @@ public class LikeServiceImpl implements LikeService {
     public void saveLike(LikeRequestDTO likeRequestDTO) {
         UserDTO userDTO = ExtractUser.get();
 
-        Likes existingLike = repository.findByUserIdAndPostId(userDTO.getId(), likeRequestDTO.getPost().getId());
+        Likes existingLike = repository.findByUserIdAndPostId(userDTO.getUserId(), likeRequestDTO.getPost().getId());
 
         if (existingLike != null) {
 

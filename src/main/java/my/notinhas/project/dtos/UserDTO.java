@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class UserDTO {
-    private Long id;
+    private Long userId;
     private String googleId;
     private String userName;
     private String email;
@@ -35,7 +35,7 @@ public class UserDTO {
 
     public UserDTO (Users user) {
 
-        this.id = user.getId();
+        this.userId = user.getId();
         this.googleId = user.getGoogleId();
         this.userName = user.getUserName();
         this.email = user.getEmail();
@@ -52,7 +52,7 @@ public class UserDTO {
     public Users convertUserDTOToUser() {
 
         return new Users(
-                this.id,
+                this.userId,
                 this.googleId,
                 this.userName,
                 this.email,

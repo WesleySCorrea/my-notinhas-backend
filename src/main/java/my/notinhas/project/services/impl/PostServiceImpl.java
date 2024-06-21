@@ -205,7 +205,7 @@ public class PostServiceImpl implements PostService {
 
     private LikeEnum verifyUserLike(Posts post, UserDTO user) {
 
-        Likes like = likeRepository.findByUserIdAndPostId(user.getId(), post.getId());
+        Likes like = likeRepository.findByUserIdAndPostId(user.getUserId(), post.getId());
 
         if (like == null) {
             return null;

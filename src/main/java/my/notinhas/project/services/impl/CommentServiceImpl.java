@@ -154,7 +154,7 @@ public class CommentServiceImpl implements CommentService {
 
     private LikeEnum verifyUserLike(CommentResponseDTO comments, UserDTO user) {
 
-        LikesComments like = likeCommentRepository.findByUserIdAndCommentId(user.getId(), comments.getId());
+        LikesComments like = likeCommentRepository.findByUserIdAndCommentId(user.getUserId(), comments.getId());
 
         if (like == null) {
             return null;

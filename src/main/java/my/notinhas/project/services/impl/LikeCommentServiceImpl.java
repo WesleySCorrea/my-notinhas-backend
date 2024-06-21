@@ -27,7 +27,7 @@ public class LikeCommentServiceImpl implements LikeCommentService {
     public void saveLike(LikeCommentRequestDTO likeCommentRequestDTO) {
         UserDTO userDTO = ExtractUser.get();
 
-        LikesComments existingLike = repository.findByUserIdAndCommentId(userDTO.getId(), likeCommentRequestDTO.getComment().getId());
+        LikesComments existingLike = repository.findByUserIdAndCommentId(userDTO.getUserId(), likeCommentRequestDTO.getComment().getId());
 
         if (existingLike != null) {
 
