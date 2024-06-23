@@ -18,6 +18,8 @@ public class PostDTO {
     private Long id;
     private LocalDateTime date;
     private String content;
+    private String userName;
+    private Long userId;
     private Boolean active;
     private Boolean isEdited;
     private UserDTO user;
