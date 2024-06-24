@@ -5,6 +5,7 @@ import my.notinhas.project.dtos.NotifyDTO;
 import my.notinhas.project.dtos.UserDTO;
 import my.notinhas.project.dtos.request.LikeCommentRequestDTO;
 import my.notinhas.project.entities.LikesComments;
+import my.notinhas.project.entities.Posts;
 import my.notinhas.project.entities.Users;
 import my.notinhas.project.enums.ActionEnum;
 import my.notinhas.project.exception.runtime.PersistFailedException;
@@ -48,22 +49,29 @@ public class LikeCommentServiceImpl implements LikeCommentService {
             try {
                 LikesComments likePersisted = this.repository.save(request);
 
-                this.createNotification(likePersisted, userDTO);
+                this.createNotification(likePersisted,
+                        userDTO,
+                        likeCommentRequestDTO.getComment().getPost().getUserId(),
+                        likeCommentRequestDTO.getComment().getPost().getId());
             } catch (Exception e) {
                 throw new PersistFailedException("Fail when the like was persisted");
             }
         }
     }
 
-    private void createNotification(LikesComments like, UserDTO userDTO) {
+    private void createNotification(LikesComments like, UserDTO userDTO, Long userId, Long postId) {
 
-        Users teste = new Users();
-//        teste.setId(like.getComment().getUser().getId());
+        Users notifyOwner = new Users();
+        notifyOwner.setId(userId);
+
+        Posts postOwner = new Posts();
+        postOwner.setId(postId);
+
 
         NotifyDTO notifyDTO = new NotifyDTO();
-//        notifyDTO.setNotifyOwner(teste);
+        notifyDTO.setNotifyOwner(notifyOwner);
         notifyDTO.setUser(userDTO.convertUserDTOToUser());
-        notifyDTO.setPost(like.getComment().getPost());
+        notifyDTO.setPost(postOwner);
         notifyDTO.setActionEnum(ActionEnum.LIKE_COMMENT);
         notifyDTO.setVerified(Boolean.FALSE);
         notifyDTO.setDate(LocalDateTime.now());

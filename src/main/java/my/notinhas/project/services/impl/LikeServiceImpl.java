@@ -48,7 +48,7 @@ public class LikeServiceImpl implements LikeService {
             try {
                 Likes likePersisted = this.repository.save(request);
 
-                this.createNotification(likePersisted, userDTO);
+                this.createNotification(likePersisted, userDTO, likeRequestDTO.getPost().getUserId());
 
             } catch (Exception e) {
                 throw new PersistFailedException("Fail when the like was persisted");
@@ -56,13 +56,13 @@ public class LikeServiceImpl implements LikeService {
         }
     }
 
-    private void createNotification(Likes like, UserDTO userDTO) {
+    private void createNotification(Likes like, UserDTO userDTO, Long userId) {
 
-        Users teste = new Users();
-//        teste.setId(like.getPost().getUser().getId());
+        Users notifyOwner = new Users();
+        notifyOwner.setId(userId);
 
         NotifyDTO notifyDTO = new NotifyDTO();
-//        notifyDTO.setNotifyOwner(teste);
+        notifyDTO.setNotifyOwner(notifyOwner);
         notifyDTO.setUser(userDTO.convertUserDTOToUser());
         notifyDTO.setPost(like.getPost());
         notifyDTO.setActionEnum(ActionEnum.LIKE_POST);
