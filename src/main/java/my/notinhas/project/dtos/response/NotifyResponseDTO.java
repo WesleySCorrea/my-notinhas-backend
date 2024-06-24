@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import my.notinhas.project.entities.Comments;
+import my.notinhas.project.entities.Notify;
 import my.notinhas.project.entities.Posts;
 import my.notinhas.project.entities.Users;
 import my.notinhas.project.enums.ActionEnum;
@@ -30,4 +31,19 @@ public class NotifyResponseDTO {
     private Boolean verified;
     @JsonFormat(pattern = "dd-MM-yy HH:mm:ss")
     private LocalDateTime date;
+
+    public NotifyResponseDTO converterNotifyToNotifyResponseDTO(Notify notify) {
+
+        NotifyResponseDTO notifyResponse = new NotifyResponseDTO();
+
+        notifyResponse.setId(notify.getId());
+        notifyResponse.setUser(notify.getNotifyOwner());
+        notifyResponse.setPost(notify.getPost());
+        notifyResponse.setComment(notify.getComment());
+        notifyResponse.setActionEnum(notify.getActionEnum());
+        notifyResponse.setVerified(notify.getVerified());
+        notifyResponse.setDate(notify.getDate());
+
+        return notifyResponse;
+    }
 }
