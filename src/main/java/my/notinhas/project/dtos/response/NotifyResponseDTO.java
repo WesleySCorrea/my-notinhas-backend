@@ -24,25 +24,30 @@ import java.time.LocalDateTime;
 public class NotifyResponseDTO {
 
     private Long id;
-    private Users user;
-    private Posts post;
-    private Comments comment;
+    private Long postId;
+    private Long commentId;
+    private Long userId;
+    private String userName;
     private ActionEnum actionEnum;
     private Boolean verified;
-    @JsonFormat(pattern = "dd-MM-yy HH:mm:ss")
-    private LocalDateTime date;
+    private String date;
 
     public NotifyResponseDTO converterNotifyToNotifyResponseDTO(Notify notify) {
 
         NotifyResponseDTO notifyResponse = new NotifyResponseDTO();
 
         notifyResponse.setId(notify.getId());
-        notifyResponse.setUser(notify.getNotifyOwner());
-        notifyResponse.setPost(notify.getPost());
-        notifyResponse.setComment(notify.getComment());
+        if (notify.getPost() != null) {
+            notifyResponse.setPostId(notify.getPost().getId());
+        }
+        if (notify.getComment() != null) {
+            notifyResponse.setCommentId(notify.getComment().getId());
+        }
+        notifyResponse.setUserId(notify.getUser().getId());
+        notifyResponse.setUserName(notify.getUser().getUserName());
         notifyResponse.setActionEnum(notify.getActionEnum());
         notifyResponse.setVerified(notify.getVerified());
-        notifyResponse.setDate(notify.getDate());
+        notifyResponse.setDate(String.valueOf(notify.getDate()));
 
         return notifyResponse;
     }
