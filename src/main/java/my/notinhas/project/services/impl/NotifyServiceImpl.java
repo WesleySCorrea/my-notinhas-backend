@@ -71,4 +71,11 @@ public class NotifyServiceImpl implements NotifyService {
 
         return new PageImpl<>(notifyResponseDTOS, pageable, notifies.getTotalElements());
     }
+
+    @Override
+    public void verifyNotify(Long id) {
+        UserDTO user = ExtractUser.get();
+
+        this.NotifyRepository.updateVerifiedByIdAndNotifyOwnerId(id, user.getUserId());
+    }
 }

@@ -41,4 +41,8 @@ public interface NotifyRepository extends JpaRepository<Notify, Long> {
                                                            @Param("commentId") Long commentId,
                                                            @Param("currentActionEnum") ActionEnum currentActionEnum);
 
+    @Modifying
+    @Transactional
+    @Query("UPDATE Notify n SET n.verified = true WHERE n.id = :id AND n.notifyOwner.id = :notifyOwnerId")
+    void updateVerifiedByIdAndNotifyOwnerId(@Param("id") Long id, @Param("notifyOwnerId") Long notifyOwnerId);
 }

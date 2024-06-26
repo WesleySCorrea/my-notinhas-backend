@@ -15,4 +15,5 @@ public interface NotifyService {
     void updateNotificationComment(Long notifyOwnerId, Long userId, Long postId, Long commentId,
                             ActionEnum newAction, ActionEnum currentActionEnum);
     Page<NotifyResponseDTO> findAllNotifications(Pageable pageable);
+    void verifyNotify(Long id);
 }
