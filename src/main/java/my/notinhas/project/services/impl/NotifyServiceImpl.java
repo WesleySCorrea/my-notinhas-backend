@@ -5,6 +5,7 @@ import my.notinhas.project.dtos.NotifyDTO;
 import my.notinhas.project.dtos.UserDTO;
 import my.notinhas.project.dtos.response.NotifyResponseDTO;
 import my.notinhas.project.entities.Notify;
+import my.notinhas.project.enums.ActionEnum;
 import my.notinhas.project.exception.runtime.PersistFailedException;
 import my.notinhas.project.repositories.NotifyRepository;
 import my.notinhas.project.services.ExtractUser;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,6 +33,27 @@ public class NotifyServiceImpl implements NotifyService {
         } catch (Exception e) {
             throw new PersistFailedException("Fail when the object was persisted");
         }
+    }
+
+    @Override
+    @Transactional
+    public void removeNotification(Long notifyOwnerId, Long userId, Long postId, ActionEnum action) {
+
+        this.NotifyRepository.deleteByNotifyOwnerIdAndUserIdAndActionEnumAndPostId(notifyOwnerId, userId, action, postId);
+    }
+
+    @Override
+    @Transactional
+    public void updateNotificationPost(Long notifyOwnerId, Long userId, Long postId, ActionEnum newAction, ActionEnum currentAction) {
+
+        this.NotifyRepository.updateActionEnumByNotifyOwnerIdAndUserIdAndPostId(newAction, notifyOwnerId, userId, postId, currentAction);
+    }
+
+    @Override
+    @Transactional
+    public void updateNotificationComment(Long notifyOwnerId, Long userId, Long postId, Long commentId, ActionEnum newAction, ActionEnum currentAction) {
+
+        this.NotifyRepository.updateActionEnumByNotifyOwnerIdAndUserIdAndPostIdAndCommentId(newAction, notifyOwnerId, userId, postId, commentId, currentAction);
     }
 
     @Override

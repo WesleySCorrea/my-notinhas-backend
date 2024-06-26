@@ -7,6 +7,7 @@ import my.notinhas.project.dtos.request.LikeRequestDTO;
 import my.notinhas.project.entities.Likes;
 import my.notinhas.project.entities.Users;
 import my.notinhas.project.enums.ActionEnum;
+import my.notinhas.project.enums.LikeEnum;
 import my.notinhas.project.exception.runtime.PersistFailedException;
 import my.notinhas.project.repositories.LikeRepository;
 import my.notinhas.project.services.ExtractUser;
@@ -35,12 +36,15 @@ public class LikeServiceImpl implements LikeService {
 
                 this.repository.deleteById(existingLike.getId());
 
+                this.removeNotification(likeRequestDTO, userDTO.getUserId());
+
             } else {
                 existingLike.setLikeEnum(likeRequestDTO.getLikeEnum());
                 existingLike.setDate(LocalDateTime.now());
                 this.repository.save(existingLike);
-            }
 
+                this.modifyNotification(likeRequestDTO, userDTO);
+            }
         } else {
 
             Likes request = likeRequestDTO.converterLikeRequestToLike(userDTO);
@@ -56,7 +60,15 @@ public class LikeServiceImpl implements LikeService {
         }
     }
 
+    private void removeNotification(LikeRequestDTO like, Long userId) {
+
+        ActionEnum actionEnum = this.verifyActionEnum(like.getLikeEnum());
+        this.notifyService.removeNotification(like.getPost().getUserId(), userId, like.getPost().getId(), actionEnum);
+    }
+
     private void createNotification(Likes like, UserDTO userDTO, Long userId) {
+
+        ActionEnum actionEnum = this.verifyActionEnum(like.getLikeEnum());
 
         Users notifyOwner = new Users();
         notifyOwner.setId(userId);
@@ -65,10 +77,44 @@ public class LikeServiceImpl implements LikeService {
         notifyDTO.setNotifyOwner(notifyOwner);
         notifyDTO.setUser(userDTO.convertUserDTOToUser());
         notifyDTO.setPost(like.getPost());
-        notifyDTO.setActionEnum(ActionEnum.LIKE_POST);
+        notifyDTO.setActionEnum(actionEnum);
         notifyDTO.setVerified(Boolean.FALSE);
         notifyDTO.setDate(LocalDateTime.now());
 
         this.notifyService.saveNotify(notifyDTO);
+    }
+
+    private void modifyNotification(LikeRequestDTO like, UserDTO userDTO) {
+
+        ActionEnum newActionEnum = this.verifyActionEnum(like.getLikeEnum());
+        ActionEnum currentActionEnum = this.verifyCurrentActionEnum(like.getLikeEnum());
+
+        this.notifyService.updateNotificationPost(like.getPost().getUserId(),
+                userDTO.getUserId(),
+                like.getPost().getId(),
+                newActionEnum,
+                currentActionEnum);
+    }
+
+    private ActionEnum verifyActionEnum(LikeEnum likeEnum) {
+
+        ActionEnum actionEnum;
+        if (likeEnum == LikeEnum.LIKE) {
+            actionEnum = ActionEnum.LIKE_POST;
+        } else {
+            actionEnum = ActionEnum.DISLIKE_POST;
+        }
+        return actionEnum;
+    }
+
+    private ActionEnum verifyCurrentActionEnum(LikeEnum likeEnum) {
+
+        ActionEnum actionEnum;
+        if (likeEnum == LikeEnum.LIKE) {
+            actionEnum = ActionEnum.DISLIKE_POST;
+        } else {
+            actionEnum = ActionEnum.LIKE_POST;
+        }
+        return actionEnum;
     }
 }
