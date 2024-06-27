@@ -1,12 +1,15 @@
 package my.notinhas.project.services.impl;
 
 import lombok.AllArgsConstructor;
-import my.notinhas.project.dtos.CommentDTO;
+import my.notinhas.project.dtos.NotifyDTO;
 import my.notinhas.project.dtos.UserDTO;
 import my.notinhas.project.dtos.request.CommentRequestDTO;
+import my.notinhas.project.dtos.request.LikeRequestDTO;
 import my.notinhas.project.dtos.response.CommentResponseDTO;
 import my.notinhas.project.entities.Comments;
 import my.notinhas.project.entities.LikesComments;
+import my.notinhas.project.entities.Users;
+import my.notinhas.project.enums.ActionEnum;
 import my.notinhas.project.enums.LikeEnum;
 import my.notinhas.project.exception.runtime.ObjectNotFoundException;
 import my.notinhas.project.exception.runtime.PersistFailedException;
@@ -15,6 +18,7 @@ import my.notinhas.project.repositories.CommentRepository;
 import my.notinhas.project.repositories.LikeCommentRepository;
 import my.notinhas.project.services.CommentService;
 import my.notinhas.project.services.ExtractUser;
+import my.notinhas.project.services.NotifyService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +31,7 @@ import java.util.List;
 @AllArgsConstructor
 public class CommentServiceImpl implements CommentService {
 
+    private final NotifyService notifyService;
     private final CommentRepository repository;
     private final LikeCommentRepository likeCommentRepository;
 
@@ -91,19 +96,21 @@ public class CommentServiceImpl implements CommentService {
     public void saveComment(CommentRequestDTO commentRequestDTO) {
         UserDTO userDTO = ExtractUser.get();
 
-        if (commentRequestDTO.getParentComment() != null) {
-            Long fatherCommentId = commentRequestDTO.getParentComment().getId();
+        if (commentRequestDTO.getParentCommentId() != null) {
+            Long fatherCommentId = commentRequestDTO.getParentCommentId();
 
             Comments fatherComment = this.repository.findById(fatherCommentId)
                     .orElseThrow(() -> new ObjectNotFoundException("Comment with ID " + fatherCommentId + " not found."));
             if (fatherComment.getParentComment() != null) {
-                commentRequestDTO.setParentComment(new CommentDTO());
+                commentRequestDTO.setParentCommentId(fatherComment.getParentComment().getId());
             }
         }
 
         Comments comments = commentRequestDTO.converterCommentRequestToComment(LocalDateTime.now(), userDTO);
         try {
-            this.repository.save(comments);
+            Comments commentPersisted = this.repository.save(comments);
+
+            this.createNotification(commentPersisted, userDTO, commentRequestDTO.getPostOwnerId());
         } catch (Exception e) {
             throw new PersistFailedException("Fail when the object was persisted");
         }
@@ -141,6 +148,7 @@ public class CommentServiceImpl implements CommentService {
             this.repository.deactivateCommentsByParentId(id);
             this.repository.save(comment);
         }
+        this.removeNotification(comment, userDTO.getUserId());
     }
 
 
@@ -162,4 +170,26 @@ public class CommentServiceImpl implements CommentService {
         return like.getLikeEnum();
     }
 
+    private void createNotification(Comments comments, UserDTO userDTO, Long postOwnerId) {
+
+        Users notifyOwner = new Users();
+        notifyOwner.setId(postOwnerId);
+
+        NotifyDTO notifyDTO = new NotifyDTO();
+        notifyDTO.setNotifyOwner(notifyOwner);
+        notifyDTO.setUser(userDTO.convertUserDTOToUser());
+        notifyDTO.setPost(comments.getPost());
+        notifyDTO.setComment(comments);
+        notifyDTO.setActionEnum(ActionEnum.COMMENT_IN_POST);
+        notifyDTO.setVerified(Boolean.FALSE);
+        notifyDTO.setDate(LocalDateTime.now());
+
+        this.notifyService.saveNotify(notifyDTO);
+    }
+
+    private void removeNotification(Comments comments, Long userId) {
+
+        ActionEnum actionEnum = ActionEnum.COMMENT_IN_POST;
+        this.notifyService.removeNotificationOfComment(comments, userId, actionEnum);
+    }
 }

@@ -65,7 +65,7 @@ public class LikeCommentServiceImpl implements LikeCommentService {
     private void removeNotification(LikeCommentRequestDTO like, Long ownerUserId, Long postId, Long userId) {
 
         ActionEnum action = this.verifyActionEnum(like.getLikeEnum());
-        this.notifyService.removeNotification(ownerUserId, userId, postId, action);
+        this.notifyService.removeNotificationOfLikeComment(like.getComment().getId(), ownerUserId, userId, postId, action);
     }
 
     private void createNotification(LikesComments like, UserDTO userDTO, LikeCommentRequestDTO likeRequest) {
@@ -99,7 +99,7 @@ public class LikeCommentServiceImpl implements LikeCommentService {
         ActionEnum newActionEnum = this.verifyActionEnum(like.getLikeEnum());
         ActionEnum currentActionEnum = this.verifyCurrentActionEnum(like.getLikeEnum());
 
-        this.notifyService.updateNotificationComment(like.getComment().getPost().getUserId(),
+        this.notifyService.updateNotificationLikeComment(like.getComment().getPost().getUserId(),
                 userDTO.getUserId(),
                 like.getComment().getPost().getId(),
                 like.getComment().getId(),

@@ -6,10 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import my.notinhas.project.dtos.CommentDTO;
-import my.notinhas.project.dtos.PostDTO;
 import my.notinhas.project.dtos.UserDTO;
 import my.notinhas.project.entities.Comments;
+import my.notinhas.project.entities.Posts;
 
 import java.time.LocalDateTime;
 
@@ -21,18 +20,24 @@ import java.time.LocalDateTime;
 public class CommentRequestDTO {
     @NotNull
     private String content;
-    private PostDTO post;
-    private CommentDTO parentComment;
+    private Long postId;
+    private Long postOwnerId;
+    private Long parentCommentId;
 
     public Comments converterCommentRequestToComment (LocalDateTime date, UserDTO user) {
+
+        Posts post = new Posts();
+        post.setId(this.getPostId());
 
         Comments comment = new Comments();
         comment.setContent(this.getContent());
         comment.setDate(date);
-        comment.setPost(this.getPost().convertPostDTOToPost());
+        comment.setPost(post);
         comment.setUser(user.convertUserDTOToUser());
-        if (this.getParentComment() != null) {
-            comment.setParentComment(this.getParentComment().toComment());
+        if (this.getParentCommentId() != null) {
+            Comments parentComment = new Comments();
+            parentComment.setId(this.getParentCommentId());
+            comment.setParentComment(parentComment);
         }
         comment.setActive(Boolean.TRUE);
 

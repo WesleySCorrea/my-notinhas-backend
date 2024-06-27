@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import my.notinhas.project.dtos.NotifyDTO;
 import my.notinhas.project.dtos.UserDTO;
 import my.notinhas.project.dtos.response.NotifyResponseDTO;
+import my.notinhas.project.entities.Comments;
 import my.notinhas.project.entities.Notify;
 import my.notinhas.project.enums.ActionEnum;
 import my.notinhas.project.exception.runtime.PersistFailedException;
@@ -23,13 +24,13 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class NotifyServiceImpl implements NotifyService {
 
-    private final NotifyRepository NotifyRepository;
+    private final NotifyRepository notifyRepository;
 
     @Override
     public void saveNotify(NotifyDTO notify) {
 
         try {
-            this.NotifyRepository.save(notify.converterNotifyDTOToNotify());
+            this.notifyRepository.save(notify.converterNotifyDTOToNotify());
         } catch (Exception e) {
             throw new PersistFailedException("Fail when the object was persisted");
         }
@@ -37,30 +38,52 @@ public class NotifyServiceImpl implements NotifyService {
 
     @Override
     @Transactional
-    public void removeNotification(Long notifyOwnerId, Long userId, Long postId, ActionEnum action) {
+    public void removeNotificationOfLikePost(Long notifyOwnerId, Long userId, Long postId, ActionEnum action) {
 
-        this.NotifyRepository.deleteByNotifyOwnerIdAndUserIdAndActionEnumAndPostId(notifyOwnerId, userId, action, postId);
+        this.notifyRepository.deleteByNotifyOwnerIdAndUserIdAndActionEnumAndPostId(notifyOwnerId, userId, action, postId);
     }
 
     @Override
     @Transactional
-    public void updateNotificationPost(Long notifyOwnerId, Long userId, Long postId, ActionEnum newAction, ActionEnum currentAction) {
+    public void removeNotificationOfLikeComment(Long commentId, Long notifyOwnerId, Long userId, Long postId, ActionEnum action) {
 
-        this.NotifyRepository.updateActionEnumByNotifyOwnerIdAndUserIdAndPostId(newAction, notifyOwnerId, userId, postId, currentAction);
+        this.notifyRepository.deleteByCommentIdAndNotifyOwnerIdAndUserIdAndActionEnumAndPostId(commentId, notifyOwnerId, userId, action, postId);
     }
 
     @Override
     @Transactional
-    public void updateNotificationComment(Long notifyOwnerId, Long userId, Long postId, Long commentId, ActionEnum newAction, ActionEnum currentAction) {
+    public void removeNotificationOfComment(Comments comments, Long userId, ActionEnum action) {
 
-        this.NotifyRepository.updateActionEnumByNotifyOwnerIdAndUserIdAndPostIdAndCommentId(newAction, notifyOwnerId, userId, postId, commentId, currentAction);
+        Long commentId = comments.getId();
+        Long postId = comments.getPost().getId();
+
+        this.notifyRepository.deleteByCommentIdAndUserIdAndActionEnumAndPostId(
+                commentId,
+                userId,
+                action,
+                postId
+        );
+    }
+
+    @Override
+    @Transactional
+    public void updateNotificationLikePost(Long notifyOwnerId, Long userId, Long postId, ActionEnum newAction, ActionEnum currentAction) {
+
+        this.notifyRepository.updateActionEnumByNotifyOwnerIdAndUserIdAndPostId(newAction, notifyOwnerId, userId, postId, currentAction);
+    }
+
+    @Override
+    @Transactional
+    public void updateNotificationLikeComment(Long notifyOwnerId, Long userId, Long postId, Long commentId, ActionEnum newAction, ActionEnum currentAction) {
+
+        this.notifyRepository.updateActionEnumByNotifyOwnerIdAndUserIdAndPostIdAndCommentId(newAction, notifyOwnerId, userId, postId, commentId, currentAction);
     }
 
     @Override
     public Page<NotifyResponseDTO> findAllNotifications(Pageable pageable) {
         UserDTO user = ExtractUser.get();
 
-        Page<Notify> notifies = this.NotifyRepository.findAllByNotifyOwnerIdAndVerifiedFalseOrderByDateDesc(user.getUserId(), pageable);
+        Page<Notify> notifies = this.notifyRepository.findAllByNotifyOwnerIdAndVerifiedFalseOrderByDateDesc(user.getUserId(), pageable);
 
         List<NotifyResponseDTO> notifyResponseDTOS = notifies.stream()
                 .map(notify -> {
@@ -76,6 +99,6 @@ public class NotifyServiceImpl implements NotifyService {
     public void verifyNotify(Long id) {
         UserDTO user = ExtractUser.get();
 
-        this.NotifyRepository.updateVerifiedByIdAndNotifyOwnerId(id, user.getUserId());
+        this.notifyRepository.updateVerifiedByIdAndNotifyOwnerId(id, user.getUserId());
     }
 }

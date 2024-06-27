@@ -63,7 +63,7 @@ public class LikeServiceImpl implements LikeService {
     private void removeNotification(LikeRequestDTO like, Long userId) {
 
         ActionEnum actionEnum = this.verifyActionEnum(like.getLikeEnum());
-        this.notifyService.removeNotification(like.getPost().getUserId(), userId, like.getPost().getId(), actionEnum);
+        this.notifyService.removeNotificationOfLikePost(like.getPost().getUserId(), userId, like.getPost().getId(), actionEnum);
     }
 
     private void createNotification(Likes like, UserDTO userDTO, Long userId) {
@@ -89,7 +89,7 @@ public class LikeServiceImpl implements LikeService {
         ActionEnum newActionEnum = this.verifyActionEnum(like.getLikeEnum());
         ActionEnum currentActionEnum = this.verifyCurrentActionEnum(like.getLikeEnum());
 
-        this.notifyService.updateNotificationPost(like.getPost().getUserId(),
+        this.notifyService.updateNotificationLikePost(like.getPost().getUserId(),
                 userDTO.getUserId(),
                 like.getPost().getId(),
                 newActionEnum,
