@@ -172,6 +172,14 @@ public class CommentServiceImpl implements CommentService {
 
     private void createNotification(Comments comments, UserDTO userDTO, Long postOwnerId) {
 
+        ActionEnum actionEnum;
+
+        if(comments.getParentComment() == null) {
+            actionEnum = ActionEnum.COMMENT_IN_POST;
+        } else {
+            actionEnum = ActionEnum.COMMENT_IN_COMMENT;
+        }
+
         Users notifyOwner = new Users();
         notifyOwner.setId(postOwnerId);
 
@@ -180,7 +188,7 @@ public class CommentServiceImpl implements CommentService {
         notifyDTO.setUser(userDTO.convertUserDTOToUser());
         notifyDTO.setPost(comments.getPost());
         notifyDTO.setComment(comments);
-        notifyDTO.setActionEnum(ActionEnum.COMMENT_IN_POST);
+        notifyDTO.setActionEnum(actionEnum);
         notifyDTO.setVerified(Boolean.FALSE);
         notifyDTO.setDate(LocalDateTime.now());
 
@@ -189,7 +197,14 @@ public class CommentServiceImpl implements CommentService {
 
     private void removeNotification(Comments comments, Long userId) {
 
-        ActionEnum actionEnum = ActionEnum.COMMENT_IN_POST;
+        ActionEnum actionEnum;
+
+        if(comments.getParentComment() == null) {
+            actionEnum = ActionEnum.COMMENT_IN_POST;
+        } else {
+            actionEnum = ActionEnum.COMMENT_IN_COMMENT;
+        }
+
         this.notifyService.removeNotificationOfComment(comments, userId, actionEnum);
     }
 }
