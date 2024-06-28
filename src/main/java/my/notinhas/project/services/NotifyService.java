@@ -7,7 +7,7 @@ import my.notinhas.project.enums.ActionEnum;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-public interface NotifyService {
+public interface   NotifyService {
 
     void saveNotify(NotifyDTO notify);
     void removeNotificationOfLikePost(Long notifyOwnerId, Long userId, Long postId, ActionEnum action);
