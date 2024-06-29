@@ -27,12 +27,14 @@ public class NotifyServiceImpl implements NotifyService {
     private final NotifyRepository notifyRepository;
 
     @Override
-    public void saveNotify(NotifyDTO notify) {
+    public void saveNotify(NotifyDTO notify, Long userId) {
 
-        try {
-            this.notifyRepository.save(notify.converterNotifyDTOToNotify());
-        } catch (Exception e) {
-            throw new PersistFailedException("Fail when the object was persisted");
+        if(!notify.getNotifyOwner().getId().equals(userId)) {
+            try {
+                this.notifyRepository.save(notify.converterNotifyDTOToNotify());
+            } catch (Exception e) {
+                throw new PersistFailedException("Fail when the object was persisted");
+            }
         }
     }
 

@@ -81,7 +81,7 @@ public class LikeServiceImpl implements LikeService {
         notifyDTO.setVerified(Boolean.FALSE);
         notifyDTO.setDate(LocalDateTime.now());
 
-        this.notifyService.saveNotify(notifyDTO);
+        this.notifyService.saveNotify(notifyDTO, userDTO.getUserId());
     }
 
     private void modifyNotification(LikeRequestDTO like, UserDTO userDTO) {

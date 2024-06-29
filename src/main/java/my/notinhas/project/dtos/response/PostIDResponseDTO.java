@@ -10,6 +10,7 @@ import my.notinhas.project.entities.Posts;
 import my.notinhas.project.enums.LikeEnum;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class PostIDResponseDTO {
     private Long id;
+    @JsonFormat(pattern = "dd-MM-yy HH:mm:ss")
     private LocalDateTime date;
     private String content;
     private UserPostResponseDTO user;
@@ -26,6 +28,7 @@ public class PostIDResponseDTO {
     private LikeEnum userLike;
     private Boolean postOwner;
     private Boolean isEdited;
+    private List<CommentResponseDTO> comments;
 
     public PostIDResponseDTO(Posts post) {
         this.id = post.getId();

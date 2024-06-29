@@ -11,11 +11,10 @@ public interface PostService {
 
     Page<PostPublicResponseDTO> findAllPublic(Pageable pageable);
     Page<PostResponseDTO> findAll(Pageable pageable);
-
     Page<PostResponseDTO> searchPosts(Pageable pageable,String content);
-    PostIDResponseDTO findByID(Long id);
+    PostIDResponseDTO findByID(Pageable pageable,Long postId, Long commentId);
     void savePost(PostRequestDTO postRequestDTO);
-    void updatePost(PostRequestDTO postRequestDTO, Long id);
+    void updatePost(Pageable pageable, PostRequestDTO postRequestDTO, Long id);
     void deleteByID(Long id);
 
 }

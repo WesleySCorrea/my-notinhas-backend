@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import my.notinhas.project.component.Variables;
 import my.notinhas.project.dtos.UserDTO;
 import my.notinhas.project.dtos.request.PostRequestDTO;
+import my.notinhas.project.dtos.response.CommentResponseDTO;
 import my.notinhas.project.dtos.response.PostIDResponseDTO;
 import my.notinhas.project.dtos.response.PostPublicResponseDTO;
 import my.notinhas.project.dtos.response.PostResponseDTO;
@@ -16,6 +17,7 @@ import my.notinhas.project.exception.runtime.UnauthorizedIdTokenException;
 import my.notinhas.project.repositories.CommentRepository;
 import my.notinhas.project.repositories.LikeRepository;
 import my.notinhas.project.repositories.PostRepository;
+import my.notinhas.project.services.CommentService;
 import my.notinhas.project.services.ExtractUser;
 import my.notinhas.project.services.PostService;
 import org.springframework.data.domain.Page;
@@ -25,6 +27,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -32,9 +36,11 @@ import java.util.NoSuchElementException;
 @RequiredArgsConstructor
 public class PostServiceImpl implements PostService {
     private final Variables variables;
+    private final CommentService commentService;
     private final PostRepository postRepository;
     private final LikeRepository likeRepository;
     private final CommentRepository commentRepository;
+
     @Override
     public Page<PostPublicResponseDTO> findAllPublic(Pageable pageable) {
 
@@ -69,7 +75,7 @@ public class PostServiceImpl implements PostService {
 
                     PostResponseDTO dto = new PostResponseDTO(post);
 
-                    dto.setPostOwner(this.verifyPostOwner(user,post));
+                    dto.setPostOwner(this.verifyPostOwner(user, post));
                     dto.setUserLike(this.verifyUserLike(post, user));
 
                     dto.setTotalLikes(this.calculeTotalLike(post.getId()));
@@ -94,7 +100,7 @@ public class PostServiceImpl implements PostService {
 
                     PostResponseDTO dto = new PostResponseDTO(post);
 
-                    dto.setPostOwner(this.verifyPostOwner(user,post));
+                    dto.setPostOwner(this.verifyPostOwner(user, post));
                     dto.setUserLike(this.verifyUserLike(post, user));
 
                     dto.setTotalLikes(this.calculeTotalLike(post.getId()));
@@ -107,19 +113,33 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostIDResponseDTO findByID(Long id) {
+    public PostIDResponseDTO findByID(Pageable pageable, Long postId, Long commentId) {
         UserDTO user = ExtractUser.get();
 
-        Posts post = this.postRepository.findById(id)
-                .orElseThrow(() -> new ObjectNotFoundException("Post with ID " + id + " not found."));
+        Posts post = this.postRepository.findById(postId)
+                .orElseThrow(() -> new ObjectNotFoundException("Post with ID " + postId + " not found."));
 
         PostIDResponseDTO postIDResponseDTO = new PostIDResponseDTO(post);
-        postIDResponseDTO.setPostOwner(this.verifyPostOwner(user,post));
+        postIDResponseDTO.setPostOwner(this.verifyPostOwner(user, post));
         postIDResponseDTO.setUserLike(this.verifyUserLike(post, user));
 
         postIDResponseDTO.setTotalLikes(this.calculeTotalLike(post.getId()));
         postIDResponseDTO.setTotalComments(this.calculeTotalComment(post.getId()));
 
+        Page<CommentResponseDTO> comments = commentService.findByPostId(postId, pageable);
+        List<CommentResponseDTO> listComments = new ArrayList<>(comments.getContent());
+
+        if (commentId != null) {
+            for (Iterator<CommentResponseDTO> iterator = listComments.iterator(); iterator.hasNext(); ) {
+                CommentResponseDTO comment = iterator.next();
+                if (comment.getId().equals(commentId)) {
+                    iterator.remove();
+                    listComments.add(0, comment);
+                    break;
+                }
+            }
+            postIDResponseDTO.setComments(listComments);
+        }
         return postIDResponseDTO;
     }
 
@@ -144,12 +164,12 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public void updatePost(PostRequestDTO postRequestDTO, Long id) {
+    public void updatePost(Pageable pageable, PostRequestDTO postRequestDTO, Long id) {
         UserDTO user = ExtractUser.get();
 
-        PostIDResponseDTO postPersisted = this.findByID(id);
+        PostIDResponseDTO postPersisted = this.findByID(pageable, id, null);
 
-        if (postPersisted.getUser().getUserName().equals(user.getUserName())) {
+        if (postPersisted.getUser().getUserId().equals(user.getUserId())) {
 
             int updatedRows = postRepository.updatePostContentAndDate(
                     postPersisted.getId(),
@@ -172,8 +192,8 @@ public class PostServiceImpl implements PostService {
         var post = this.postRepository.findById(id);
         if (post.isPresent() && post.get().getUser().getEmail().equals(user.getEmail())) {
             var postToDelete = post.get();
-                postToDelete.setActive(Boolean.FALSE);
-                this.postRepository.save(postToDelete);
+            postToDelete.setActive(Boolean.FALSE);
+            this.postRepository.save(postToDelete);
         } else {
             throw new NoSuchElementException("Post with ID: " + id + " not found!");
         }
@@ -193,7 +213,7 @@ public class PostServiceImpl implements PostService {
         return commentRepository.countByPostIdAndActiveIsTrue(postId);
     }
 
-    private void verifyDateActive (Posts post) {
+    private void verifyDateActive(Posts post) {
 
         Duration duration = Duration.between(post.getDate(), LocalDateTime.now());
 
