@@ -192,7 +192,7 @@ public class CommentServiceImpl implements CommentService {
         notifyDTO.setVerified(Boolean.FALSE);
         notifyDTO.setDate(LocalDateTime.now());
 
-        this.notifyService.saveNotify(notifyDTO, userDTO.getUserId());
+        this.notifyService.saveNotify(notifyDTO);
     }
 
     private void removeNotification(Comments comments, Long userId) {
