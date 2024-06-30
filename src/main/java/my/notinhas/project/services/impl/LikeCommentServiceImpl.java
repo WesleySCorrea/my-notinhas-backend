@@ -91,7 +91,7 @@ public class LikeCommentServiceImpl implements LikeCommentService {
         notifyDTO.setVerified(Boolean.FALSE);
         notifyDTO.setDate(LocalDateTime.now());
 
-        this.notifyService.saveNotify(notifyDTO, userDTO.getUserId());
+        this.notifyService.saveNotify(notifyDTO);
     }
 
     private void modifyNotification(LikeCommentRequestDTO like, UserDTO userDTO) {

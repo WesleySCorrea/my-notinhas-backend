@@ -35,10 +35,10 @@ public class PostController {
         return ResponseEntity.ok().body(posts);
     }
 
-    @GetMapping("/{postId}-{commentId}")
-    public ResponseEntity<PostIDResponseDTO> findById(Pageable pageable,@PathVariable Long postId, @PathVariable Long commentId) {
+    @GetMapping("/{id}")
+    public ResponseEntity<PostIDResponseDTO> findById(@PathVariable Long id) {
 
-        PostIDResponseDTO post = this.service.findByID(pageable, postId, commentId);
+        PostIDResponseDTO post = this.service.findByID(id);
 
         return ResponseEntity.ok().body(post);
     }
@@ -58,9 +58,9 @@ public class PostController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Void> update(Pageable pageable, @RequestBody PostRequestDTO postRequestDTO, @PathVariable Long id) {
+    public ResponseEntity<Void> update(@RequestBody PostRequestDTO postRequestDTO, @PathVariable Long id) {
 
-        this.service.updatePost(pageable, postRequestDTO, id);
+        this.service.updatePost(postRequestDTO, id);
 
         return ResponseEntity.ok().build();
     }
