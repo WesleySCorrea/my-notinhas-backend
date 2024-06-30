@@ -85,7 +85,7 @@ public class NotifyServiceImpl implements NotifyService {
     public Page<NotifyResponseDTO> findAllNotifications(Pageable pageable) {
         UserDTO user = ExtractUser.get();
 
-        Page<Notify> notifies = this.notifyRepository.findAllByNotifyOwnerIdOrderByDateDesc(user.getUserId(), pageable);
+        Page<Notify> notifies = this.notifyRepository.findAllByNotifyOwnerIdAndVerifiedFalseOrderByDateDesc(user.getUserId(), pageable);
 
         List<NotifyResponseDTO> notifyResponseDTOS = notifies.stream()
                 .map(notify -> {
