@@ -34,6 +34,14 @@ public class CommentController {
         return ResponseEntity.ok().body(comments);
     }
 
+    @GetMapping("/notify/{postId}/{commentId}")
+    public ResponseEntity<Page<CommentResponseDTO>> findByPostId(@PathVariable Long postId, Pageable pageable) {
+
+        Page<CommentResponseDTO> comments = this.service.findByPostId(postId, pageable);
+
+        return ResponseEntity.ok().body(comments);
+    }
+
     @PostMapping
     public ResponseEntity<Void> save(@Valid @RequestBody CommentRequestDTO commentRequestDTO) {
 
