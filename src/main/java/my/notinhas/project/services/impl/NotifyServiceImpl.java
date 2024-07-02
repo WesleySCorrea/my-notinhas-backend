@@ -37,6 +37,15 @@ public class NotifyServiceImpl implements NotifyService {
     }
 
     @Override
+    public Long countNotificationByUserId() {
+        UserDTO user = ExtractUser.get();
+
+        Long quantity = this.notifyRepository.countByNotifyOwnerIdAndVerifiedFalse(user.getUserId());
+
+        return quantity;
+    }
+
+    @Override
     @Transactional
     public void removeNotificationOfLikePost(Long notifyOwnerId, Long userId, Long postId, ActionEnum action) {
 

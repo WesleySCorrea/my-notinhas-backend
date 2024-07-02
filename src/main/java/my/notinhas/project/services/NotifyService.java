@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 public interface NotifyService {
 
     void saveNotify(NotifyDTO notify);
+    Long countNotificationByUserId();
     void removeNotificationOfLikePost(Long notifyOwnerId, Long userId, Long postId, ActionEnum action);
     void removeNotificationOfLikeComment(Long commentId, Long notifyOwnerId, Long userId, Long postId, ActionEnum action);
     void removeNotificationOfComment(Comments comments, Long userId, ActionEnum action);

@@ -23,6 +23,14 @@ public class NotifyController {
         return ResponseEntity.ok().body(notifies);
     }
 
+    @GetMapping("/quantity")
+    public ResponseEntity<Long> countQuantity() {
+
+        Long quantityNotifies = this.service.countNotificationByUserId();
+
+        return ResponseEntity.ok().body(quantityNotifies);
+    }
+
     @PatchMapping("/{id}")
     public ResponseEntity<Void> verifyNotify(@PathVariable Long id) {
 
