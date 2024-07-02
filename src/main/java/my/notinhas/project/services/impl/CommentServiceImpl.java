@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import my.notinhas.project.dtos.NotifyDTO;
 import my.notinhas.project.dtos.UserDTO;
 import my.notinhas.project.dtos.request.CommentRequestDTO;
-import my.notinhas.project.dtos.request.LikeRequestDTO;
 import my.notinhas.project.dtos.response.CommentResponseDTO;
 import my.notinhas.project.entities.Comments;
 import my.notinhas.project.entities.LikesComments;
@@ -25,6 +24,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -36,8 +36,27 @@ public class CommentServiceImpl implements CommentService {
     private final LikeCommentRepository likeCommentRepository;
 
     @Override
-    public Page<CommentResponseDTO> findAllCommentSon(Pageable pageable, Long id) {
+    public CommentResponseDTO findById(Long id) {
+        UserDTO userDTO = ExtractUser.get();
 
+        Comments comment = this.repository.findById(id)
+                .orElseThrow(() -> new ObjectNotFoundException("Comment with ID " + id + " not found."));
+
+        CommentResponseDTO commentResponseDTO = new CommentResponseDTO().converterCommentToCommentResponse(comment, userDTO);
+        commentResponseDTO.setTotalLikes(this.calculeTotalLike(comment.getId()));
+        commentResponseDTO.setUserLike(this.verifyUserLike(commentResponseDTO, userDTO));
+
+        for (CommentResponseDTO replies : commentResponseDTO.getReplies()) {
+
+            replies.setTotalLikes(this.calculeTotalLike(replies.getId()));
+            replies.setUserLike(this.verifyUserLike(replies, userDTO));
+        }
+
+        return commentResponseDTO;
+    }
+
+    @Override
+    public Page<CommentResponseDTO> findAllCommentSon(Pageable pageable, Long id) {
         UserDTO userDTO = ExtractUser.get();
 
         Page<Comments> comments;
@@ -90,6 +109,29 @@ public class CommentServiceImpl implements CommentService {
                 .toList();
 
         return new PageImpl<>(commentResponseDTOS, pageable, comments.getTotalElements());
+    }
+
+    @Override
+    public Page<CommentResponseDTO> findCommentToNotify(Long postId, Long commentId, Pageable pageable) {
+
+        Page<CommentResponseDTO> comments = this.findByPostId(postId, pageable);
+
+        if (commentId != 0) {
+            List<CommentResponseDTO> commentsList = new ArrayList<>(comments.getContent());
+
+            for (CommentResponseDTO comment : commentsList) {
+                if (comment.getId().equals(commentId)) {
+                    commentsList.remove(comment);
+                    commentsList.add(0, comment);
+                    return new PageImpl<>(commentsList, pageable, comments.getTotalElements());
+                }
+            }
+
+            CommentResponseDTO commentToNotify = this.findById(commentId);
+            commentsList.add(0, commentToNotify);
+            return new PageImpl<>(commentsList, pageable, comments.getTotalElements());
+        }
+        return comments;
     }
 
     @Override
@@ -174,7 +216,7 @@ public class CommentServiceImpl implements CommentService {
 
         ActionEnum actionEnum;
 
-        if(comments.getParentComment() == null) {
+        if (comments.getParentComment() == null) {
             actionEnum = ActionEnum.COMMENT_IN_POST;
         } else {
             actionEnum = ActionEnum.COMMENT_IN_COMMENT;
@@ -199,7 +241,7 @@ public class CommentServiceImpl implements CommentService {
 
         ActionEnum actionEnum;
 
-        if(comments.getParentComment() == null) {
+        if (comments.getParentComment() == null) {
             actionEnum = ActionEnum.COMMENT_IN_POST;
         } else {
             actionEnum = ActionEnum.COMMENT_IN_COMMENT;
