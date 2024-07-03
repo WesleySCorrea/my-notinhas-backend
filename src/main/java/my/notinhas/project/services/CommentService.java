@@ -11,7 +11,7 @@ public interface CommentService {
     Page<CommentResponseDTO> findAllCommentSon(Pageable pageable, Long id);
     Page<CommentResponseDTO> findByPostId(Long postId, Pageable pageable);
     Page<CommentResponseDTO> findCommentToNotify(Long postId, Long commentId ,Pageable pageable);
-    void saveComment(CommentRequestDTO commentRequestDTO);
+    CommentResponseDTO saveComment(CommentRequestDTO commentRequestDTO);
     void updateComment(CommentRequestDTO commentRequestDTO, Long id);
     void delete(Long id);
 }

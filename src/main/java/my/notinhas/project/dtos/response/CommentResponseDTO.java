@@ -51,13 +51,14 @@ public class CommentResponseDTO {
 
         commentResponseDTO.setUser(new UserPostResponseDTO(comment.getUser().getId(), comment.getUser().getUserName()));
 
-        List<CommentResponseDTO> replies = comment.getReplies().stream()
-                .map(comments -> new CommentResponseDTO()
-                        .converterCommentToCommentResponse(comments, user))
-                .toList();
+        if(comment.getReplies() != null) {
+            List<CommentResponseDTO> replies = comment.getReplies().stream()
+                    .map(comments -> new CommentResponseDTO()
+                            .converterCommentToCommentResponse(comments, user))
+                    .toList();
 
-        commentResponseDTO.setReplies(replies);
-
+            commentResponseDTO.setReplies(replies);
+        }
         return commentResponseDTO;
     }
 }

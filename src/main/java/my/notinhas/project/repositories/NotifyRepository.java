@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 public interface NotifyRepository extends JpaRepository<Notify, Long> {
 
-    Page<Notify> findAllByNotifyOwnerIdAndVerifiedFalseOrderByDateDesc(Long notifyOwner, Pageable pageable);
+    Page<Notify> findAllByNotifyOwnerIdOrderByDateDesc(Long notifyOwner, Pageable pageable);
     Long countByNotifyOwnerIdAndVerifiedFalse(Long notifyOwner);
     void deleteByNotifyOwnerIdAndUserIdAndActionEnumAndPostId(Long notifyOwnerId, Long userId, ActionEnum action, Long postId);
     void deleteByCommentIdAndNotifyOwnerIdAndUserIdAndActionEnumAndPostId(Long commentId, Long notifyOwnerId, Long userId, ActionEnum action, Long postId);

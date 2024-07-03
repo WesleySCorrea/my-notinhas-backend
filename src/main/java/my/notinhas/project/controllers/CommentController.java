@@ -43,11 +43,11 @@ public class CommentController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> save(@Valid @RequestBody CommentRequestDTO commentRequestDTO) {
+    public ResponseEntity<CommentResponseDTO> save(@Valid @RequestBody CommentRequestDTO commentRequestDTO) {
 
-        this.service.saveComment(commentRequestDTO);
+        var objectPersisted = this.service.saveComment(commentRequestDTO);
 
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(objectPersisted);
     }
 
     @PatchMapping("/{id}")

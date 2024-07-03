@@ -135,7 +135,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public void saveComment(CommentRequestDTO commentRequestDTO) {
+    public CommentResponseDTO saveComment(CommentRequestDTO commentRequestDTO) {
         UserDTO userDTO = ExtractUser.get();
 
         if (commentRequestDTO.getParentCommentId() != null) {
@@ -151,11 +151,12 @@ public class CommentServiceImpl implements CommentService {
         Comments comments = commentRequestDTO.converterCommentRequestToComment(LocalDateTime.now(), userDTO);
         try {
             Comments commentPersisted = this.repository.save(comments);
-
             this.createNotification(commentPersisted, userDTO, commentRequestDTO.getPostOwnerId());
+            return new CommentResponseDTO().converterCommentToCommentResponse(commentPersisted, userDTO);
         } catch (Exception e) {
             throw new PersistFailedException("Fail when the object was persisted");
         }
+
     }
 
     @Override
