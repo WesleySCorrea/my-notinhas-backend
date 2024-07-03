@@ -1,183 +1,174 @@
 import requests
 
+class TestException(Exception):
+    pass
+
+def get_token():
+    token = input("Insira o Bearer token: ").strip("'\"")
+    return token
+
+def log(message):
+    print(message)
+
+def post_content(token):
+    log("Iniciando teste de criação de postagem")
+    post_url = 'http://localhost:8090/api/post'
+    post_data = {'content': 'TESTE AUTOMATIZADO'}
+    post_headers = {
+        'Authorization': f'Bearer {token}',
+        'Content-Type': 'application/json'
+    }
+    response = requests.post(post_url, json=post_data, headers=post_headers)
+    if response.status_code != 201:
+        log("Falha no teste de criação de postagem")
+        raise TestException(f"Erro na postagem: {response.status_code}")
+    log("Teste de criação de postagem realizado com sucesso")
+    return response.json()['id']
+
+def get_posts(token):
+    log("Iniciando teste de recuperação de postagens")
+    get_url = 'http://localhost:8090/api/post?page=0&size=10'
+    get_headers = {'Authorization': f'Bearer {token}'}
+    response = requests.get(get_url, headers=get_headers)
+    if response.status_code != 200:
+        log("Falha no teste de recuperação de postagens")
+        raise TestException(f"Erro ao recuperar postagens: {response.status_code}")
+    log("Teste de recuperação de postagens realizado com sucesso")
+
+def like_post(token, post_id, like_types):
+    log("Iniciando teste de likes na postagem")
+    like_url = 'http://localhost:8090/api/like'
+    like_headers = {
+        'Authorization': f'Bearer {token}',
+        'Content-Type': 'application/json'
+    }
+    for likeType in like_types:
+        like_data = {'likeEnum': likeType, 'post': {'id': post_id}}
+        response = requests.post(like_url, json=like_data, headers=like_headers)
+        if response.status_code != 201:
+            log("Falha no teste de likes na postagem")
+            raise TestException(f"Erro no teste de likes: {response.status_code}")
+    log("Teste de likes na postagem realizado com sucesso")
+
+def comment_post(token, post_id, content):
+    log("Iniciando teste de criação de comentário")
+    comment_url = 'http://localhost:8090/api/comment'
+    comment_data = {'content': content, 'post': {'id': post_id}}
+    comment_headers = {
+        'Authorization': f'Bearer {token}',
+        'Content-Type': 'application/json'
+    }
+    response = requests.post(comment_url, json=comment_data, headers=comment_headers)
+    if response.status_code != 201:
+        log("Falha no teste de criação de comentário")
+        raise TestException(f"Erro ao criar comentário: {response.status_code}")
+    log("Teste de criação de comentário realizado com sucesso")
+    return response.json()['id']
+
+def get_comments(token, post_id):
+    log("Iniciando teste de recuperação de comentários")
+    get_comment_url = f'http://localhost:8090/api/comment/post/{post_id}?page=0&size=10'
+    get_comment_headers = {'Authorization': f'Bearer {token}'}
+    response = requests.get(get_comment_url, headers=get_comment_headers)
+    if response.status_code != 200:
+        log("Falha no teste de recuperação de comentários")
+        raise TestException(f"Erro ao recuperar comentário: {response.status_code}")
+    log("Teste de recuperação de comentários realizado com sucesso")
+    return response.json()['content'][0]['id']
+
+def like_comment(token, comment_id, like_types):
+    log("Iniciando teste de likes no comentário")
+    like_comment_url = 'http://localhost:8090/api/likecom'
+    like_headers = {
+        'Authorization': f'Bearer {token}',
+        'Content-Type': 'application/json'
+    }
+    for likeType in like_types:
+        like_comment_data = {'likeEnum': likeType, 'comment': {'id': comment_id}}
+        response = requests.post(like_comment_url, json=like_comment_data, headers=like_headers)
+        if response.status_code != 201:
+            log("Falha no teste de likes no comentário")
+            raise TestException(f"Erro no teste de likes do comentário: {response.status_code}")
+    log("Teste de likes no comentário realizado com sucesso")
+
+def reply_comment(token, post_id, comment_id, content):
+    log("Iniciando teste de criação de réplica de comentário")
+    reply_comment_url = 'http://localhost:8090/api/comment'
+    reply_comment_data = {'content': content, 'post': {'id': post_id}, 'parentComment': {'id': comment_id}}
+    reply_comment_headers = {
+        'Authorization': f'Bearer {token}',
+        'Content-Type': 'application/json'
+    }
+    response = requests.post(reply_comment_url, json=reply_comment_data, headers=reply_comment_headers)
+    if response.status_code != 201:
+        log("Falha no teste de criação de réplica de comentário")
+        raise TestException(f"Erro no teste de criar réplica: {response.status_code}")
+    log("Teste de criação de réplica de comentário realizado com sucesso")
+    return response.json()['id']
+
+def get_replies(token, comment_id):
+    log("Iniciando teste de recuperação de réplicas de comentário")
+    get_comment_reply_url = f'http://localhost:8090/api/comment/son/{comment_id}?page=0&size=10'
+    get_comment_reply_headers = {'Authorization': f'Bearer {token}'}
+    response = requests.get(get_comment_reply_url, headers=get_comment_reply_headers)
+    if response.status_code != 200:
+        log("Falha no teste de recuperação de réplicas de comentário")
+        raise TestException(f"Erro ao recuperar réplicas: {response.status_code}")
+    log("Teste de recuperação de réplicas de comentário realizado com sucesso")
+    return response.json()['content'][0]['id']
+
+def patch_content(token, url, content):
+    log(f"Iniciando teste de edição de conteúdo em {url}")
+    patch_headers = {
+        'Authorization': f'Bearer {token}',
+        'Content-Type': 'application/json'
+    }
+    response = requests.patch(url, json={'content': content}, headers=patch_headers)
+    if response.status_code != 200:
+        log(f"Falha no teste de edição de conteúdo em {url}")
+        raise TestException(f"Erro ao editar conteúdo: {response.status_code}")
+    log(f"Teste de edição de conteúdo em {url} realizado com sucesso")
+
+def delete_content(token, url):
+    log(f"Iniciando teste de exclusão de conteúdo em {url}")
+    delete_headers = {'Authorization': f'Bearer {token}'}
+    response = requests.delete(url, headers=delete_headers)
+    if response.status_code != 204:
+        log(f"Falha no teste de exclusão de conteúdo em {url}")
+        raise TestException(f"Erro ao deletar conteúdo: {response.status_code}")
+    log(f"Teste de exclusão de conteúdo em {url} realizado com sucesso")
+
 def main():
-    # Aguarda o input do accessToken
-    code = input("Insira o authCode do Google: ")
-    code = code.strip("'\"")
-    
-    # Primeira chamada para o endpoint de login
-    login_url = 'http://localhost:8090/api/auth/login'
-    login_data = {'code': code}
-    login_headers = {'Content-Type': 'application/json'}
-    login_response = requests.post(login_url, json=login_data, headers=login_headers)
+    token = get_token()
 
-    # Verifica se o login foi bem-sucedido
-    if login_response.status_code == 201:
-        print("01 - TESTE LOGIN OK")
-        # Extrai o id_token da resposta
-        token = login_response.json().get('idToken')
+    post_id = post_content(token)
 
-        # Segunda chamada para o endpoint de postagem
-        post_url = 'http://localhost:8090/api/post'
-        post_data = {'content': 'TESTE AUTOMATIZADO'}
-        post_headers = {
-            'Authorization': f'Bearer {token}',
-            'Content-Type': 'application/json'
-        }
-        post_response = requests.post(post_url, json=post_data, headers=post_headers)
+    get_posts(token)
 
-        # Verifica se a postagem foi bem-sucedida
-        if post_response.status_code == 201:
-            print("02 - TESTE POSTAGEM OK")
+    like_post(token, post_id, ['LIKE', 'DISLIKE', 'LIKE'])
 
-            # Chamada GET para recuperar as postagens
-            get_url = f'http://localhost:8090/api/post?page=0&size=10'
-            get_headers = {'Authorization': f'Bearer {token}'}
-            get_response = requests.get(get_url, headers=get_headers)
+    comment_id = comment_post(token, post_id, 'Comentário teste automático')
 
-            # Verifica se a recuperação das postagens foi bem-sucedida
-            if get_response.status_code == 200:
-                print("03 - TESTE GET POSTAGENS OK")
-                post_id = get_response.json()['content'][0]['id']  # Obtém o ID do primeiro post
+    get_comments(token, post_id)
 
-                # Chamadas para teste de likes
-                like_url = 'http://localhost:8090/api/like'
-                like_types = ['LIKE', 'DISLIKE', 'LIKE']
-                for likeType in like_types:
-                    like_data = {
-                        'likeEnum': likeType,
-                        'post': {'id': post_id}
-                    }
-                    like_response = requests.post(like_url, json=like_data, headers=post_headers)
+    like_comment(token, comment_id, ['LIKE', 'DISLIKE', 'LIKE'])
 
-                if like_response.status_code == 201:
-                    print("04 - TESTE LIKES OK")
+    reply_comment_id = reply_comment(token, post_id, comment_id, 'Comentário réplica teste automático')
 
-                    # Teste para criação de um comentário
-                    comment_url = 'http://localhost:8090/api/comment'
-                    comment_data = {'content': 'Comentário teste automático', 'post': {'id': post_id}}
-                    comment_response = requests.post(comment_url, json=comment_data, headers=post_headers)
-                    if comment_response.status_code == 201:
-                        print("05 - TESTE CRIAR COMENTARIO OK")
+    get_replies(token, comment_id)
 
-                        # Teste de recuperação do comentário
-                        get_comment_url = f'http://localhost:8090/api/comment/post/{post_id}?page=0&size=10'
-                        get_comment_response = requests.get(get_comment_url, headers=post_headers)
-                        if get_comment_response.status_code == 200:
-                            print("06 - TESTE GET COMENTARIO OK")
-                            
-                            
-                            comments_data = get_comment_response.json()
-                            if comments_data['content']:
-                                comment_id = comments_data['content'][0]['id']
+    like_comment(token, reply_comment_id, ['LIKE', 'DISLIKE', 'LIKE'])
 
-                            # Testes de like, dislike e like no comentário
-                            like_comment_url = 'http://localhost:8090/api/likecom'
-                            for likeType in like_types:
-                                like_comment_data = {'likeEnum': likeType, 'comment': {'id': comment_id}}
-                                like_comment_response = requests.post(like_comment_url, json=like_comment_data, headers=post_headers)
+    patch_content(token, f'http://localhost:8090/api/comment/{reply_comment_id}', 'Comentário réplica teste automático EDITADO')
+    patch_content(token, f'http://localhost:8090/api/comment/{comment_id}', 'Comentário teste automático EDITADO')
+    patch_content(token, f'http://localhost:8090/api/post/{post_id}', 'TESTE AUTOMATIZADO EDITADO')
 
-                            if like_comment_response.status_code == 201:
-                                print("07 - TESTE LIKES COMENTARIOS OK")
-                                
-                                
-                                comment_reply_data = {'content': 'Comentário réplica teste automático', 'post': {'id': post_id}, 'parentComment': {'id': comment_id}}
-                                comment_reply_response = requests.post(comment_url, json=comment_reply_data, headers=post_headers)
-                                if comment_reply_response.status_code == 201:
-                                    print("08 - TESTE CRIAR REPLICA OK")
-                                    
-                        
-                                    get_comment_reply_url = f'http://localhost:8090/api/comment/son/{comment_id}?page=0&size=10'
-                                    get_comment_reply_response = requests.get(get_comment_reply_url, headers=post_headers)
-                                    if get_comment_reply_response.status_code == 200:
-                                        print("09 - TESTE GET REPLICA OK")
-                                        
-                                        
-                                        comments_reply_data = get_comment_reply_response.json()
-                                        if comments_reply_data['content']:
-                                            comment_reply_id = comments_reply_data['content'][0]['id']
-                                        for likeType in like_types:
-                                            like_comment_data = {'likeEnum': likeType, 'comment': {'id': comment_reply_id}}
-                                            like_comment_reply_response = requests.post(like_comment_url, json=like_comment_data, headers=post_headers)
-                                        if like_comment_reply_response.status_code == 201:
-                                            print("10 - TESTE LIKES REPLICA OK")
-                                            
-                                            
-                                            patch_comment_reply_url = f'http://localhost:8090/api/comment/{comment_reply_id}'
-                                            patch_comment_reply_data = {'content': 'Comentário réplica teste automático EDITADO', 'post': {'id': post_id}}
-                                            patch_comment_reply_response = requests.patch(patch_comment_reply_url, json=patch_comment_reply_data, headers=post_headers)
-                                            
-                                            if patch_comment_reply_response.status_code == 200:
-                                                print("11 - TESTE EDITAR REPLICA OK")
-                                                
-                                                
-                                                patch_comment_url = f'http://localhost:8090/api/comment/{comment_id}'
-                                                patch_comment_data = {'content': 'Comentário teste automático EDITADO', 'post': {'id': post_id}}
-                                                patch_comment_response = requests.patch(patch_comment_url, json=patch_comment_data, headers=post_headers)
-                                                
-                                                if patch_comment_response.status_code == 200:
-                                                    print("12 - TESTE EDITAR COMENTÁRIO OK")
-                                                    
-                                                    
-                                                    patch_post_url = f'http://localhost:8090/api/post/{post_id}'
-                                                    patch_post_data = {'content': 'TESTE AUTOMATIZADO EDITADO'}
-                                                    patch_post_response = requests.patch(patch_post_url, json=patch_post_data, headers=post_headers)
-                                                    
-                                                    if patch_post_response.status_code == 200:
-                                                        print("13 - TESTE EDITAR POSTAGEM OK")
-                                                        
-                                                        delete_comment_reply_url = f'http://localhost:8090/api/comment/{comment_reply_id}'
-                                                        delete_comment_reply_response = requests.delete(delete_comment_reply_url, headers=post_headers)
-                                                        
-                                                        if delete_comment_reply_response.status_code == 204:
-                                                            print("14 - TESTE DELETAR REPLICA OK")
-                                                            
-                                                            
-                                                            delete_comment_url = f'http://localhost:8090/api/comment/{comment_id}'
-                                                            delete_comment_response = requests.delete(delete_comment_url, headers=post_headers)
-                                                            
-                                                            if delete_comment_response.status_code == 204:
-                                                                print("15 - TESTE DELETAR COMENTÁRIO OK")
-                                                                
-                                                                delete_post_url = f'http://localhost:8090/api/post/{post_id}'
-                                                                delete_post_response = requests.delete(delete_post_url, headers=post_headers)
-                                                                
-                                                                if delete_post_response.status_code == 204:
-                                                                    print("16 - TESTE DELETAR POSTAGEM OK")
-                                                                
-                                                                
-                                                                else:
-                                                                    print(f"Erro ao deletar postagem: {delete_post_response.status_code}")                                                                
-                                                            else:
-                                                                print(f"Erro ao deletar comentário: {delete_comment_response.status_code}")
-                                                        else:
-                                                            print(f"Erro ao deletar replica: {delete_comment_reply_response.status_code}")
-                                                    else:
-                                                        print(f"Erro ao editar postagem: {patch_post_response.status_code}")
-                                                else:
-                                                    print(f"Erro ao editar comentário: {patch_comment_response.status_code}")
-                                            else:
-                                                print(f"Erro ao editar replica: {patch_comment_reply_response.status_code}")
-                                        else:
-                                            print(f"Erro no teste de likes da replica: {like_comment_reply_response.status_code}")
-                                    else:
-                                        print(f"Erro ao recuperar replicas: {get_comment_reply_response.status_code}")
-                                else:
-                                    print(f"Erro no teste de criar replica: {comment_reply_response.status_code}")
-                            else:
-                                print(f"Erro no teste de likes do comentário: {like_comment_response.status_code}")
-                        else:
-                            print(f"Erro ao recuperar comentário: {get_comment_response.status_code}")
-                    else:
-                        print(f"Erro ao criar comentário: {comment_response.status_code}")
-                else:
-                    print(f"Erro no teste de likes: {like_response.status_code}")
-            else:
-                print(f"Erro ao recuperar postagens: {get_response.status_code}")
-        else:
-            print(f"Erro na postagem: {post_response.status_code}")
-    else:
-        print(f"Erro no login: {login_response.status_code}")
+    delete_content(token, f'http://localhost:8090/api/comment/{reply_comment_id}')
+    delete_content(token, f'http://localhost:8090/api/comment/{comment_id}')
+    delete_content(token, f'http://localhost:8090/api/post/{post_id}')
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except TestException as e:
+        print(e)
