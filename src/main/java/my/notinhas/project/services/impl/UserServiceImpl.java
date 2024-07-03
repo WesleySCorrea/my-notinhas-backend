@@ -230,14 +230,8 @@ public class UserServiceImpl implements UserService {
             this.likeCommentRepository.delete(likeComment);
         }
 
-        Users user = this.repository.findByEmail(userDTO.getEmail());
-        user.setActive(false);
-        user.setUserName(this.resetUserName(user.getGoogleId(), user.getFirstName()));
-        user.setEditatedBio(null);
-        user.setEditatedUsername(null);
-        user.setBio(null);
-        user.setEditatedUsername(null);
-        this.repository.save(user);
+        String restUserName = this.resetUserName(userDTO.getGoogleId(), userDTO.getFirstName());
+        this.repository.updateUserFields(userDTO.getUserId(), restUserName);
     }
 
     private List<UserHistoryResponseDTO> extratListPostByUser(Long userId) {
