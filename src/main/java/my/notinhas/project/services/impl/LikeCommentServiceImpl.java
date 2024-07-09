@@ -38,7 +38,8 @@ public class LikeCommentServiceImpl implements LikeCommentService {
 
                 this.repository.deleteById(existingLike.getId());
 
-                this.removeNotification(likeCommentRequestDTO, likeCommentRequestDTO.getComment().getPost().getUserId(),
+                this.removeNotification(likeCommentRequestDTO,
+                        likeCommentRequestDTO.getComment().getUser().getUserId(),
                         likeCommentRequestDTO.getComment().getPost().getId(),
                         userDTO.getUserId());
             } else {
@@ -65,7 +66,8 @@ public class LikeCommentServiceImpl implements LikeCommentService {
     private void removeNotification(LikeCommentRequestDTO like, Long ownerUserId, Long postId, Long userId) {
 
         ActionEnum action = this.verifyActionEnum(like.getLikeEnum());
-        this.notifyService.removeNotificationOfLikeComment(like.getComment().getId(), ownerUserId, userId, postId, action);
+        this.notifyService.removeNotificationOfLikeComment(like.getComment().getId(),
+                ownerUserId, userId, postId, action);
     }
 
     private void createNotification(LikesComments like, UserDTO userDTO, LikeCommentRequestDTO likeRequest) {
@@ -73,7 +75,7 @@ public class LikeCommentServiceImpl implements LikeCommentService {
         ActionEnum actionEnum = this.verifyActionEnum(like.getLikeEnum());
 
         Users notifyOwner = new Users();
-        notifyOwner.setId(likeRequest.getComment().getPost().getUserId());
+        notifyOwner.setId(likeRequest.getComment().getUser().getUserId());
 
         Posts postOwner = new Posts();
         postOwner.setId(likeRequest.getComment().getPost().getId());
@@ -99,7 +101,7 @@ public class LikeCommentServiceImpl implements LikeCommentService {
         ActionEnum newActionEnum = this.verifyActionEnum(like.getLikeEnum());
         ActionEnum currentActionEnum = this.verifyCurrentActionEnum(like.getLikeEnum());
 
-        this.notifyService.updateNotificationLikeComment(like.getComment().getPost().getUserId(),
+        this.notifyService.updateNotificationLikeComment(like.getComment().getUser().getUserId(),
                 userDTO.getUserId(),
                 like.getComment().getPost().getId(),
                 like.getComment().getId(),
