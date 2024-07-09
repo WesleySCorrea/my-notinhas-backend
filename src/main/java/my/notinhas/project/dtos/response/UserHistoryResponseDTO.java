@@ -24,7 +24,7 @@ public class UserHistoryResponseDTO {
     private String content;
     private Long postId;
     private Long commentId;
-    @JsonFormat(pattern = "dd-MM-yy HH:mm:ss")
+    @JsonFormat(pattern = "dd/MM/yy HH:mm:ss")
     private LocalDateTime date;
 
     public UserHistoryResponseDTO converterPostToUserHistory(Posts post) {

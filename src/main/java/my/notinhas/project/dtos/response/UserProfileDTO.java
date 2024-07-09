@@ -1,5 +1,6 @@
 package my.notinhas.project.dtos.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,6 +19,7 @@ public class UserProfileDTO {
     private Long id;
     private String userName;
     private String bio;
+    @JsonFormat(pattern = "dd/MM/yy HH:mm:ss")
     private LocalDateTime created;
 
     public UserProfileDTO converterUserToUserProfile(Users user) {

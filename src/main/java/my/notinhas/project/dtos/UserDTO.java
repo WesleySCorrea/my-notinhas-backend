@@ -24,11 +24,12 @@ public class UserDTO {
     private String firstName;
     private String lastName;
     private String picture;
+    @JsonFormat(pattern = "dd/MM/yy HH:mm:ss")
     private LocalDateTime created;
-    @JsonFormat(pattern = "dd-MM-yy HH:mm:ss")
+    @JsonFormat(pattern = "dd/MM/yy HH:mm:ss")
     private LocalDateTime editatedUsername;
     private String bio;
-    @JsonFormat(pattern = "dd-MM-yy HH:mm:ss")
+    @JsonFormat(pattern = "dd/MM/yy HH:mm:ss")
 
     private LocalDateTime editatedBio;
     private Boolean active;
