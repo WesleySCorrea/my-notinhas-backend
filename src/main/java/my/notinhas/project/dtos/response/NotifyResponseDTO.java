@@ -18,6 +18,7 @@ public class NotifyResponseDTO {
     private Long id;
     private Long postId;
     private Long commentId;
+    private Long parentId;
     private Long userId;
     private String userName;
     private ActionEnum actionEnum;
@@ -34,6 +35,9 @@ public class NotifyResponseDTO {
         }
         if (notify.getComment() != null) {
             notifyResponse.setCommentId(notify.getComment().getId());
+        }
+        if (notify.getParentId() != null) {
+            notifyResponse.setParentId(notify.getParentId());
         }
         notifyResponse.setUserId(notify.getUser().getId());
         notifyResponse.setUserName(notify.getUser().getUserName());

@@ -141,6 +141,7 @@ public class CommentServiceImpl implements CommentService {
         if (commentRequestDTO.getParentCommentId() != null) {
             Long fatherCommentId = commentRequestDTO.getParentCommentId();
 
+//RETURAR ESSE ORELSETHROW
             Comments fatherComment = this.repository.findById(fatherCommentId)
                     .orElseThrow(() -> new ObjectNotFoundException("Comment with ID " + fatherCommentId + " not found."));
             if (fatherComment.getParentComment() != null) {
@@ -216,11 +217,13 @@ public class CommentServiceImpl implements CommentService {
     private void createNotification(Comments comments, UserDTO userDTO, Long postOwnerId) {
 
         ActionEnum actionEnum;
+        Long replieId = null;
 
         if (comments.getParentComment() == null) {
             actionEnum = ActionEnum.COMMENT_IN_POST;
         } else {
             actionEnum = ActionEnum.COMMENT_IN_COMMENT;
+            replieId = comments.getParentComment().getId();
         }
 
         Users notifyOwner = new Users();
@@ -231,6 +234,7 @@ public class CommentServiceImpl implements CommentService {
         notifyDTO.setUser(userDTO.convertUserDTOToUser());
         notifyDTO.setPost(comments.getPost());
         notifyDTO.setComment(comments);
+        notifyDTO.setParentId(replieId);
         notifyDTO.setActionEnum(actionEnum);
         notifyDTO.setVerified(Boolean.FALSE);
         notifyDTO.setDate(LocalDateTime.now());

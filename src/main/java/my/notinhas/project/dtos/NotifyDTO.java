@@ -23,6 +23,7 @@ public class NotifyDTO {
     private Users user;
     private Posts post;
     private Comments comment;
+    private Long parentId;
     private ActionEnum actionEnum;
     private Boolean verified = Boolean.FALSE;
     private LocalDateTime date;
@@ -33,6 +34,7 @@ public class NotifyDTO {
         notify.setUser(this.getUser());
         notify.setPost(this.getPost());
         notify.setComment(this.getComment());
+        notify.setParentId(this.getParentId());
         notify.setActionEnum(this.getActionEnum());
         notify.setVerified(this.getVerified());
         notify.setDate(this.getDate());

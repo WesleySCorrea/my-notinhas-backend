@@ -29,6 +29,7 @@ public class CommentResponseDTO {
     private LikeEnum userLike;
     private Boolean commentOwner;
     private UserPostResponseDTO user;
+    //RETIRAR LISTA DE REPLIES
     private List<CommentResponseDTO> replies;
 
     public CommentResponseDTO converterCommentToCommentResponse(Comments comment, UserDTO user) {
