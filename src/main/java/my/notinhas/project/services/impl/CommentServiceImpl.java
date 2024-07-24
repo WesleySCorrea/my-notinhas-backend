@@ -56,32 +56,41 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public Page<CommentResponseDTO> findAllCommentSon(Pageable pageable, Long id) {
+    public Page<CommentResponseDTO> findAllCommentSon(Pageable pageable, Long parentCommentId) {
         UserDTO userDTO = ExtractUser.get();
-
-        Page<Comments> comments;
+//
+//        Page<Comments> comments;
+//        try {
+//            comments = this.repository.findAllByParentCommentIdAndActiveIsTrue(pageable, parentCommentId);
+//        } catch (Exception e) {
+//            throw new ObjectNotFoundException("Comments not found");
+//        }
+//        List<CommentResponseDTO> commentResponseDTOS = comments.stream()
+//                .map(comment -> {
+//                    CommentResponseDTO commentResponseDTO = new CommentResponseDTO()
+//                            .converterCommentToCommentResponse(comment, userDTO);
+//
+//                    commentResponseDTO.setTotalLikes(this.calculeTotalLike(comment.getId()));
+//                    commentResponseDTO.setUserLike(this.verifyUserLike(commentResponseDTO, userDTO));
+//                    return commentResponseDTO;
+//                })
+//                .toList();
+        Page<Object[]> comments;
         try {
-            comments = this.repository.findAllByParentCommentIdAndActiveIsTrue(pageable, id);
+            comments = this.repository.findByParentCommentId(parentCommentId, userDTO.getUserId(), pageable);
         } catch (Exception e) {
-            throw new ObjectNotFoundException("Comments not found");
+            throw new ObjectNotFoundException("Comments with post ID " + parentCommentId + "not found");
         }
-        List<CommentResponseDTO> commentResponseDTOS = comments.stream()
-                .map(comment -> {
-                    CommentResponseDTO commentResponseDTO = new CommentResponseDTO()
-                            .converterCommentToCommentResponse(comment, userDTO);
 
-                    commentResponseDTO.setTotalLikes(this.calculeTotalLike(comment.getId()));
-                    commentResponseDTO.setUserLike(this.verifyUserLike(commentResponseDTO, userDTO));
-                    return commentResponseDTO;
-                })
+        List<CommentResponseDTO> dtos = comments.stream()
+                .map(CommentResponseDTO::new)
                 .toList();
 
-        return new PageImpl<>(commentResponseDTOS, pageable, comments.getTotalElements());
+        return new PageImpl<>(dtos, pageable, comments.getTotalElements());
     }
 
     @Override
     public Page<CommentResponseDTO> findByPostId(Long postId, Pageable pageable) {
-
         UserDTO userDTO = ExtractUser.get();
 
 //        Page<Comments> comments;
@@ -120,7 +129,7 @@ public class CommentServiceImpl implements CommentService {
                 .map(CommentResponseDTO::new)
                 .toList();
 
-        return new PageImpl<>(dtos, pageable, dtos.size());
+        return new PageImpl<>(dtos, pageable, comments.getTotalElements());
     }
 
     @Override
