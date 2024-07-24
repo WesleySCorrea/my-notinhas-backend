@@ -62,4 +62,16 @@ public class CommentResponseDTO {
         }
         return commentResponseDTO;
     }
+
+    public CommentResponseDTO(Object[] row) {
+        this.id = (Long) row[0];
+        this.date = ((java.sql.Timestamp) row[1]).toLocalDateTime();
+        this.content = (String) row[2];
+        this.isEdited = (Boolean) row[3];
+        this.totalLikes = (Long) row[4];
+        this.totalReplies = ((Long) row[5]).intValue();
+        this.userLike = (row[6] != null) ? LikeEnum.valueOf((String) row[6]) : null;
+        this.commentOwner = (Boolean) row[7];
+        this.user = new UserPostResponseDTO((Long) row[8], (String) row[9]);
+    }
 }

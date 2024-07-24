@@ -84,31 +84,43 @@ public class CommentServiceImpl implements CommentService {
 
         UserDTO userDTO = ExtractUser.get();
 
-        Page<Comments> comments;
+//        Page<Comments> comments;
+//        try {
+//            comments = this.repository.findByPostIdAndParentCommentIsNullAndActiveIsTrue(postId, pageable);
+//        } catch (Exception e) {
+//            throw new ObjectNotFoundException("Comment with post ID " + postId + "not found");
+//        }
+//        List<CommentResponseDTO> commentResponseDTOS = comments.stream()
+//                .map(comment -> {
+//                    CommentResponseDTO commentResponseDTO = new CommentResponseDTO()
+//                            .converterCommentToCommentResponse(comment, userDTO);
+//
+//                    commentResponseDTO.setTotalLikes(this.calculeTotalLike(comment.getId()));
+//                    commentResponseDTO.setUserLike(this.verifyUserLike(commentResponseDTO, userDTO));
+//
+//                    for (CommentResponseDTO replies : commentResponseDTO.getReplies()) {
+//
+//                        replies.setTotalLikes(this.calculeTotalLike(replies.getId()));
+//                        replies.setUserLike(this.verifyUserLike(replies, userDTO));
+//                    }
+//
+//                    return commentResponseDTO;
+//                })
+//                .toList();
+//
+//        return new PageImpl<>(commentResponseDTOS, pageable, comments.getTotalElements());
+        Page<Object[]> comments;
         try {
-            comments = this.repository.findByPostIdAndParentCommentIsNullAndActiveIsTrue(postId, pageable);
+            comments = this.repository.findByPostIdAndParentCommentIsNull(postId, userDTO.getUserId(), pageable);
         } catch (Exception e) {
-            throw new ObjectNotFoundException("Comment with post ID " + postId + "not found");
+            throw new ObjectNotFoundException("Comments with post ID " + postId + "not found");
         }
-        List<CommentResponseDTO> commentResponseDTOS = comments.stream()
-                .map(comment -> {
-                    CommentResponseDTO commentResponseDTO = new CommentResponseDTO()
-                            .converterCommentToCommentResponse(comment, userDTO);
 
-                    commentResponseDTO.setTotalLikes(this.calculeTotalLike(comment.getId()));
-                    commentResponseDTO.setUserLike(this.verifyUserLike(commentResponseDTO, userDTO));
-
-                    for (CommentResponseDTO replies : commentResponseDTO.getReplies()) {
-
-                        replies.setTotalLikes(this.calculeTotalLike(replies.getId()));
-                        replies.setUserLike(this.verifyUserLike(replies, userDTO));
-                    }
-
-                    return commentResponseDTO;
-                })
+        List<CommentResponseDTO> dtos = comments.stream()
+                .map(CommentResponseDTO::new)
                 .toList();
 
-        return new PageImpl<>(commentResponseDTOS, pageable, comments.getTotalElements());
+        return new PageImpl<>(dtos, pageable, dtos.size());
     }
 
     @Override
