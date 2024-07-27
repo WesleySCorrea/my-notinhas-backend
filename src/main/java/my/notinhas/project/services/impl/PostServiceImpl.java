@@ -22,7 +22,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -38,16 +37,17 @@ public class PostServiceImpl implements PostService {
     @Override
     public Page<PostPublicResponseDTO> findAllPublic(Pageable pageable) {
 
-        Page<Posts> posts = this.postRepository
-                .findAllByActiveTrueOrderByDateDesc(pageable);
+        Page<Object[]> posts = this.postRepository
+                .findAllPostsByPublic(pageable);
 
         List<PostPublicResponseDTO> postResponseDTO = posts.stream()
                 .map(post -> {
-                    if (variables.getDeleteAfterOneDay()) {
-                        this.verifyDateActive(post);
-                    }
+                    PostPublicResponseDTO postsResponseDTO = new PostPublicResponseDTO(post);
 
-                    return new PostPublicResponseDTO(post);
+                    if (variables.getDeleteAfterOneDay()) {
+                        this.verifyActivePost(postsResponseDTO);
+                    }
+                    return postsResponseDTO;
                 })
                 .toList();
 
@@ -58,23 +58,15 @@ public class PostServiceImpl implements PostService {
     public Page<PostResponseDTO> findAll(Pageable pageable) {
         UserDTO user = ExtractUser.get();
 
-        Page<Posts> posts = this.postRepository
-                .findAllByActiveTrueOrderByDateDesc(pageable);
+        Page<Object[]> posts = this.postRepository.findActivePosts(user.getUserId(), pageable);
 
         List<PostResponseDTO> postResponseDTO = posts.stream()
                 .map(post -> {
-                    if (variables.getDeleteAfterOneDay()) {
-                        this.verifyDateActive(post);
-                    }
-
                     PostResponseDTO dto = new PostResponseDTO(post);
 
-                    dto.setPostOwner(this.verifyPostOwner(user,post));
-                    dto.setUserLike(this.verifyUserLike(post, user));
-
-                    dto.setTotalLikes(this.calculeTotalLike(post.getId()));
-                    dto.setTotalComments(this.calculeTotalComment(post.getId()));
-
+                    if (variables.getDeleteAfterOneDay()) {
+                        this.verifyActivePost(dto);
+                    }
                     return dto;
                 })
                 .toList();
@@ -200,6 +192,30 @@ public class PostServiceImpl implements PostService {
         if (duration.toHours() >= 24) {
             post.setActive(Boolean.FALSE);
             postRepository.save(post);
+        }
+    }
+
+    private void verifyActivePost (PostResponseDTO post) {
+
+        Duration duration = Duration.between(post.getDate(), LocalDateTime.now());
+
+        if (duration.toHours() >= 24) {
+            int rowsAffected = postRepository.updateActiveFalse(post.getId());
+            if (rowsAffected == 0) {
+                System.out.println("Post with ID: " + post.getId() + " not found!");
+            }
+        }
+    }
+
+    private void verifyActivePost (PostPublicResponseDTO post) {
+
+        Duration duration = Duration.between(post.getDate(), LocalDateTime.now());
+
+        if (duration.toHours() >= 24) {
+            int rowsAffected = postRepository.updateActiveFalse(post.getId());
+            if (rowsAffected == 0) {
+                System.out.println("Post with ID: " + post.getId() + " not found!");
+            }
         }
     }
 

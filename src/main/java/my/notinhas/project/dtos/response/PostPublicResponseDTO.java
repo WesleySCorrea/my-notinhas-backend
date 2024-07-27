@@ -26,4 +26,10 @@ public class PostPublicResponseDTO {
         this.content = post.getContent();
         this.date = post.getDate();
     }
+
+    public PostPublicResponseDTO(Object[] row) {
+        this.id = (Long) row[0];
+        this.date = ((java.sql.Timestamp) row[1]).toLocalDateTime();
+        this.content = (String) row[2];
+    }
 }

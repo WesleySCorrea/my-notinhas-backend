@@ -58,23 +58,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public Page<CommentResponseDTO> findAllCommentSon(Pageable pageable, Long parentCommentId) {
         UserDTO userDTO = ExtractUser.get();
-//
-//        Page<Comments> comments;
-//        try {
-//            comments = this.repository.findAllByParentCommentIdAndActiveIsTrue(pageable, parentCommentId);
-//        } catch (Exception e) {
-//            throw new ObjectNotFoundException("Comments not found");
-//        }
-//        List<CommentResponseDTO> commentResponseDTOS = comments.stream()
-//                .map(comment -> {
-//                    CommentResponseDTO commentResponseDTO = new CommentResponseDTO()
-//                            .converterCommentToCommentResponse(comment, userDTO);
-//
-//                    commentResponseDTO.setTotalLikes(this.calculeTotalLike(comment.getId()));
-//                    commentResponseDTO.setUserLike(this.verifyUserLike(commentResponseDTO, userDTO));
-//                    return commentResponseDTO;
-//                })
-//                .toList();
+
         Page<Object[]> comments;
         try {
             comments = this.repository.findByParentCommentId(parentCommentId, userDTO.getUserId(), pageable);
@@ -93,31 +77,6 @@ public class CommentServiceImpl implements CommentService {
     public Page<CommentResponseDTO> findByPostId(Long postId, Pageable pageable) {
         UserDTO userDTO = ExtractUser.get();
 
-//        Page<Comments> comments;
-//        try {
-//            comments = this.repository.findByPostIdAndParentCommentIsNullAndActiveIsTrue(postId, pageable);
-//        } catch (Exception e) {
-//            throw new ObjectNotFoundException("Comment with post ID " + postId + "not found");
-//        }
-//        List<CommentResponseDTO> commentResponseDTOS = comments.stream()
-//                .map(comment -> {
-//                    CommentResponseDTO commentResponseDTO = new CommentResponseDTO()
-//                            .converterCommentToCommentResponse(comment, userDTO);
-//
-//                    commentResponseDTO.setTotalLikes(this.calculeTotalLike(comment.getId()));
-//                    commentResponseDTO.setUserLike(this.verifyUserLike(commentResponseDTO, userDTO));
-//
-//                    for (CommentResponseDTO replies : commentResponseDTO.getReplies()) {
-//
-//                        replies.setTotalLikes(this.calculeTotalLike(replies.getId()));
-//                        replies.setUserLike(this.verifyUserLike(replies, userDTO));
-//                    }
-//
-//                    return commentResponseDTO;
-//                })
-//                .toList();
-//
-//        return new PageImpl<>(commentResponseDTOS, pageable, comments.getTotalElements());
         Page<Object[]> comments;
         try {
             comments = this.repository.findByPostIdAndParentCommentIsNull(postId, userDTO.getUserId(), pageable);
@@ -125,11 +84,11 @@ public class CommentServiceImpl implements CommentService {
             throw new ObjectNotFoundException("Comments with post ID " + postId + "not found");
         }
 
-        List<CommentResponseDTO> dtos = comments.stream()
+        List<CommentResponseDTO> commentResponseDTOS = comments.stream()
                 .map(CommentResponseDTO::new)
                 .toList();
 
-        return new PageImpl<>(dtos, pageable, comments.getTotalElements());
+        return new PageImpl<>(commentResponseDTOS, pageable, comments.getTotalElements());
     }
 
     @Override

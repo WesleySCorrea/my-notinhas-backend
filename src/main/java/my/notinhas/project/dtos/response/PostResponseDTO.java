@@ -35,4 +35,16 @@ public class PostResponseDTO {
         this.user = new UserPostResponseDTO(post.getUser().getId(), post.getUser().getUserName());
         this.isEdited = post.getIsEdited();
     }
+
+    public PostResponseDTO(Object[] row) {
+        this.id = (Long) row[0];
+        this.date = ((java.sql.Timestamp) row[1]).toLocalDateTime();
+        this.content = (String) row[2];
+        this.user = new UserPostResponseDTO((Long) row[3], (String) row[4]);
+        this.totalLikes = (Long) row[5];
+        this.totalComments = (Long) row[6];
+        this.userLike = (row[7] != null) ? LikeEnum.valueOf((String) row[7]) : null;
+        this.postOwner = (Boolean) row[8];
+        this.isEdited = (Boolean) row[9];
+    }
 }
