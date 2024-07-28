@@ -83,12 +83,17 @@ public class LikeCommentServiceImpl implements LikeCommentService {
         Comments comments = new Comments();
         comments.setId(likeRequest.getComment().getId());
 
+        Long parentCommentId = null;
+        if (likeRequest.getComment().getParentComment() != null) {
+            parentCommentId = likeRequest.getComment().getParentComment().getId();
+        }
 
         NotifyDTO notifyDTO = new NotifyDTO();
         notifyDTO.setNotifyOwner(notifyOwner);
         notifyDTO.setUser(userDTO.convertUserDTOToUser());
         notifyDTO.setPost(postOwner);
         notifyDTO.setComment(comments);
+        notifyDTO.setParentId(parentCommentId);
         notifyDTO.setActionEnum(actionEnum);
         notifyDTO.setVerified(Boolean.FALSE);
         notifyDTO.setDate(LocalDateTime.now());
