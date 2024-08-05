@@ -1,5 +1,6 @@
 package my.notinhas.project.services.impl;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import lombok.AllArgsConstructor;
 import my.notinhas.project.dtos.UserDTO;
 import my.notinhas.project.dtos.request.UpdateUserRequestDTO;
@@ -69,6 +70,27 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void updateToken(Long userId, String idToken) {
+        this.repository.updateToken(userId, idToken);
+    }
+
+    @Override
+    public void saveTokenAndRefreshToken(Long userId, String refreshToken, String idToken) {
+        this.repository.saveTokenAndRefreshToken(userId, refreshToken, idToken);
+    }
+
+    @Override
+    public Users findUserByIdToken(String idToken) {
+        return this.repository.findByIdToken(idToken);
+    }
+
+    @Override
+    public void activeUser(String email) {
+        this.repository.activeUser(email);
+    }
+
+
+    @Override
     public UserIDResponseDTO findByID(Long id) {
 
         Users user = this.repository.findById(id)
@@ -131,16 +153,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDTO findByEmail(String email) {
-
-        Users user;
-        try {
-            user = this.repository.findByEmail(email);
-        } catch (Exception e) {
-            throw new PersistFailedException("Fail when the object was persisted");
-        }
-
-        return new UserDTO(user);
+    public Users findByEmail(String email) {
+        return this.repository.findByEmail(email);
     }
 
     @Override
@@ -156,18 +170,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDTO saveUsers(UserDTO userDTO) {
-
-        Users request = userDTO.convertUserDTOToUser();
-
-        Users newUser;
-        try {
-            newUser = this.repository.save(request);
-        } catch (Exception e) {
-            throw new PersistFailedException("Failed when trying to persist the object");
-        }
-
-        return new UserDTO(newUser);
+    public Users saveUsers(GoogleIdToken googleIdToken) {
+        var persistUser = new UserDTO().createUserDTOWithUserName(googleIdToken);
+        return this.repository.save(persistUser);
     }
 
     @Override

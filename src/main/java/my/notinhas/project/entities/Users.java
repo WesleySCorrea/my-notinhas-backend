@@ -2,7 +2,6 @@ package my.notinhas.project.entities;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -12,9 +11,8 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Setter
-@AllArgsConstructor
-@RequiredArgsConstructor
 @Table(name = "users")
+@RequiredArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class Users {
 
@@ -44,4 +42,28 @@ public class Users {
     private LocalDateTime editatedBio;
     @Column(name = "active")
     private Boolean active;
+
+    //Auth
+    @Column(name = "refresh_token", length = 300)
+    private String refreshToken;
+    @Column(name = "id_token", length = 50)
+    private String idToken;
+
+
+    public Users(Long id, String googleId, String userName, String email, String firstName, String lastName, String picture, LocalDateTime created, LocalDateTime editatedUsername, String bio, LocalDateTime editatedBio, Boolean active) {
+        this.id = id;
+        this.googleId = googleId;
+        this.userName = userName;
+        this.email = email;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.picture = picture;
+        this.created = created;
+        this.editatedUsername = editatedUsername;
+        this.bio = bio;
+        this.editatedBio = editatedBio;
+        this.active = active;
+    }
+
+
 }

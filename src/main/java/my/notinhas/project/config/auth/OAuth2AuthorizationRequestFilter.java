@@ -10,14 +10,12 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import my.notinhas.project.component.Auth;
-import my.notinhas.project.component.GoogleHttpRequests;
 import my.notinhas.project.dtos.UserDTO;
+import my.notinhas.project.entities.Users;
 import my.notinhas.project.exception.FieldMessage;
 import my.notinhas.project.exception.ValidationError;
 import my.notinhas.project.exception.runtime.CallHttpErrorException;
 import my.notinhas.project.exception.runtime.UnauthorizedIdTokenException;
-import my.notinhas.project.services.AuthenticationTokenService;
 import my.notinhas.project.services.UserService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -39,9 +37,6 @@ import java.util.List;
 public class OAuth2AuthorizationRequestFilter extends OncePerRequestFilter {
 
     private final UserService userService;
-    private final GoogleHttpRequests googleHttpRequests;
-    private final AuthenticationTokenService authenticationTokenService;
-    private final Auth auth;
 
     @Value("${google.client-id}")
     private String clientId;
@@ -65,11 +60,11 @@ public class OAuth2AuthorizationRequestFilter extends OncePerRequestFilter {
         try {
         if (googleIdToken != null) {
 
-            UserDTO userDTO = userService.findByEmail(googleIdToken.getPayload().getEmail());
+            Users users = userService.findByEmail(googleIdToken.getPayload().getEmail());
 
             SecurityContextHolder.getContext()
                     .setAuthentication(
-                            new UsernamePasswordAuthenticationToken(userDTO, null, null));
+                            new UsernamePasswordAuthenticationToken(users, null, null));
 
         } else {
             throw new UnauthorizedIdTokenException("Token invalid or expired");

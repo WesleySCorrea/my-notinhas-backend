@@ -87,14 +87,6 @@ public class UserController {
         return ResponseEntity.ok().body(pageLikes);
     }
 
-    @PostMapping
-    public ResponseEntity<UserDTO> save(@RequestBody UserDTO userDTO) {
-
-        UserDTO user = this.service.saveUsers(userDTO);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(user);
-    }
-
     @PatchMapping()
     public ResponseEntity<UserDTO> update(@RequestBody UpdateUserRequestDTO userDTO) {
 

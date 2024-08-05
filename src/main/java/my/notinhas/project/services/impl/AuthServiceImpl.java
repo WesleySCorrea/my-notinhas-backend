@@ -8,18 +8,14 @@ import my.notinhas.project.component.GoogleHttpRequests;
 import my.notinhas.project.dtos.UserDTO;
 import my.notinhas.project.dtos.auth.IdTokenDTO;
 import my.notinhas.project.dtos.auth.login.LoginResponseDTO;
-import my.notinhas.project.entities.AuthenticationToken;
 import my.notinhas.project.exception.runtime.ObjectNotFoundException;
 import my.notinhas.project.exception.runtime.PersistFailedException;
 import my.notinhas.project.exception.runtime.UnauthorizedIdTokenException;
 import my.notinhas.project.services.AuthService;
-import my.notinhas.project.services.AuthenticationTokenService;
 import my.notinhas.project.services.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-
-import java.time.LocalDateTime;
 
 @Service
 @AllArgsConstructor
@@ -28,7 +24,6 @@ public class AuthServiceImpl implements AuthService {
     private final Auth auth;
     private final UserService service;
     private final GoogleHttpRequests requests;
-    private final AuthenticationTokenService authenticationTokenService;
     @Override
     public LoginResponseDTO login(String code) {
 
@@ -38,29 +33,19 @@ public class AuthServiceImpl implements AuthService {
 
         String userEmail = googleIdToken.getPayload().getEmail();
 
-        UserDTO userDTO;
-        if (service.existsByEmail(userEmail)) {
-            userDTO = service.findByEmail(userEmail);
+        var users = service.findByEmail(userEmail);
 
-            if (userDTO.getActive().equals(false)) {
-                userDTO.setActive(true);
-                this.activeUser(userDTO);
+        if (users != null) {
+            if (!users.getActive()) {
+                this.service.activeUser(userEmail);
             }
         } else {
-            userDTO = this.register(googleIdToken);
+            users = this.service.saveUsers(googleIdToken);
         }
-        var token = idTokenDTO.getIdToken();
+        var shortToken = this.shroten(idTokenDTO.getIdToken());
         var refreshToken = idTokenDTO.getRefreshToken();
-        var cacheToken = this.shroten(token);
-        this.authenticationTokenService
-                .saveRefreshToken(
-                        new AuthenticationToken(
-                                cacheToken,
-                                refreshToken,
-                                userDTO.getUserName(),
-                                userDTO.getPicture(),
-                                LocalDateTime.now().plusMinutes(65L)));
-        return new LoginResponseDTO(idTokenDTO.getIdToken(), userDTO.getUserName(), userDTO.getPicture());
+        this.service.saveTokenAndRefreshToken(users.getId(), refreshToken, shortToken);
+        return new LoginResponseDTO(idTokenDTO.getIdToken(), users.getUserName(), users.getPicture());
     }
 
     @Override
@@ -77,56 +62,18 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public UserDTO register(GoogleIdToken googleIdToken) {
-
-        UserDTO userDTO = new UserDTO().createUserDTOWithUserName(googleIdToken);
-        UserDTO newUserDTO;
-
-        try {
-            newUserDTO = service.saveUsers(userDTO);
-        } catch (Exception e) {
-            throw new PersistFailedException("Fail when the object was persisted");
-        }
-
-        return newUserDTO;
-    }
-
-    @Override
-    public UserDTO activeUser(UserDTO userDTO) {
-
-        UserDTO newUserDTO;
-        try {
-            newUserDTO = service.saveUsers(userDTO);
-        } catch (Exception e) {
-            throw new PersistFailedException("Fail when the object was persisted");
-        }
-
-        return newUserDTO;
-    }
-
-    @Override
     public LoginResponseDTO refresh() {
-        var token = this.extractToken();
-        var cacheToken = this.shroten(token);
-        var authenticationToken = this.authenticationTokenService.getRefreshToken(cacheToken);
-        if (authenticationToken.isPresent()) {
-            var refreshToken = authenticationToken.get().getRefreshToken();
-            var picture = authenticationToken.get().getPicture();
-            var userName = authenticationToken.get().getUserName();
-            this.authenticationTokenService.deleteRefreshToken(cacheToken);
-            var idTokenDTO = this.requests.refreshTokenRequest(refreshToken);
-            var newCacheToken = this.shroten(idTokenDTO.getIdToken());
-            this.authenticationTokenService
-                    .saveRefreshToken(
-                            new AuthenticationToken(
-                                    newCacheToken,
-                                    refreshToken,
-                                    userName,
-                                    picture,
-                                    LocalDateTime.now().plusMinutes(65L)));
-            return new LoginResponseDTO(idTokenDTO.getIdToken(), userName, picture);
+        try {
+            var token = this.extractToken();
+            var shortToken = this.shroten(token);
+            var user = service.findUserByIdToken(shortToken);
+            var idTokenDTO = this.requests.refreshTokenRequest(user.getRefreshToken());
+            var newShortToken = this.shroten(idTokenDTO.getIdToken());
+            this.service.updateToken(user.getId(), newShortToken);
+            return new LoginResponseDTO(idTokenDTO.getIdToken(), user.getUserName(), user.getPicture());
+        } catch (Exception e) {
+            throw new ObjectNotFoundException("Invalid token");
         }
-        throw new ObjectNotFoundException("Invalid token");
     }
 
     private String extractToken() {

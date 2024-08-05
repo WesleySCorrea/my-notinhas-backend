@@ -68,7 +68,7 @@ public class UserDTO {
         );
     }
 
-    public UserDTO createUserDTOWithUserName (GoogleIdToken googleIdToken) {
+    public Users createUserDTOWithUserName (GoogleIdToken googleIdToken) {
 
         String googleId = googleIdToken.getPayload().get("sub").toString();
 
@@ -85,7 +85,7 @@ public class UserDTO {
             familyName = googleIdToken.getPayload().get("family_name").toString();
         }
 
-        return new UserDTO(
+        return new Users(
                 null,
                 googleId,
                 userName,
