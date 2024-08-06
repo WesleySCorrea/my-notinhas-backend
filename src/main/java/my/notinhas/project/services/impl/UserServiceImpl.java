@@ -8,7 +8,6 @@ import my.notinhas.project.dtos.response.*;
 import my.notinhas.project.entities.*;
 import my.notinhas.project.exception.runtime.InvalidUserNameException;
 import my.notinhas.project.exception.runtime.ObjectNotFoundException;
-import my.notinhas.project.exception.runtime.PersistFailedException;
 import my.notinhas.project.repositories.*;
 import my.notinhas.project.services.ExtractUser;
 import my.notinhas.project.services.UserService;

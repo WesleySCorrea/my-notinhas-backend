@@ -4,17 +4,12 @@ import lombok.RequiredArgsConstructor;
 import my.notinhas.project.component.Variables;
 import my.notinhas.project.dtos.UserDTO;
 import my.notinhas.project.dtos.request.PostRequestDTO;
-import my.notinhas.project.dtos.response.PostIDResponseDTO;
 import my.notinhas.project.dtos.response.PostPublicResponseDTO;
 import my.notinhas.project.dtos.response.PostResponseDTO;
-import my.notinhas.project.entities.Likes;
 import my.notinhas.project.entities.Posts;
-import my.notinhas.project.enums.LikeEnum;
 import my.notinhas.project.exception.runtime.ObjectNotFoundException;
 import my.notinhas.project.exception.runtime.PersistFailedException;
 import my.notinhas.project.exception.runtime.UnauthorizedIdTokenException;
-import my.notinhas.project.repositories.CommentRepository;
-import my.notinhas.project.repositories.LikeRepository;
 import my.notinhas.project.repositories.PostRepository;
 import my.notinhas.project.services.ExtractUser;
 import my.notinhas.project.services.PostService;
@@ -33,8 +28,6 @@ import java.util.NoSuchElementException;
 public class PostServiceImpl implements PostService {
     private final Variables variables;
     private final PostRepository postRepository;
-    private final LikeRepository likeRepository;
-    private final CommentRepository commentRepository;
     @Override
     public Page<PostPublicResponseDTO> findAllPublic(Pageable pageable) {
 
@@ -78,42 +71,34 @@ public class PostServiceImpl implements PostService {
     @Override
     public Page<PostResponseDTO> searchPosts(Pageable pageable, String content) {
         UserDTO user = ExtractUser.get();
-        Page<Posts> posts = this.postRepository.findByContentContainingCaseSensitiveAndActiveTrue(content, pageable);
+
+        Page<Object[]> posts = this.postRepository.findActivePostsContaining(user.getUserId(), content, pageable);
+
         List<PostResponseDTO> postResponseDTO = posts.stream()
                 .map(post -> {
-                    if (variables.getDeleteAfterOneDay()) {
-                        this.verifyDateActive(post);
-                    }
-
                     PostResponseDTO dto = new PostResponseDTO(post);
 
-                    dto.setPostOwner(this.verifyPostOwner(user,post));
-                    dto.setUserLike(this.verifyUserLike(post, user));
-
-                    dto.setTotalLikes(this.calculeTotalLike(post.getId()));
-                    dto.setTotalComments(this.calculeTotalComment(post.getId()));
-
+                    if (variables.getDeleteAfterOneDay()) {
+                        this.verifyActivePost(dto);
+                    }
                     return dto;
                 })
                 .toList();
+
         return new PageImpl<>(postResponseDTO, pageable, posts.getTotalElements());
     }
 
     @Override
-    public PostIDResponseDTO findByID(Long id) {
+    public PostResponseDTO findByID(Long postId) {
         UserDTO user = ExtractUser.get();
 
-        Posts post = this.postRepository.findById(id)
-                .orElseThrow(() -> new ObjectNotFoundException("Post with ID " + id + " not found."));
+        List<Object[]> posts = this.postRepository.findActivePostById(user.getUserId(), postId);
 
-        PostIDResponseDTO postIDResponseDTO = new PostIDResponseDTO(post);
-        postIDResponseDTO.setPostOwner(this.verifyPostOwner(user,post));
-        postIDResponseDTO.setUserLike(this.verifyUserLike(post, user));
+        var postResponseDTO = posts.stream()
+                .map(PostResponseDTO::new)
+                .toList();
 
-        postIDResponseDTO.setTotalLikes(this.calculeTotalLike(post.getId()));
-        postIDResponseDTO.setTotalComments(this.calculeTotalComment(post.getId()));
-
-        return postIDResponseDTO;
+        return postResponseDTO.get(0);
     }
 
     @Override
@@ -140,7 +125,7 @@ public class PostServiceImpl implements PostService {
     public void updatePost(PostRequestDTO postRequestDTO, Long id) {
         UserDTO user = ExtractUser.get();
 
-        PostIDResponseDTO postPersisted = this.findByID(id);
+        PostResponseDTO postPersisted = this.findByID(id);
 
         if (postPersisted.getUser().getUserName().equals(user.getUserName())) {
 
@@ -172,30 +157,6 @@ public class PostServiceImpl implements PostService {
         }
     }
 
-
-    private Long calculeTotalLike(Long postId) {
-
-        Long totalLike = likeRepository.countByPostIdAndLikeEnum(postId, LikeEnum.LIKE);
-        Long totalDislike = likeRepository.countByPostIdAndLikeEnum(postId, LikeEnum.DISLIKE);
-
-        return totalLike - totalDislike;
-    }
-
-    private Long calculeTotalComment(Long postId) {
-
-        return commentRepository.countByPostIdAndActiveIsTrue(postId);
-    }
-
-    private void verifyDateActive (Posts post) {
-
-        Duration duration = Duration.between(post.getDate(), LocalDateTime.now());
-
-        if (duration.toHours() >= 24) {
-            post.setActive(Boolean.FALSE);
-            postRepository.save(post);
-        }
-    }
-
     private void verifyActivePost (PostResponseDTO post) {
 
         Duration duration = Duration.between(post.getDate(), LocalDateTime.now());
@@ -218,20 +179,5 @@ public class PostServiceImpl implements PostService {
                 System.out.println("Post with ID: " + post.getId() + " not found!");
             }
         }
-    }
-
-    private LikeEnum verifyUserLike(Posts post, UserDTO user) {
-
-        Likes like = likeRepository.findByUserIdAndPostId(user.getUserId(), post.getId());
-
-        if (like == null) {
-            return null;
-        }
-        return like.getLikeEnum();
-    }
-
-    private Boolean verifyPostOwner(UserDTO user, Posts post) {
-
-        return post.getUser().getEmail().equals(user.getEmail());
     }
 }

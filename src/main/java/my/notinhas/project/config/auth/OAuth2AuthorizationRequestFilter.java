@@ -10,7 +10,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import my.notinhas.project.dtos.UserDTO;
 import my.notinhas.project.entities.Users;
 import my.notinhas.project.exception.FieldMessage;
 import my.notinhas.project.exception.ValidationError;

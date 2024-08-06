@@ -2,7 +2,6 @@ package my.notinhas.project.controllers;
 
 import lombok.AllArgsConstructor;
 import my.notinhas.project.dtos.request.PostRequestDTO;
-import my.notinhas.project.dtos.response.PostIDResponseDTO;
 import my.notinhas.project.dtos.response.PostPublicResponseDTO;
 import my.notinhas.project.dtos.response.PostResponseDTO;
 import my.notinhas.project.services.PostService;
@@ -36,9 +35,9 @@ public class PostController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PostIDResponseDTO> findById(@PathVariable Long id) {
+    public ResponseEntity<PostResponseDTO> findById(@PathVariable Long id) {
 
-        PostIDResponseDTO post = this.service.findByID(id);
+        PostResponseDTO post = this.service.findByID(id);
 
         return ResponseEntity.ok().body(post);
     }
