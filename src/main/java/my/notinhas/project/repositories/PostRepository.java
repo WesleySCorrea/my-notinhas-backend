@@ -120,6 +120,111 @@ public interface PostRepository extends JpaRepository<Posts, Long> {
     ORDER BY p.date DESC
     """, nativeQuery = true)
     List<Object[]> findActivePostById(@Param("userId") Long userId, @Param("postId") Long postId);
-    List<Posts> findByUserIdAndActiveIsTrueOrderByDateDesc(Long userId);
+    Page<Posts> findByUserIdAndActiveIsTrueOrderByDateDesc(Long userId, Pageable pageable);
     List<Posts> findByUserUserNameAndActiveIsTrue(String username);
+    @Query(value = "SELECT * FROM (" +
+            "SELECT " +
+            "    'POST' AS reaction, " +
+            "    p.content, " +
+            "    p.id AS post_id, " +
+            "    NULL AS comment_id, " +
+            "    p.date " +
+            "FROM " +
+            "    posts p " +
+            "WHERE " +
+            "    p.user_id = :userId AND p.active = TRUE " +
+            "UNION ALL " +
+            "SELECT " +
+            "    'COMMENT' AS reaction, " +
+            "    c.content, " +
+            "    c.post_id, " +
+            "    c.id AS comment_id, " +
+            "    c.date " +
+            "FROM " +
+            "    comments c " +
+            "WHERE " +
+            "    c.user_id = :userId AND EXISTS ( " +
+            "        SELECT 1 " +
+            "        FROM posts p " +
+            "        WHERE p.id = c.post_id AND p.active = TRUE " +
+            "    ) " +
+            "UNION ALL " +
+            "SELECT " +
+            "    CASE " +
+            "        WHEN l.like_enum = 'LIKE' THEN 'LIKE' " +
+            "        ELSE 'DISLIKE' " +
+            "    END AS reaction, " +
+            "    p.content, " +
+            "    l.post_id, " +
+            "    NULL AS comment_id, " +
+            "    l.date " +
+            "FROM " +
+            "    likes l " +
+            "JOIN " +
+            "    posts p ON l.post_id = p.id " +
+            "WHERE " +
+            "    l.user_id = :userId " +
+            "UNION ALL " +
+            "SELECT " +
+            "    CASE " +
+            "        WHEN lc.like_enum = 'LIKE' THEN 'LIKE_COM' " +
+            "        ELSE 'DISLIKE_COM' " +
+            "    END AS reaction, " +
+            "    c.content, " +
+            "    lc.comment_id AS post_id, " +
+            "    lc.comment_id AS comment_id, " +
+            "    lc.date " +
+            "FROM " +
+            "    likes_comments lc " +
+            "JOIN " +
+            "    comments c ON lc.comment_id = c.id " +
+            "WHERE " +
+            "    lc.user_id = :userId " +
+            ") AS history " +
+            "ORDER BY date DESC",
+            countQuery = "SELECT COUNT(*) FROM (" +
+                    "SELECT " +
+                    "    'POST' " +
+                    "FROM " +
+                    "    posts p " +
+                    "WHERE " +
+                    "    p.user_id = :userId AND p.active = TRUE " +
+                    "UNION ALL " +
+                    "SELECT " +
+                    "    'COMMENT' " +
+                    "FROM " +
+                    "    comments c " +
+                    "WHERE " +
+                    "    c.user_id = :userId AND EXISTS ( " +
+                    "        SELECT 1 " +
+                    "        FROM posts p " +
+                    "        WHERE p.id = c.post_id AND p.active = TRUE " +
+                    "    ) " +
+                    "UNION ALL " +
+                    "SELECT " +
+                    "    CASE " +
+                    "        WHEN l.like_enum = 'LIKE' THEN 'LIKE' " +
+                    "        ELSE 'DISLIKE' " +
+                    "    END " +
+                    "FROM " +
+                    "    likes l " +
+                    "JOIN " +
+                    "    posts p ON l.post_id = p.id " +
+                    "WHERE " +
+                    "    l.user_id = :userId " +
+                    "UNION ALL " +
+                    "SELECT " +
+                    "    CASE " +
+                    "        WHEN lc.like_enum = 'LIKE' THEN 'LIKE_COM' " +
+                    "        ELSE 'DISLIKE_COM' " +
+                    "    END " +
+                    "FROM " +
+                    "    likes_comments lc " +
+                    "JOIN " +
+                    "    comments c ON lc.comment_id = c.id " +
+                    "WHERE " +
+                    "    lc.user_id = :userId " +
+                    ") AS count_history",
+            nativeQuery = true)
+    Page<Object[]> findUserHistoryByUserId(@Param("userId") Long userId, Pageable pageable);
 }

@@ -121,18 +121,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public Page<UserHistoryResponseDTO> findHistoryByUserId(Long id, Pageable pageable) {
 
-        List<UserHistoryResponseDTO> postsUser = this.extratListPostByUser(id);
-        List<UserHistoryResponseDTO> commentsUser = this.extratListCommentsByUser(id);
-        List<UserHistoryResponseDTO> reactionsUser = this.extratListReactionsByUser(id);
+        Page<Object[]> results = postRepository.findUserHistoryByUserId(id, pageable);
 
-        List<UserHistoryResponseDTO> historyUser = new ArrayList<>();
-        historyUser.addAll(postsUser);
-        historyUser.addAll(commentsUser);
-        historyUser.addAll(reactionsUser);
+        List<UserHistoryResponseDTO> userHistoryList = results.stream()
+                .map(UserHistoryResponseDTO::new)
+                .collect(Collectors.toList());
 
-        historyUser.sort(Comparator.comparing(UserHistoryResponseDTO::getDate).reversed());
-
-        return new PageImpl<>(historyUser, pageable, historyUser.size());
+        return new PageImpl<>(userHistoryList, pageable, results.getTotalElements());
     }
 
     @Override
@@ -236,36 +231,6 @@ public class UserServiceImpl implements UserService {
 
         String restUserName = this.resetUserName(userDTO.getGoogleId(), userDTO.getFirstName());
         this.repository.updateUserFields(userDTO.getUserId(), restUserName);
-    }
-
-    private List<UserHistoryResponseDTO> extratListPostByUser(Long userId) {
-
-        List<Posts> posts = this.postRepository.findByUserIdAndActiveIsTrueOrderByDateDesc(userId);
-
-        return posts.stream().map(
-                post -> new UserHistoryResponseDTO()
-                        .converterPostToUserHistory(post)
-        ).collect(Collectors.toList());
-    }
-
-    private List<UserHistoryResponseDTO> extratListCommentsByUser(Long userId) {
-
-        List<Comments> comments = this.commentRepository.findByUserIdAndPostActiveIsTrueOrderByDateDesc(userId);
-
-        return comments.stream().map(
-                comment -> new UserHistoryResponseDTO()
-                        .converterCommentToUserHistory(comment)
-        ).collect(Collectors.toList());
-    }
-
-    private List<UserHistoryResponseDTO> extratListReactionsByUser(Long userId) {
-
-        List<Likes> likes = this.likeRepository.findByUserIdOrderByDateDesc(userId);
-
-        return likes.stream().map(
-                like -> new UserHistoryResponseDTO()
-                        .converterReactionToUserHistory(like)
-        ).collect(Collectors.toList());
     }
 
     private Page<CommentToUserDTO> extratPageComments(Long userId, Pageable pageable) {
