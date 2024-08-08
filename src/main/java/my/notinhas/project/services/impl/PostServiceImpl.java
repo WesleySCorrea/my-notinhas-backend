@@ -36,12 +36,11 @@ public class PostServiceImpl implements PostService {
 
         List<PostPublicResponseDTO> postResponseDTO = posts.stream()
                 .map(post -> {
-                    PostPublicResponseDTO postsResponseDTO = new PostPublicResponseDTO(post);
-
                     if (variables.getDeleteAfterOneDay()) {
-                        this.verifyActivePost(postsResponseDTO);
+                        this.verifyActivePost(post[0], post[1]);
                     }
-                    return postsResponseDTO;
+
+                    return new PostPublicResponseDTO(post);
                 })
                 .toList();
 
@@ -56,12 +55,11 @@ public class PostServiceImpl implements PostService {
 
         List<PostResponseDTO> postResponseDTO = posts.stream()
                 .map(post -> {
-                    PostResponseDTO dto = new PostResponseDTO(post);
-
                     if (variables.getDeleteAfterOneDay()) {
-                        this.verifyActivePost(dto);
+                        this.verifyActivePost(post[0], post[1]);
                     }
-                    return dto;
+
+                    return new PostResponseDTO(post);
                 })
                 .toList();
 
@@ -76,12 +74,11 @@ public class PostServiceImpl implements PostService {
 
         List<PostResponseDTO> postResponseDTO = posts.stream()
                 .map(post -> {
-                    PostResponseDTO dto = new PostResponseDTO(post);
-
                     if (variables.getDeleteAfterOneDay()) {
-                        this.verifyActivePost(dto);
+                        this.verifyActivePost(post[0], post[1]);
                     }
-                    return dto;
+
+                    return new PostResponseDTO(post);
                 })
                 .toList();
 
@@ -157,26 +154,14 @@ public class PostServiceImpl implements PostService {
         }
     }
 
-    private void verifyActivePost (PostResponseDTO post) {
+    private void verifyActivePost (Object postId, Object postDate) {
 
-        Duration duration = Duration.between(post.getDate(), LocalDateTime.now());
-
-        if (duration.toHours() >= 24) {
-            int rowsAffected = postRepository.updateActiveFalse(post.getId());
-            if (rowsAffected == 0) {
-                System.out.println("Post with ID: " + post.getId() + " not found!");
-            }
-        }
-    }
-
-    private void verifyActivePost (PostPublicResponseDTO post) {
-
-        Duration duration = Duration.between(post.getDate(), LocalDateTime.now());
+        Duration duration = Duration.between(((java.sql.Timestamp) postDate).toLocalDateTime(), LocalDateTime.now());
 
         if (duration.toHours() >= 24) {
-            int rowsAffected = postRepository.updateActiveFalse(post.getId());
+            int rowsAffected = postRepository.updateActiveFalse((Long) postId);
             if (rowsAffected == 0) {
-                System.out.println("Post with ID: " + post.getId() + " not found!");
+                System.out.println("Post with ID: " + postId + " not found!");
             }
         }
     }
