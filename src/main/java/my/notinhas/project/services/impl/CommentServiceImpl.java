@@ -6,15 +6,12 @@ import my.notinhas.project.dtos.UserDTO;
 import my.notinhas.project.dtos.request.CommentRequestDTO;
 import my.notinhas.project.dtos.response.CommentResponseDTO;
 import my.notinhas.project.entities.Comments;
-import my.notinhas.project.entities.LikesComments;
 import my.notinhas.project.entities.Users;
 import my.notinhas.project.enums.ActionEnum;
-import my.notinhas.project.enums.LikeEnum;
 import my.notinhas.project.exception.runtime.ObjectNotFoundException;
 import my.notinhas.project.exception.runtime.PersistFailedException;
 import my.notinhas.project.exception.runtime.UnauthorizedIdTokenException;
 import my.notinhas.project.repositories.CommentRepository;
-import my.notinhas.project.repositories.LikeCommentRepository;
 import my.notinhas.project.services.CommentService;
 import my.notinhas.project.services.ExtractUser;
 import my.notinhas.project.services.NotifyService;
@@ -33,26 +30,18 @@ public class CommentServiceImpl implements CommentService {
 
     private final NotifyService notifyService;
     private final CommentRepository repository;
-    private final LikeCommentRepository likeCommentRepository;
 
     @Override
     public CommentResponseDTO findById(Long id) {
         UserDTO userDTO = ExtractUser.get();
 
-        Comments comment = this.repository.findById(id)
-                .orElseThrow(() -> new ObjectNotFoundException("Comment with ID " + id + " not found."));
+        List<Object[]> comments = this.repository.findCommentByIdAndUserId(id, userDTO.getUserId());
 
-        CommentResponseDTO commentResponseDTO = new CommentResponseDTO().converterCommentToCommentResponse(comment, userDTO);
-        commentResponseDTO.setTotalLikes(this.calculeTotalLike(comment.getId()));
-        commentResponseDTO.setUserLike(this.verifyUserLike(commentResponseDTO, userDTO));
+        var commentResponseDTO = comments.stream()
+                .map(CommentResponseDTO::new)
+                .toList();
 
-        for (CommentResponseDTO replies : commentResponseDTO.getReplies()) {
-
-            replies.setTotalLikes(this.calculeTotalLike(replies.getId()));
-            replies.setUserLike(this.verifyUserLike(replies, userDTO));
-        }
-
-        return commentResponseDTO;
+        return commentResponseDTO.get(0);
     }
 
     @Override
@@ -121,7 +110,6 @@ public class CommentServiceImpl implements CommentService {
         if (commentRequestDTO.getParentCommentId() != null) {
             Long fatherCommentId = commentRequestDTO.getParentCommentId();
 
-//RETURAR ESSE ORELSETHROW
             Comments fatherComment = this.repository.findById(fatherCommentId)
                     .orElseThrow(() -> new ObjectNotFoundException("Comment with ID " + fatherCommentId + " not found."));
             if (fatherComment.getParentComment() != null) {
@@ -137,7 +125,6 @@ public class CommentServiceImpl implements CommentService {
         } catch (Exception e) {
             throw new PersistFailedException("Fail when the object was persisted");
         }
-
     }
 
     @Override
@@ -173,25 +160,6 @@ public class CommentServiceImpl implements CommentService {
             this.repository.save(comment);
         }
         this.removeNotification(comment, userDTO.getUserId());
-    }
-
-
-    private Long calculeTotalLike(Long commentId) {
-
-        Long totalLike = likeCommentRepository.countByCommentIdAndLikeEnum(commentId, LikeEnum.LIKE);
-        Long totalDislike = likeCommentRepository.countByCommentIdAndLikeEnum(commentId, LikeEnum.DISLIKE);
-
-        return totalLike - totalDislike;
-    }
-
-    private LikeEnum verifyUserLike(CommentResponseDTO comments, UserDTO user) {
-
-        LikesComments like = likeCommentRepository.findByUserIdAndCommentId(user.getUserId(), comments.getId());
-
-        if (like == null) {
-            return null;
-        }
-        return like.getLikeEnum();
     }
 
     private void createNotification(Comments comments, UserDTO userDTO, Long postOwnerId) {
