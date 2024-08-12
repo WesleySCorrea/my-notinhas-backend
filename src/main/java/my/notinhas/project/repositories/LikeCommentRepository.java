@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface LikeCommentRepository extends JpaRepository<LikesComments, Long> {
-    Long countByCommentIdAndLikeEnum(Long postId, LikeEnum likeEnum);
     LikesComments findByUserIdAndCommentId(Long userId, Long commentId);
     List<LikesComments> findByUserUserName(String userName);
 }
