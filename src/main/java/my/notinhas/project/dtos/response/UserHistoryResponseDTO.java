@@ -20,6 +20,7 @@ public class UserHistoryResponseDTO {
     private String content;
     private Long postId;
     private Long commentId;
+    private Long parentCommentId;
     @JsonFormat(pattern = "dd/MM/yy HH:mm:ss")
     private LocalDateTime date;
 
@@ -29,7 +30,8 @@ public class UserHistoryResponseDTO {
         this.content = (String) history[1];
         this.postId = (Long) history[2];
         this.commentId = (Long) history[3];
-        this.date = ((java.sql.Timestamp) history[4]).toLocalDateTime();
+        this.parentCommentId = (Long) history[4];
+        this.date = ((java.sql.Timestamp) history[5]).toLocalDateTime();
         adjustContent();
     }
     public void adjustContent() {
