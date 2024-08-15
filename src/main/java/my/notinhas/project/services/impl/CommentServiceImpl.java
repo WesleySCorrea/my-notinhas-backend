@@ -121,7 +121,9 @@ public class CommentServiceImpl implements CommentService {
         try {
             Comments commentPersisted = this.repository.save(comments);
             this.createNotification(commentPersisted, userDTO, commentRequestDTO.getPostOwnerId());
-            return new CommentResponseDTO().converterCommentToCommentResponse(commentPersisted, userDTO);
+            var commentDto = new CommentResponseDTO().converterCommentToCommentResponse(commentPersisted, userDTO);
+            commentDto.setTotalLikes(0L);
+            return commentDto;
         } catch (Exception e) {
             throw new PersistFailedException("Fail when the object was persisted");
         }
