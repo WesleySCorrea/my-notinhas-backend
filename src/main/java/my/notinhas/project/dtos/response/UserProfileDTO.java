@@ -16,7 +16,7 @@ import java.util.Optional;
 @AllArgsConstructor
 public class UserProfileDTO {
 
-    private Long id;
+    private Long userId;
     private String userName;
     private String bio;
     @JsonFormat(pattern = "dd/MM/yy HH:mm:ss")
@@ -26,7 +26,7 @@ public class UserProfileDTO {
 
         UserProfileDTO userProfile = new UserProfileDTO();
 
-        userProfile.setId(user.getId());
+        userProfile.setUserId(user.getId());
         userProfile.setUserName(user.getUserName());
         userProfile.setBio(Optional.ofNullable(user.getBio()).orElse(""));
         userProfile.setCreated(user.getCreated());

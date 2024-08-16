@@ -35,8 +35,8 @@ public class UserHistoryResponseDTO {
         adjustContent();
     }
     public void adjustContent() {
-        if (this.content != null && this.content.length() > 30) {
-            this.content = this.content.substring(0, 27) + "...";
+        if (this.content != null && this.content.length() > 22) {
+            this.content = this.content.substring(0, 22) + "...";
         }
     }
 }
