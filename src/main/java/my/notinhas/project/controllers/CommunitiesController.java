@@ -3,6 +3,7 @@ package my.notinhas.project.controllers;
 import lombok.AllArgsConstructor;
 import my.notinhas.project.dtos.request.CommunityRequestDTO;
 import my.notinhas.project.dtos.response.CommunityResponseDTO;
+import my.notinhas.project.dtos.response.PostResponseDTO;
 import my.notinhas.project.services.CommunityService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,7 +21,7 @@ public class CommunitiesController {
     @GetMapping
     public ResponseEntity<Page<CommunityResponseDTO>> findAllPublic(Pageable pageable) {
 
-        Page<CommunityResponseDTO> posts = this.service.findAll(pageable);
+        var posts = this.service.findAll(pageable);
 
         return ResponseEntity.ok().body(posts);
     }
@@ -28,9 +29,17 @@ public class CommunitiesController {
     @PostMapping
     public ResponseEntity<CommunityResponseDTO> save(@RequestBody CommunityRequestDTO communityRequestDTO) {
 
-        var response = this.service.save(communityRequestDTO);
+        var community = this.service.save(communityRequestDTO);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(HttpStatus.CREATED).body(community);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CommunityResponseDTO> findById(@PathVariable Long id) {
+
+        var community = this.service.findById(id);
+
+        return ResponseEntity.ok().body(community);
     }
 
 

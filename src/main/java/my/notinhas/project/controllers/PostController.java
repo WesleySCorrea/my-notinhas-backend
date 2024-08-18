@@ -34,6 +34,14 @@ public class PostController {
         return ResponseEntity.ok().body(posts);
     }
 
+    @GetMapping("/community/{communityId}")
+    public ResponseEntity<Page<PostResponseDTO>> findByCommunitId(@PathVariable Long communityId,Pageable pageable) {
+
+        var posts = this.service.findByCommunityId(communityId, pageable);
+
+        return ResponseEntity.ok().body(posts);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<PostResponseDTO> findById(@PathVariable Long id) {
 

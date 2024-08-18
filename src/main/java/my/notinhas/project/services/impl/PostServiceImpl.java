@@ -6,6 +6,7 @@ import my.notinhas.project.dtos.UserDTO;
 import my.notinhas.project.dtos.request.PostRequestDTO;
 import my.notinhas.project.dtos.response.PostPublicResponseDTO;
 import my.notinhas.project.dtos.response.PostResponseDTO;
+import my.notinhas.project.entities.Community;
 import my.notinhas.project.entities.Posts;
 import my.notinhas.project.exception.runtime.ObjectNotFoundException;
 import my.notinhas.project.exception.runtime.PersistFailedException;
@@ -67,6 +68,24 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    public Page<PostResponseDTO> findByCommunityId(Long communityId,Pageable pageable) {
+        UserDTO user = ExtractUser.get();
+
+        Page<Object[]> posts = this.postRepository.findActivePostsCommunityId(user.getUserId(),communityId,pageable);
+
+        List<PostResponseDTO> postResponseDTO = posts.stream()
+                .map(post -> {
+                    if (variables.getDeleteAfterOneDay()) {
+                        this.verifyActivePost(post[0], post[1]);
+                    }
+                    return new PostResponseDTO(post);
+                })
+                .toList();
+
+        return new PageImpl<>(postResponseDTO, pageable, posts.getTotalElements());
+    }
+
+    @Override
     public Page<PostResponseDTO> searchPosts(Pageable pageable, String content) {
         UserDTO user = ExtractUser.get();
 
@@ -110,6 +129,12 @@ public class PostServiceImpl implements PostService {
         request.setContent(filteredContent);
         request.setActive(Boolean.TRUE);
         request.setUser(user.convertUserDTOToUser());
+
+        if(postRequestDTO.getCommunityId() != null) {
+            var community = new Community();
+            community.setId(postRequestDTO.getCommunityId());
+            request.setCommunity(community);
+        }
 
         try {
             this.postRepository.save(request);

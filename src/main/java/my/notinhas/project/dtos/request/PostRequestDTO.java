@@ -11,4 +11,5 @@ import lombok.Setter;
 @AllArgsConstructor
 public class PostRequestDTO {
     private String content;
+    private Long communityId;
 }

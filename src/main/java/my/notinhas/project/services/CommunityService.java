@@ -11,4 +11,6 @@ public interface CommunityService {
 
     CommunityResponseDTO save(CommunityRequestDTO communityRequestDTO);
 
+    CommunityResponseDTO findById(Long id);
+
 }

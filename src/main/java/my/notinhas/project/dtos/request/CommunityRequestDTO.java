@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import my.notinhas.project.dtos.UserDTO;
 import my.notinhas.project.entities.Community;
 import my.notinhas.project.entities.Users;
 
@@ -18,11 +19,11 @@ public class CommunityRequestDTO {
     private String title;
     private String description;
 
-    public Community toEntity(Long userId) {
+    public Community toEntity(UserDTO userDTO) {
         var community = new Community();
         community.setName(this.title);
         community.setDescription(this.description);
-        community.setOwner(new Users(userId));
+        community.setOwner(userDTO.convertUserDTOToUser());
         community.setCreated(LocalDateTime.now());
         return community;
     }

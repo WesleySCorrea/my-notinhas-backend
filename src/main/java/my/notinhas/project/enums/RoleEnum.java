@@ -4,6 +4,7 @@ public enum RoleEnum {
 
     MEMBER,
     ADMIN,
+    OWNER,
     MODERATOR
 
 }

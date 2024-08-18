@@ -50,6 +50,12 @@ public class UserDTO {
         this.active = user.getActive();
     }
 
+
+    public UserDTO(Long userId, String userName) {
+        this.userId = userId;
+        this.userName = userName;
+    }
+
     public Users convertUserDTOToUser() {
 
         return new Users(

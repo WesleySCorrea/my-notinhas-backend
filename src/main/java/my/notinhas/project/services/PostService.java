@@ -10,6 +10,7 @@ public interface PostService {
 
     Page<PostPublicResponseDTO> findAllPublic(Pageable pageable);
     Page<PostResponseDTO> findAll(Pageable pageable);
+    Page<PostResponseDTO> findByCommunityId(Long communityId,Pageable pageable);
     Page<PostResponseDTO> searchPosts(Pageable pageable,String content);
     PostResponseDTO findByID(Long id);
     void savePost(PostRequestDTO postRequestDTO);
