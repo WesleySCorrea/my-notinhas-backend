@@ -28,4 +28,7 @@ public class Posts {
     @ManyToOne(cascade = CascadeType.REMOVE)
     @JoinColumn(name = "user_id")
     private Users user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "community_id", nullable = true)
+    private Community community;
 }
