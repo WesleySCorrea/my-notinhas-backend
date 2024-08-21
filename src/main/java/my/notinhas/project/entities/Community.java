@@ -45,7 +45,4 @@ public class Community {
 
     @Column(name = "active", columnDefinition = "BOOLEAN DEFAULT TRUE")
     private Boolean active;
-
-
-
 }

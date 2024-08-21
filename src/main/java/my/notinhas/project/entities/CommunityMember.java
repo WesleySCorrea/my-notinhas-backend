@@ -34,7 +34,4 @@ public class CommunityMember {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private RoleEnum role;
-
-
-
 }

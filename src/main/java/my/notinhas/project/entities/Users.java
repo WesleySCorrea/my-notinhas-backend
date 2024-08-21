@@ -68,6 +68,4 @@ public class Users {
     public Users(Long id) {
         this.id = id;
     }
-
-
 }

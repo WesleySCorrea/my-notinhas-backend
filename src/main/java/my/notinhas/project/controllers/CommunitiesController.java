@@ -3,7 +3,6 @@ package my.notinhas.project.controllers;
 import lombok.AllArgsConstructor;
 import my.notinhas.project.dtos.request.CommunityRequestDTO;
 import my.notinhas.project.dtos.response.CommunityResponseDTO;
-import my.notinhas.project.dtos.response.PostResponseDTO;
 import my.notinhas.project.services.CommunityService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,20 +15,28 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/communities")
 public class CommunitiesController {
 
-    private final CommunityService service;
+    private final CommunityService communityService;
 
     @GetMapping
     public ResponseEntity<Page<CommunityResponseDTO>> findAllPublic(Pageable pageable) {
 
-        var posts = this.service.findAll(pageable);
+        Page<CommunityResponseDTO> communities = this.communityService.findAll(pageable);
 
-        return ResponseEntity.ok().body(posts);
+        return ResponseEntity.ok().body(communities);
+    }
+
+    @GetMapping("/user")
+    public ResponseEntity<Page<CommunityResponseDTO>> findAllCommunityByUser(Pageable pageable) {
+
+        Page<CommunityResponseDTO> communities = this.communityService.findAllCommunityByUser(pageable);
+
+        return ResponseEntity.ok().body(communities);
     }
 
     @PostMapping
     public ResponseEntity<CommunityResponseDTO> save(@RequestBody CommunityRequestDTO communityRequestDTO) {
 
-        var community = this.service.save(communityRequestDTO);
+        var community = this.communityService.save(communityRequestDTO);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(community);
     }
@@ -37,10 +44,8 @@ public class CommunitiesController {
     @GetMapping("/{id}")
     public ResponseEntity<CommunityResponseDTO> findById(@PathVariable Long id) {
 
-        var community = this.service.findById(id);
+        CommunityResponseDTO community = this.communityService.findById(id);
 
         return ResponseEntity.ok().body(community);
     }
-
-
 }
