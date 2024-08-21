@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import my.notinhas.project.dtos.UserDTO;
 import my.notinhas.project.entities.Community;
 import org.springframework.data.domain.Page;
 
@@ -21,8 +22,7 @@ public class CommunityResponseDTO {
     private Long id;
     private String title;
     private String description;
-    private Long ownerId;
-    private String owmerUserName;
+    private UserDTO owner;
     private Long totalMembers;
     private Long totalPosts;
     @JsonFormat(pattern = "dd/MM/yy HH:mm:ss")
@@ -40,8 +40,9 @@ public class CommunityResponseDTO {
         this.id = (Long) row[0];
         this.title = (String) row[1];
         this.description = (String) row[2];
-        this.ownerId = (Long) row[3];
-        this.owmerUserName = (String) row[4];
+        Long ownerId = (Long) row[3];
+        String ownerUserName = (String) row[4];
+        this.owner = new UserDTO(ownerId, ownerUserName);
         this.totalMembers = (Long) row[5];
         this.totalPosts = (Long) row[6];
         this.created = ((java.sql.Timestamp) row[7]).toLocalDateTime();
@@ -55,11 +56,12 @@ public class CommunityResponseDTO {
             Long ownerId = (Long) objects[3];
             String googleId = (String) objects[4];
             String ownerUserName = (String) objects[5];
+            UserDTO owner = new UserDTO(ownerId, ownerUserName);
             Long totalMembers = (Long) objects[6];
             Long totalPosts = (Long) objects[7];
             LocalDateTime created = (LocalDateTime) objects[8];
 
-            return new CommunityResponseDTO(id, title, description, ownerId, ownerUserName, totalMembers, totalPosts, created);
+            return new CommunityResponseDTO(id, title, description, owner, totalMembers, totalPosts, created);
         });
     }
 }
