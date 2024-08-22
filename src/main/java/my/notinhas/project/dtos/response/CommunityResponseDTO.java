@@ -27,12 +27,14 @@ public class CommunityResponseDTO {
     private Long totalPosts;
     @JsonFormat(pattern = "dd/MM/yy HH:mm:ss")
     private LocalDateTime created;
+    private Boolean protectedCommunity;
 
     public CommunityResponseDTO(Community community) {
         this.id = community.getId();
         this.title = community.getName();
         this.description = community.getDescription();
         this.created = community.getCreated();
+        this.protectedCommunity = community.getProtectedCommunity();
     }
 
     public CommunityResponseDTO(Object[] row) {
@@ -46,6 +48,7 @@ public class CommunityResponseDTO {
         this.totalMembers = (Long) row[5];
         this.totalPosts = (Long) row[6];
         this.created = ((java.sql.Timestamp) row[7]).toLocalDateTime();
+        this.protectedCommunity = (Boolean) row[8];
     }
 
     public Page<CommunityResponseDTO> convertToCommunityResponseDTO(Page<Object[]> page) {
@@ -60,8 +63,9 @@ public class CommunityResponseDTO {
             Long totalMembers = (Long) objects[6];
             Long totalPosts = (Long) objects[7];
             LocalDateTime created = (LocalDateTime) objects[8];
+            Boolean protectedCommunity = (Boolean) objects[9];
 
-            return new CommunityResponseDTO(id, title, description, owner, totalMembers, totalPosts, created);
+            return new CommunityResponseDTO(id, title, description, owner, totalMembers, totalPosts, created, protectedCommunity);
         });
     }
 }

@@ -13,20 +13,14 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CommunityRequestDTO {
-
-    private String title;
+public class CommunityUpdateRequestDTO {
     private String description;
-    private Boolean protectedCommunity;
 
     public Community toEntity(UserDTO userDTO) {
         var community = new Community();
-        community.setName(this.title);
         community.setDescription(this.description);
         community.setOwner(userDTO.convertUserDTOToUser());
         community.setCreated(LocalDateTime.now());
-        community.setProtectedCommunity(this.protectedCommunity);
         return community;
     }
-
 }

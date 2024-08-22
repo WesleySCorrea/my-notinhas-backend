@@ -45,4 +45,7 @@ public class Community {
 
     @Column(name = "active", columnDefinition = "BOOLEAN DEFAULT TRUE")
     private Boolean active;
+
+    @Column(name = "protected_community", columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean protectedCommunity;
 }
