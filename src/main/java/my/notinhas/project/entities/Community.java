@@ -44,7 +44,7 @@ public class Community {
     private List<Posts> posts;
 
     @Column(name = "active", columnDefinition = "BOOLEAN DEFAULT TRUE")
-    private Boolean active;
+    private Boolean active = Boolean.TRUE;
 
     @Column(name = "protected_community", columnDefinition = "BOOLEAN DEFAULT FALSE")
     private Boolean protectedCommunity;
