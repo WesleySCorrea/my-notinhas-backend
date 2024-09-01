@@ -13,6 +13,7 @@ import my.notinhas.project.entities.Users;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class UserIDResponseDTO {
+    private Long userId;
     private String userName;
     private String firstName;
     private String lastName;
@@ -25,6 +26,7 @@ public class UserIDResponseDTO {
         userResponse.setFirstName(user.getFirstName());
         userResponse.setLastName(user.getLastName());
         userResponse.setPicture(user.getPicture());
+        userResponse.setUserId(user.getId());
 
         return userResponse;
     }

@@ -42,6 +42,14 @@ public class PostController {
         return ResponseEntity.ok().body(posts);
     }
 
+    @GetMapping("/users/{userId}")
+    public ResponseEntity<Page<PostResponseDTO>> findByUserId(@PathVariable Long userId,Pageable pageable) {
+
+        var posts = this.service.findByUserId(userId, pageable);
+
+        return ResponseEntity.ok().body(posts);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<PostResponseDTO> findById(@PathVariable Long id) {
 

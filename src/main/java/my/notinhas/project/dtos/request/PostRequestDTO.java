@@ -12,4 +12,5 @@ import lombok.Setter;
 public class PostRequestDTO {
     private String content;
     private Long communityId;
+    private Long targetUserId;
 }

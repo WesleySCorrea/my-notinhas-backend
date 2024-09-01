@@ -8,12 +8,14 @@ import my.notinhas.project.dtos.response.PostPublicResponseDTO;
 import my.notinhas.project.dtos.response.PostResponseDTO;
 import my.notinhas.project.entities.Community;
 import my.notinhas.project.entities.Posts;
+import my.notinhas.project.entities.Users;
 import my.notinhas.project.exception.runtime.ObjectNotFoundException;
 import my.notinhas.project.exception.runtime.PersistFailedException;
 import my.notinhas.project.exception.runtime.UnauthorizedIdTokenException;
 import my.notinhas.project.repositories.PostRepository;
 import my.notinhas.project.services.ExtractUser;
 import my.notinhas.project.services.PostService;
+import my.notinhas.project.services.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +31,7 @@ import java.util.NoSuchElementException;
 public class PostServiceImpl implements PostService {
     private final Variables variables;
     private final PostRepository postRepository;
+    private final UserService userService;
     @Override
     public Page<PostPublicResponseDTO> findAllPublic(Pageable pageable) {
 
@@ -136,6 +139,11 @@ public class PostServiceImpl implements PostService {
             request.setCommunity(community);
         }
 
+        if(postRequestDTO.getTargetUserId() != null) {
+            var userOriginDto = this.userService.findByID(postRequestDTO.getTargetUserId());
+            request.setTargetUser(new Users(userOriginDto.getUserId()));
+        }
+
         try {
             this.postRepository.save(request);
         } catch (Exception e) {
@@ -177,6 +185,24 @@ public class PostServiceImpl implements PostService {
         } else {
             throw new NoSuchElementException("Post with ID: " + id + " not found!");
         }
+    }
+
+    @Override
+    public Page<PostResponseDTO> findByUserId(Long targetUserId, Pageable pageable) {
+        var user = ExtractUser.get();
+        Page<Object[]> posts = this.postRepository.findActivePostsTargetUserId(user.getUserId(), targetUserId, pageable);
+
+        List<PostResponseDTO> postResponseDTO = posts.stream()
+                .map(post -> {
+                    if (variables.getDeleteAfterOneDay()) {
+                        this.verifyActivePost(post[0], post[1]);
+                    }
+
+                    return new PostResponseDTO(post);
+                })
+                .toList();
+
+        return new PageImpl<>(postResponseDTO, pageable, posts.getTotalElements());
     }
 
     private void verifyActivePost (Object postId, Object postDate) {
