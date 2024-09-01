@@ -26,10 +26,10 @@ public class CommunitiesController {
         return ResponseEntity.ok().body(communities);
     }
 
-    @GetMapping("/user")
-    public ResponseEntity<Page<CommunityResponseDTO>> findAllCommunityByUser(Pageable pageable) {
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<Page<CommunityResponseDTO>> findAllCommunityByUser(Pageable pageable, @PathVariable Long userId) {
 
-        Page<CommunityResponseDTO> communities = this.communityService.findAllCommunityByUser(pageable);
+        Page<CommunityResponseDTO> communities = this.communityService.findAllCommunityByUser(pageable,userId);
 
         return ResponseEntity.ok().body(communities);
 

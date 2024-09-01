@@ -38,9 +38,8 @@ public class CommunityServiceImpl implements CommunityService {
     }
 
     @Override
-    public Page<CommunityResponseDTO> findAllCommunityByUser(Pageable pageable) {
-        UserDTO user = ExtractUser.get();
-        Page<Object[]> communities = communityRepository.findAllCommunityByUser(user.getUserId(), pageable);
+    public Page<CommunityResponseDTO> findAllCommunityByUser(Pageable pageable, Long userId) {
+        Page<Object[]> communities = communityRepository.findAllCommunityByUser(userId, pageable);
 
         List<CommunityResponseDTO> communityResponseDTO = communities.stream()
                 .map(CommunityResponseDTO::new)

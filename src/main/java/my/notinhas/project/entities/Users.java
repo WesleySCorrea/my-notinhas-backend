@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -42,6 +43,8 @@ public class Users {
     private LocalDateTime editatedBio;
     @Column(name = "active")
     private Boolean active;
+    @OneToMany(mappedBy = "targetUser", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Posts> posts;
 
     //Auth
     @Column(name = "refresh_token", length = 300)
