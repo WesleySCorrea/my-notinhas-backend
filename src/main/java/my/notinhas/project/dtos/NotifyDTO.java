@@ -5,10 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import my.notinhas.project.entities.Comments;
-import my.notinhas.project.entities.Notify;
-import my.notinhas.project.entities.Posts;
-import my.notinhas.project.entities.Users;
+import my.notinhas.project.entities.*;
 import my.notinhas.project.enums.ActionEnum;
 
 import java.time.LocalDateTime;
@@ -24,6 +21,7 @@ public class NotifyDTO {
     private Posts post;
     private Comments comment;
     private Long parentId;
+    private Community community;
     private ActionEnum actionEnum;
     private Boolean verified = Boolean.FALSE;
     private LocalDateTime date;
@@ -35,6 +33,7 @@ public class NotifyDTO {
         notify.setPost(this.getPost());
         notify.setComment(this.getComment());
         notify.setParentId(this.getParentId());
+        notify.setCommunity(this.getCommunity());
         notify.setActionEnum(this.getActionEnum());
         notify.setVerified(this.getVerified());
         notify.setDate(this.getDate());

@@ -64,4 +64,22 @@ public class CommunitiesController {
 
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/entry/{communityId}")
+    public ResponseEntity<Void> entryCommunity(@PathVariable Long communityId) {
+
+        this.communityService.entryCommunity(communityId);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/entry/private/{communityId}/{interestingUserId}/{approval}")
+    public ResponseEntity<Void> entryPrivateCommunity(@PathVariable Long communityId,
+                                                      @PathVariable Long interestingUserId,
+                                                      @PathVariable Boolean approval) {
+
+        this.communityService.entryPrivateCommunity(communityId, interestingUserId, approval);
+
+        return ResponseEntity.ok().build();
+    }
 }

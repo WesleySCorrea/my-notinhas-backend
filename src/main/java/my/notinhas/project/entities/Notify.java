@@ -35,6 +35,9 @@ public class Notify {
     private Comments comment;
     @Column(name = "parent_id")
     private Long parentId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "community_id")
+    private Community community;
     @NotNull
     @Column(name = "action_enum")
     @Enumerated(value = EnumType.STRING)
