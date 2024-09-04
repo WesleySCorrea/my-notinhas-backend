@@ -16,4 +16,5 @@ public interface CommunityService {
     void updateCommunity(CommunityUpdateRequestDTO communityUpdateRequestDTO, Long id);
     void entryCommunity(Long communityId);
     void entryPrivateCommunity(Long communityId, Long interestingUserId, Boolean approval);
+    void delete(Long id);
 }

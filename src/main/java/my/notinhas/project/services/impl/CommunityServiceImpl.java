@@ -171,6 +171,18 @@ public class CommunityServiceImpl implements CommunityService {
         } else throw new PersistFailedException("Community does not belong to the user");
     }
 
+    @Override
+    public void delete(Long id) {
+
+        UserDTO user = ExtractUser.get();
+
+        CommunityResponseDTO communityResponseDTO = this.findById(id);
+        if (communityResponseDTO.getOwner().getUserId().equals(user.getUserId())) {
+
+            this.communityRepository.updateCommunityByIdToFalse(id, user.getUserId());
+        }
+    }
+
     private void createNotification(Long communityId, Long notifyOwnerId, UserDTO userDTO) {
 
         ActionEnum actionEnum = ActionEnum.ENTRY_INTO_COMMUNITY;

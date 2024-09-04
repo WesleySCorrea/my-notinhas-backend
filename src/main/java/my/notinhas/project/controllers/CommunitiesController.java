@@ -82,4 +82,12 @@ public class CommunitiesController {
 
         return ResponseEntity.ok().build();
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+
+        this.communityService.delete(id);
+
+        return ResponseEntity.noContent().build();
+    }
 }

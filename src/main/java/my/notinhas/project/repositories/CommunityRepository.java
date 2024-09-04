@@ -137,4 +137,10 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
     @Transactional
     @Query("UPDATE Community c SET c.description = :description WHERE c.id = :id AND c.active = true")
     int updateCommunityDescription(@Param("id") Long id, @Param("description") String description);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE Community c SET c.active = false WHERE c.id = :id AND c.owner.id = :ownerId")
+    void updateCommunityByIdToFalse(Long id, Long ownerId);
+
 }
