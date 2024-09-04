@@ -3,6 +3,7 @@ package my.notinhas.project.controllers;
 import lombok.AllArgsConstructor;
 import my.notinhas.project.dtos.request.CommunityRequestDTO;
 import my.notinhas.project.dtos.request.CommunityUpdateRequestDTO;
+import my.notinhas.project.dtos.response.CommunityMemberResponseDTO;
 import my.notinhas.project.dtos.response.CommunityResponseDTO;
 import my.notinhas.project.services.CommunityService;
 import org.springframework.data.domain.Page;
@@ -55,6 +56,14 @@ public class CommunitiesController {
         CommunityResponseDTO community = this.communityService.findById(id);
 
         return ResponseEntity.ok().body(community);
+    }
+
+    @GetMapping("/{communityId}/members")
+    public ResponseEntity<Page<CommunityMemberResponseDTO>> findAllMembersByCommunities(@PathVariable Long communityId, Pageable pageable) {
+
+        Page<CommunityMemberResponseDTO> communities = this.communityService.findAllMembersByCommunities(communityId, pageable);
+
+        return ResponseEntity.ok().body(communities);
     }
 
     @PatchMapping("/{id}")

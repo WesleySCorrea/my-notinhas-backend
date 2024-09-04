@@ -5,7 +5,9 @@ import my.notinhas.project.dtos.NotifyDTO;
 import my.notinhas.project.dtos.UserDTO;
 import my.notinhas.project.dtos.request.CommunityRequestDTO;
 import my.notinhas.project.dtos.request.CommunityUpdateRequestDTO;
+import my.notinhas.project.dtos.response.CommunityMemberResponseDTO;
 import my.notinhas.project.dtos.response.CommunityResponseDTO;
+import my.notinhas.project.dtos.response.PostResponseDTO;
 import my.notinhas.project.entities.Community;
 import my.notinhas.project.entities.CommunityMember;
 import my.notinhas.project.entities.Users;
@@ -100,6 +102,17 @@ public class CommunityServiceImpl implements CommunityService {
                 .toList();
 
         return communityResponseDTO.get(0);
+    }
+
+    @Override
+    public Page<CommunityMemberResponseDTO> findAllMembersByCommunities(Long communityId, Pageable pageable) {
+
+        Page<CommunityMember> members = this.memberRepository.findByCommunityId(communityId, pageable);
+
+        List<CommunityMemberResponseDTO> memberResponseDTOS = members.stream()
+                        .map(CommunityMemberResponseDTO::new).toList();
+
+        return new PageImpl<>(memberResponseDTOS, pageable, members.getTotalElements());
     }
 
     @Override
