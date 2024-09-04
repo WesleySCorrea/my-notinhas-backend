@@ -9,7 +9,7 @@ import org.springframework.data.domain.Pageable;
 public interface CommunityService {
 
     Page<CommunityResponseDTO> findAll(Pageable pageable);
-    Page<CommunityResponseDTO> findAllCommunityByUser(Pageable pageable, Long userId);
+    Page<CommunityResponseDTO> findAllCommunityByUser(Pageable pageable);
     Page<CommunityResponseDTO> findAllCommunityByOwner(Pageable pageable);
     CommunityResponseDTO save(CommunityRequestDTO communityRequestDTO);
     CommunityResponseDTO findById(Long id);

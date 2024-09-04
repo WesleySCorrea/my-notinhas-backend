@@ -42,14 +42,17 @@ public class CommunityServiceImpl implements CommunityService {
 
     @Override
     public Page<CommunityResponseDTO> findAll(Pageable pageable) {
-        var communities = communityRepository.findAllPCommunities(pageable);
+        UserDTO user = ExtractUser.get();
+
+        var communities = communityRepository.findAllPCommunities(user.getUserId(), pageable);
         return new CommunityResponseDTO()
                 .convertToCommunityResponseDTO(communities);
     }
 
     @Override
-    public Page<CommunityResponseDTO> findAllCommunityByUser(Pageable pageable, Long userId) {
-        Page<Object[]> communities = communityRepository.findAllCommunityByUser(userId, pageable);
+    public Page<CommunityResponseDTO> findAllCommunityByUser(Pageable pageable) {
+        UserDTO user = ExtractUser.get();
+        Page<Object[]> communities = communityRepository.findAllCommunityByUser(user.getUserId(), pageable);
 
         List<CommunityResponseDTO> communityResponseDTO = communities.stream()
                 .map(CommunityResponseDTO::new)
@@ -80,6 +83,7 @@ public class CommunityServiceImpl implements CommunityService {
         communityMember.setRoleMember(RoleEnum.OWNER);
         communityMember.setUser(user.convertUserDTOToUser());
         communityMember.setJoinedDate(LocalDateTime.now());
+        communityMember.setStatusMember(StatusMemberEnum.OWNER);
         this.memberRepository.save(communityMember);
         return new CommunityResponseDTO(result);
     }
@@ -87,7 +91,9 @@ public class CommunityServiceImpl implements CommunityService {
     @Override
     public CommunityResponseDTO findById(Long communityId) {
 
-        List<Object[]> communities = this.communityRepository.findByIdAndActiveTrue(communityId);
+        UserDTO user = ExtractUser.get();
+
+        List<Object[]> communities = this.communityRepository.findByIdAndActiveTrue(communityId, user.getUserId());
 
         var communityResponseDTO = communities.stream()
                 .map(CommunityResponseDTO::new)

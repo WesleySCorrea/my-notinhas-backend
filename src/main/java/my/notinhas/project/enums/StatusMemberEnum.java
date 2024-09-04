@@ -5,5 +5,6 @@ public enum StatusMemberEnum {
     JOINED,
     NOT_MEMBER,
     PENDING,
-    BANNED
+    BANNED,
+    OWNER
 }

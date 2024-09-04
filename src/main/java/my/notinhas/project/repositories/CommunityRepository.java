@@ -23,7 +23,8 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
         COUNT(DISTINCT m.user_id) AS total_members,
         COUNT(DISTINCT p.id) AS total_posts,
         c.created,
-        c.protected_community
+        c.protected_community,
+        COALESCE(cm.status_member, 'NOT_MEMBER') AS user_status_member
     FROM
         public.communities c
     LEFT JOIN
@@ -31,16 +32,16 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
     LEFT JOIN
         public.posts p ON c.id = p.community_id
     INNER JOIN
-        public.users u ON m.user_id = u.id
-    INNER JOIN
         public.users o ON c.owner_id = o.id
+    LEFT JOIN
+        public.community_members cm ON c.id = cm.community_id AND cm.user_id = :userId
     WHERE
         c.id = :communityId
-        and c.active = true
+        AND c.active = true
     GROUP BY
-        c.id, c.name, c.description, o.id, o.user_name, c.created, c.protected_community
+        c.id, c.name, c.description, o.id, o.user_name, c.created, c.protected_community, cm.status_member
     """, nativeQuery = true)
-    List<Object[]> findByIdAndActiveTrue(@Param("communityId") Long communityId);
+    List<Object[]> findByIdAndActiveTrue(@Param("communityId") Long communityId, @Param("userId") Long userId);
 
     @Query("""
     SELECT
@@ -53,7 +54,8 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
         COUNT(DISTINCT m.id) AS totalMembers,
         COUNT(DISTINCT p.id) AS totalPosts,
         c.created,
-        c.protectedCommunity
+        c.protectedCommunity,
+        COALESCE(cm.statusMember, 'NOT_MEMBER') AS user_status_member
     FROM
         Community c
     LEFT JOIN
@@ -62,12 +64,15 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
         c.members m
     LEFT JOIN
         c.posts p
-   WHERE
+    LEFT JOIN
+        CommunityMember cm ON cm.community = c AND cm.user.id = :userId
+    WHERE
         c.active = true
     GROUP BY
-        c.id, c.name, c.description, u.id, u.googleId, u.userName, c.created, c.protectedCommunity
+        c.id, c.name, c.description, u.id, u.googleId, u.userName, c.created, c.protectedCommunity, cm.statusMember
     """)
-    Page<Object[]> findAllPCommunities(Pageable pageable);
+    Page<Object[]> findAllPCommunities(@Param("userId") Long userId, Pageable pageable);
+
     @Query(value = """
     SELECT
         c.id AS community_id,
@@ -78,7 +83,8 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
         COUNT(DISTINCT m.user_id) AS total_members,
         COUNT(DISTINCT p.id) AS total_posts,
         c.created,
-        c.protected_community
+        c.protected_community,
+        COALESCE(cm.status_member, 'NOT_MEMBER') AS user_status
     FROM
         public.communities c
     LEFT JOIN
@@ -86,14 +92,14 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
     LEFT JOIN
         public.posts p ON c.id = p.community_id
     INNER JOIN
-        public.users u ON m.user_id = u.id
-    INNER JOIN
         public.users o ON c.owner_id = o.id
+    LEFT JOIN
+        public.community_members cm ON cm.community_id = c.id AND cm.user_id = :userId
     WHERE
-        u.id = :userId
-        and c.active = true
+        c.active = true
+        AND cm.user_id IS NOT NULL
     GROUP BY
-        c.id, c.name, c.description, o.id, o.user_name, c.created, c.protected_community
+        c.id, c.name, c.description, o.id, o.user_name, c.created, c.protected_community, cm.status_member
     """, nativeQuery = true)
     Page<Object[]> findAllCommunityByUser(@Param("userId") Long userId, Pageable pageable);
 
@@ -107,7 +113,8 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
         COUNT(DISTINCT m.user_id) AS total_members,
         COUNT(DISTINCT p.id) AS total_posts,
         c.created,
-        c.protected_community
+        c.protected_community,
+        COALESCE(cm.status_member, 'NOT_MEMBER') AS status_member
     FROM
         public.communities c
     LEFT JOIN
@@ -115,14 +122,14 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
     LEFT JOIN
         public.posts p ON c.id = p.community_id
     INNER JOIN
-        public.users u ON m.user_id = u.id
-    INNER JOIN
         public.users o ON c.owner_id = o.id
+    LEFT JOIN
+        public.community_members cm ON cm.community_id = c.id AND cm.user_id = :userId
     WHERE
         c.owner_id = :userId
-        and c.active = true
+        AND c.active = true
     GROUP BY
-        c.id, c.name, c.description, o.id, o.user_name, c.created, c.protected_community
+        c.id, c.name, c.description, o.id, o.user_name, c.created, c.protected_community, cm.status_member
     """, nativeQuery = true)
     Page<Object[]> findAllCommunityByOwner(@Param("userId") Long userId, Pageable pageable);
 

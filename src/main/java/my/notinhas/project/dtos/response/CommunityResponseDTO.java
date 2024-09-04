@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import my.notinhas.project.dtos.UserDTO;
 import my.notinhas.project.entities.Community;
+import my.notinhas.project.enums.StatusMemberEnum;
 import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
@@ -28,6 +29,7 @@ public class CommunityResponseDTO {
     @JsonFormat(pattern = "dd/MM/yy HH:mm:ss")
     private LocalDateTime created;
     private Boolean protectedCommunity;
+    private StatusMemberEnum statusMember;
 
     public CommunityResponseDTO(Community community) {
         this.id = community.getId();
@@ -49,6 +51,8 @@ public class CommunityResponseDTO {
         this.totalPosts = (Long) row[6];
         this.created = ((java.sql.Timestamp) row[7]).toLocalDateTime();
         this.protectedCommunity = (Boolean) row[8];
+        String statusMemberString = (String) row[9];
+        this.statusMember = StatusMemberEnum.valueOf(statusMemberString);
     }
 
     public Page<CommunityResponseDTO> convertToCommunityResponseDTO(Page<Object[]> page) {
@@ -64,8 +68,9 @@ public class CommunityResponseDTO {
             Long totalPosts = (Long) objects[7];
             LocalDateTime created = (LocalDateTime) objects[8];
             Boolean protectedCommunity = (Boolean) objects[9];
+            StatusMemberEnum statusMember = (StatusMemberEnum) objects[10];
 
-            return new CommunityResponseDTO(id, title, description, owner, totalMembers, totalPosts, created, protectedCommunity);
+            return new CommunityResponseDTO(id, title, description, owner, totalMembers, totalPosts, created, protectedCommunity, statusMember);
         });
     }
 }
