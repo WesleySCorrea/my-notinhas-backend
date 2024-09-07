@@ -64,6 +64,17 @@ public class CommunityServiceImpl implements CommunityService {
     }
 
     @Override
+    public Page<CommunityResponseDTO> findAllCommunityByUser(Long userId,Pageable pageable) {
+        Page<Object[]> communities = communityRepository.findAllCommunityByUser(userId, pageable);
+
+        List<CommunityResponseDTO> communityResponseDTO = communities.stream()
+                .map(CommunityResponseDTO::new)
+                .toList();
+
+        return new PageImpl<>(communityResponseDTO, pageable, communities.getTotalElements());
+    }
+
+    @Override
     public Page<CommunityResponseDTO> findAllCommunityByOwner(Pageable pageable) {
         UserDTO user = ExtractUser.get();
         Page<Object[]> communities = communityRepository.findAllCommunityByOwner(user.getUserId(), pageable);
@@ -87,7 +98,11 @@ public class CommunityServiceImpl implements CommunityService {
         communityMember.setJoinedDate(LocalDateTime.now());
         communityMember.setStatusMember(StatusMemberEnum.OWNER);
         this.memberRepository.save(communityMember);
-        return new CommunityResponseDTO(result);
+        var dtoResponse = new CommunityResponseDTO(result);
+        dtoResponse.setStatusMember(StatusMemberEnum.OWNER);
+        dtoResponse.setTotalMembers(1L);
+        dtoResponse.setTotalPosts(0L);
+        return dtoResponse;
     }
 
     @Override

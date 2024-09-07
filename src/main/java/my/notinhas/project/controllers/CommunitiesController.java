@@ -34,7 +34,18 @@ public class CommunitiesController {
 
         return ResponseEntity.ok().body(communities);
 
-    }    @GetMapping("/owner")
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<Page<CommunityResponseDTO>> findAllCommunityByUser(@PathVariable Long userId,Pageable pageable) {
+
+        Page<CommunityResponseDTO> communities = this.communityService.findAllCommunityByUser(userId,pageable);
+
+        return ResponseEntity.ok().body(communities);
+
+    }
+
+    @GetMapping("/owner")
     public ResponseEntity<Page<CommunityResponseDTO>> findAllCommunityByOwner(Pageable pageable) {
 
         Page<CommunityResponseDTO> communities = this.communityService.findAllCommunityByOwner(pageable);
